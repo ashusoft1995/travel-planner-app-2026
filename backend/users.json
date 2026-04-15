@@ -1,0 +1,30 @@
+[
+  {
+    "id": "2110",
+    "username": "ashu",
+    "email": "ashenafiabebe@gmail.com",
+    "name": "Ashenafi Abebe",
+    "passwordHash": "$2b$10$83fNa6PlX2mmND7d9Q2bDeMTY5IxOzwfyN/KqDVLXCgT4Z1rhJNi.",
+    "role": "admin",
+    "status": "active",
+    "createdAt": "2026-04-11T21:39:12.410Z"
+  },
+  {
+    "id": "2111",
+    "username": "birhanu",
+    "name": "Birhanu Alemayehu",
+    "email": "birhanu@gmail.com",
+    "passwordHash": "$2b$10$8/AGXU0EtLA1rvMrQzVg5Osruxy9dqfR7FTSlge3HH9L9IJ2Lx1oW",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2026-04-12T00:02:15.183Z"
+  },
+  {
+    "id": "2112",
+    "name": "ashenafi abebe",
+    "email": "ashenafiabebe21@gmail.com",
+    "passwordHash": "$2b$10$b4JbEt67sTiqKSNqNsCS6.ggO0/h1iarS.A6CWr33hXDykip0p8rG",
+    "role": "user",
+    "createdAt": "2026-04-14T12:12:24.771Z"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "name": "travel-planner",
+  "private": true,
+  "description": "Run backend + frontend (see START-DEV.txt)",
+  "scripts": {
+    "backend": "node backend/server.js",
+    "frontend": "npm run dev --prefix frontend",
+    "dev:backend": "node backend/server.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "kill-ports": "powershell -NoProfile -ExecutionPolicy Bypass -File ./kill-dev-ports.ps1"
+  }
+}

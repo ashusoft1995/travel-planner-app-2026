@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --panel: #ffffff;
+  --border: rgba(0, 0, 0, 0.08);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --accent: #6366f1;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.dark {
+  --bg: #0d0d1a;
+  --surface: #12122a;
+  --panel: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.1);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.3);
+  --accent: #8b5cf6;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, rgba(31, 91, 181, 0.12), transparent 45%), var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.container {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.card-surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.75rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.btn-primary {
+  border-radius: 999px;
+  padding: 0.95rem 1.6rem;
+  background: linear-gradient(135deg, #1f5bb5, #2aa65a);
+  color: #fff;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 36px rgba(31, 91, 181, 0.28);
+}
+
+.btn-secondary {
+  border-radius: 999px;
+  padding: 0.95rem 1.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-weight: 600;
+}
+
+.page-shell {
+  min-height: calc(100vh - 140px);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.form-field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.70);
+  color: var(--text);
+  padding: 0.95rem 1rem;
+}
+
+.dark .form-field {
+  background: rgba(2, 6, 23, 0.35);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.1s; opacity: 0; }
+.stagger-2 { animation-delay: 0.2s; opacity: 0; }
+.stagger-3 { animation-delay: 0.3s; opacity: 0; }
+
+/* Glow Effects */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  transform: scale(0.5);
+}
+.btn-primary:hover::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Glow Effects */
+.text-glow {
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.glass-panel {
+  background: rgba(18, 18, 42, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Custom Scrollbar for better UI feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Mobile Feature Guarantees --- */
+@media (max-width: 768px) {
+  /* Readable font size: Minimum 16px on mobile to prevent zooming */
+  html {
+    font-size: 16px !important;
+  }
+
+  /* Touch-friendly buttons: Minimum 44px touch target per HIG/Material guidelines */
+  button, 
+  .btn-primary,
+  .btn-secondary,
+  input, 
+  select, 
+  textarea,
+  .touch-target {
+    min-height: 44px;
+  }
+
+  /* Responsive grid: Enforce single-column on small screens when this helper is applied */
+  .mobile-grid-1 {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+

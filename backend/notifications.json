@@ -1,0 +1,97 @@
+[
+  {
+    "id": "1b57f071-161a-4bd8-9b33-9206674f180b",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "trip_pending",
+    "title": "New trip pending review",
+    "body": "ashenafiabebe21@gmail.com added “lalibala”.",
+    "read": false,
+    "createdAt": "2026-04-14T12:19:43.986Z",
+    "meta": {
+      "tripId": "3116",
+      "ownerEmail": "ashenafiabebe21@gmail.com"
+    }
+  },
+  {
+    "id": "d536939c-53c3-4ff0-943d-5a7a3f6ed7a9",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "trip_pending",
+    "title": "New trip pending review",
+    "body": "ashenafiabebe21@gmail.com added “lalibala”.",
+    "read": false,
+    "createdAt": "2026-04-14T12:19:36.801Z",
+    "meta": {
+      "tripId": "3115",
+      "ownerEmail": "ashenafiabebe21@gmail.com"
+    }
+  },
+  {
+    "id": "f095a02e-e67c-4892-93d6-1c72bd3a057f",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "contact_inbox",
+    "title": "New contact / support message",
+    "body": "he <ashhh@gmail.com>: ashu",
+    "read": true,
+    "createdAt": "2026-04-14T03:17:30.729Z",
+    "meta": {
+      "contactId": "d6b196a4-3879-4bfc-bb0d-54f9bca9867e"
+    }
+  },
+  {
+    "id": "78bb6187-1549-48fe-ade1-9b08e3ebc9c3",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "contact_inbox",
+    "title": "New contact / support message",
+    "body": "he <ashhh@gmail.com>: ashu",
+    "read": true,
+    "createdAt": "2026-04-14T03:04:43.058Z",
+    "meta": {
+      "contactId": "63c648a5-9e0a-4ade-8a12-6149803b4710"
+    }
+  },
+  {
+    "id": "e0019c30-0727-4c6f-937c-061d6835ead7",
+    "audience": "user",
+    "userEmail": "birhanu@gmail.com",
+    "type": "trip_reviewed",
+    "title": "Trip approved",
+    "body": "Your trip to “Lalibela” was approved.",
+    "read": false,
+    "createdAt": "2026-04-13T17:45:03.594Z",
+    "meta": {
+      "tripId": "50191245-e418-41ad-8a72-d97c24b73070",
+      "decision": "approved"
+    }
+  },
+  {
+    "id": "1a60656b-be74-4095-ac99-d0572110ea7b",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "contact_inbox",
+    "title": "New contact / support message",
+    "body": "ash <ash@gmail.com>: hi",
+    "read": true,
+    "createdAt": "2026-04-13T17:32:03.449Z",
+    "meta": {
+      "contactId": "02e8ae13-e63b-4bf6-b4a4-db3b2f1f17d7"
+    }
+  },
+  {
+    "id": "7adbaa9b-4662-433e-af01-a2f13d6495ff",
+    "audience": "admin",
+    "userEmail": "",
+    "type": "trip_pending",
+    "title": "New trip pending review",
+    "body": "birhanu@gmail.com added “Lalibela”.",
+    "read": true,
+    "createdAt": "2026-04-12T00:06:51.301Z",
+    "meta": {
+      "tripId": "50191245-e418-41ad-8a72-d97c24b73070",
+      "ownerEmail": "birhanu@gmail.com"
+    }
+  }
+]

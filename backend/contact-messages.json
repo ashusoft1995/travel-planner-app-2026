@@ -1,0 +1,38 @@
+[
+  {
+    "id": "d6b196a4-3879-4bfc-bb0d-54f9bca9867e",
+    "name": "he",
+    "email": "ashhh@gmail.com",
+    "subject": "",
+    "message": "ashu",
+    "adminTarget": "Ashenafi Abebe",
+    "otherAdminDetail": "",
+    "replies": [],
+    "status": "open",
+    "createdAt": "2026-04-14T03:17:30.243Z"
+  },
+  {
+    "id": "63c648a5-9e0a-4ade-8a12-6149803b4710",
+    "name": "he",
+    "email": "ashhh@gmail.com",
+    "subject": "",
+    "message": "ashu",
+    "adminTarget": "Ashenafi Abebe",
+    "otherAdminDetail": "",
+    "replies": [],
+    "status": "open",
+    "createdAt": "2026-04-14T03:04:41.523Z"
+  },
+  {
+    "id": "02e8ae13-e63b-4bf6-b4a4-db3b2f1f17d7",
+    "name": "ash",
+    "email": "ash@gmail.com",
+    "subject": "",
+    "message": "hi",
+    "adminTarget": "Ashenafi Abebe",
+    "otherAdminDetail": "",
+    "replies": [],
+    "status": "open",
+    "createdAt": "2026-04-13T17:32:03.310Z"
+  }
+]

@@ -1,0 +1,42 @@
+EthioTravel — run backend + frontend (two terminals)
+
+Prerequisites
+- Install Node.js LTS from https://nodejs.org (includes npm).
+- If "node" or "npm" is not recognized in PowerShell/CMD, restart the terminal after install, or use the included .bat files (they prepend Program Files\nodejs to PATH).
+
+1) Backend (Express, port 5000)
+   cd backend
+   npm install
+   npm run dev
+   API: http://localhost:5000/api/trips (requires sign-in: Authorization: Bearer <token>)
+   Health: http://localhost:5000/api/health
+   Auth: POST /api/auth/register  body: { "name", "email", "password" }
+         POST /api/auth/login     body: { "identifier": "email or username", "password" }
+         GET  /api/auth/me         header: Authorization: Bearer <token>
+   Default admin (created on first run if missing): username ashu, password Ashu19951
+   (override with env ADMIN_PASSWORD). Admin email: admin@ethiotravel.local
+
+2) Frontend (Next.js, port 3000)
+   cd frontend
+   npm install
+   npm run dev
+   Open: http://localhost:3000
+
+Optional — API URL for another machine / custom host
+- Copy frontend/.env.example to frontend/.env.local
+- Set NEXT_PUBLIC_API_URL to your backend base, e.g. http://192.168.1.10:5000
+- Restart "npm run dev"
+
+Postman
+- POST http://localhost:5000/api/auth/login  (get token), then use header Authorization: Bearer <token>
+- GET http://localhost:5000/api/trips   (optional ?ownerEmail= for admin only)
+- POST   http://localhost:5000/api/trips   (JSON body: destination, startDate, endDate, budget, accommodation, activities[], notes, image? — owner is the signed-in user)
+- PUT    http://localhost:5000/api/trips/:id
+- DELETE http://localhost:5000/api/trips/:id
+- GET  http://localhost:5000/api/travel-requests   (admin Bearer token only)
+- PUT/PATCH/DELETE http://localhost:5000/api/travel-requests/:id  (admin)
+- POST http://localhost:5000/api/travel-requests   (JSON: fullName, email, nationality, age, gender, travelHistory, desiredDestination, … optional profilePhoto/travelImage as data URLs)
+
+Windows shortcuts
+- Double-click start-backend.bat (from this folder)
+- Double-click start-frontend.bat (from this folder)

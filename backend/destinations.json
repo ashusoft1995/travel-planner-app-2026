@@ -1,0 +1,380 @@
+[
+  {
+    "id": "1",
+    "name": "Addis Ababa",
+    "region": "Addis Ababa",
+    "country": "Ethiopia",
+    "description": "Ethiopia's vibrant capital city, known for its rich history, diverse culture, and modern amenities. Home to the African Union headquarters and numerous cultural landmarks.",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80",
+    "lat": 9.145,
+    "lng": 40.4897,
+    "travelVolumeIndex": 95,
+    "hotels": {
+      "Sheraton Addis": { "rating": 4.5, "price": "$$$" },
+      "Hilton Addis": { "rating": 4.3, "price": "$$$" },
+      "Radisson Blu": { "rating": 4.4, "price": "$$$" }
+    },
+    "activities": {
+      "City Tour": { "duration": "4 hours", "price": "$50" },
+      "National Museum": { "duration": "2 hours", "price": "$20" },
+      "Mercato Market": { "duration": "3 hours", "price": "$30" }
+    }
+  },
+  {
+    "id": "2",
+    "name": "Lalibela",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "Ancient city famous for its rock-hewn churches, dating back to the 12th century. A UNESCO World Heritage site and major pilgrimage destination.",
+    "imageUrl": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=800&q=80",
+    "lat": 12.0167,
+    "lng": 39.0833,
+    "travelVolumeIndex": 88,
+    "hotels": {
+      "Maribela Hotel": { "rating": 4.2, "price": "$$" },
+      "Tukul Village": { "rating": 4.6, "price": "$$$" },
+      "Mezena Lodge": { "rating": 4.4, "price": "$$" }
+    },
+    "activities": {
+      "Church Tour": { "duration": "Full day", "price": "$80" },
+      "Bet Giyorgis": { "duration": "2 hours", "price": "$25" },
+      "Mountain Hiking": { "duration": "3 hours", "price": "$40" }
+    }
+  },
+  {
+    "id": "3",
+    "name": "Gondar",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "Historic city known as the 'Camelot of Africa', home to medieval castles and churches from the 17th century.",
+    "imageUrl": "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80",
+    "lat": 12.6,
+    "lng": 37.4667,
+    "travelVolumeIndex": 82,
+    "hotels": {
+      "Goha Hotel": { "rating": 4.1, "price": "$$" },
+      "Fasil Lodge": { "rating": 4.3, "price": "$$$" },
+      "Mayan Lodge": { "rating": 4.5, "price": "$$$" }
+    },
+    "activities": {
+      "Castle Tour": { "duration": "3 hours", "price": "$45" },
+      "Fasiladas Bath": { "duration": "2 hours", "price": "$30" },
+      "Debre Berhan Selassie": { "duration": "1 hour", "price": "$20" }
+    }
+  },
+  {
+    "id": "4",
+    "name": "Bahir Dar",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "Beautiful city on the shores of Lake Tana, gateway to the Blue Nile Falls and ancient island monasteries.",
+    "imageUrl": "https://images.unsplash.com/photo-1544735716-392fe24b9c6d?auto=format&fit=crop&w=800&q=80",
+    "lat": 11.6,
+    "lng": 37.3833,
+    "travelVolumeIndex": 79,
+    "hotels": {
+      "Kuriftu Resort": { "rating": 4.7, "price": "$$$" },
+      "Tana Hotel": { "rating": 4.2, "price": "$$" },
+      "Blue Nile Resort": { "rating": 4.4, "price": "$$$" }
+    },
+    "activities": {
+      "Blue Nile Falls": { "duration": "Half day", "price": "$60" },
+      "Lake Tana Boat": { "duration": "3 hours", "price": "$50" },
+      "Island Monastery": { "duration": "Full day", "price": "$75" }
+    }
+  },
+  {
+    "id": "5",
+    "name": "Simien Mountains National Park",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "UNESCO World Heritage site offering spectacular mountain scenery, endemic wildlife, and challenging trekking opportunities.",
+    "imageUrl": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
+    "lat": 13.1667,
+    "lng": 38.0,
+    "travelVolumeIndex": 75,
+    "hotels": {
+      "Simien Lodge": { "rating": 4.6, "price": "$$$" },
+      "Limalimo Lodge": { "rating": 4.4, "price": "$$$" },
+      "Bwahit Mountain": { "rating": 4.2, "price": "$$" }
+    },
+    "activities": {
+      "Mountain Trekking": { "duration": "3 days", "price": "$300" },
+      "Walia Viewing": { "duration": "Full day", "price": "$100" },
+      "Gelada Baboon": { "duration": "Half day", "price": "$60" }
+    }
+  },
+  {
+    "id": "6",
+    "name": "Axum",
+    "region": "Tigray",
+    "country": "Ethiopia",
+    "description": "Ancient capital of the Aksumite Empire, featuring impressive stelae fields and archaeological treasures.",
+    "imageUrl": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=800&q=80",
+    "lat": 14.1217,
+    "lng": 38.7311,
+    "travelVolumeIndex": 71,
+    "hotels": {
+      "Yeha Hotel": { "rating": 4.0, "price": "$$" },
+      "Sabean Hotel": { "rating": 4.2, "price": "$$" },
+      "Remhai Hotel": { "rating": 4.5, "price": "$$$" }
+    },
+    "activities": {
+      "Stelae Field": { "duration": "2 hours", "price": "$35" },
+      "Queen of Sheba": { "duration": "3 hours", "price": "$45" },
+      "Church of Mary": { "duration": "1 hour", "price": "$25" }
+    }
+  },
+  {
+    "id": "7",
+    "name": "Hawassa",
+    "region": "Sidama",
+    "country": "Ethiopia",
+    "description": "Relaxing lakeside city known for its beautiful lake, vibrant fish market, and pleasant climate.",
+    "imageUrl": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80",
+    "lat": 7.0583,
+    "lng": 38.4758,
+    "travelVolumeIndex": 68,
+    "hotels": {
+      "Hawassa Resort": { "rating": 4.3, "price": "$$$" },
+      "South Lake": { "rating": 4.1, "price": "$$" },
+      "Haile Resort": { "rating": 4.5, "price": "$$$" }
+    },
+    "activities": {
+      "Lake Boat": { "duration": "2 hours", "price": "$40" },
+      "Fish Market": { "duration": "1 hour", "price": "$20" },
+      "Bird Watching": { "duration": "3 hours", "price": "$35" }
+    }
+  },
+  {
+    "id": "8",
+    "name": "Harar",
+    "region": "Harari",
+    "country": "Ethiopia",
+    "description": "Ancient walled city famous for its unique architecture, colorful markets, and hyena feeding tradition.",
+    "imageUrl": "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=800&q=80",
+    "lat": 9.3133,
+    "lng": 42.1183,
+    "travelVolumeIndex": 65,
+    "hotels": {
+      "Ras Hotel": { "rating": 4.2, "price": "$$" },
+      "Harar Cultural": { "rating": 4.0, "price": "$$" },
+      "Jugol Hotel": { "rating": 4.3, "price": "$$" }
+    },
+    "activities": {
+      "City Walls": { "duration": "2 hours", "price": "$30" },
+      "Hyena Feeding": { "duration": "1 hour", "price": "$25" },
+      "Harar Jugol": { "duration": "3 hours", "price": "$40" }
+    }
+  },
+  {
+    "id": "9",
+    "name": "Sof Omar Caves",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Impressive underground cave system with stunning limestone formations and underground streams.",
+    "imageUrl": "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=800&q=80",
+    "lat": 6.8833,
+    "lng": 42.3833,
+    "travelVolumeIndex": 58,
+    "hotels": {
+      "Sof Omar Lodge": { "rating": 4.1, "price": "$$" },
+      "Sheikh Hussein": { "rating": 3.9, "price": "$" },
+      "Goro Hotel": { "rating": 4.0, "price": "$$" }
+    },
+    "activities": {
+      "Cave Exploration": { "duration": "4 hours", "price": "$50" },
+      "Underground River": { "duration": "3 hours", "price": "$40" },
+      "Stalactite Tour": { "duration": "2 hours", "price": "$30" }
+    }
+  },
+  {
+    "id": "10",
+    "name": "Bale Mountains National Park",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Vast mountain wilderness with diverse ecosystems, endemic wildlife, and Ethiopia's highest peak.",
+    "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    "lat": 6.8333,
+    "lng": 39.75,
+    "travelVolumeIndex": 62,
+    "hotels": {
+      "Bale Mountain Lodge": { "rating": 4.4, "price": "$$$" },
+      "Wabe Shebelle": { "rating": 4.2, "price": "$$" },
+      "Sanetti Plateau": { "rating": 4.3, "price": "$$$" }
+    },
+    "activities": {
+      "Mountain Hiking": { "duration": "2 days", "price": "$200" },
+      "Wolf Tracking": { "duration": "Full day", "price": "$120" },
+      "Forest Trek": { "duration": "1 day", "price": "$80" }
+    }
+  },
+  {
+    "id": "11",
+    "name": "Jimma",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Major coffee-growing region known for its lush landscapes, waterfalls, and rich cultural heritage.",
+    "imageUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
+    "lat": 7.6667,
+    "lng": 36.8333,
+    "travelVolumeIndex": 56,
+    "hotels": {
+      "Jimma Resort": { "rating": 4.3, "price": "$$$" },
+      "Coffee Valley": { "rating": 4.1, "price": "$$" },
+      "Sheka Lodge": { "rating": 4.2, "price": "$$" }
+    },
+    "activities": {
+      "Coffee Tour": { "duration": "Half day", "price": "$45" },
+      "Waterfall Visit": { "duration": "3 hours", "price": "$35" },
+      "Cultural Village": { "duration": "Full day", "price": "$70" }
+    }
+  },
+  {
+    "id": "12",
+    "name": "Gamo Gofa",
+    "region": "Southern Nations",
+    "country": "Ethiopia",
+    "description": "Stunning highland region with traditional villages, coffee terraces, and dramatic mountain scenery.",
+    "imageUrl": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+    "lat": 6.3167,
+    "lng": 37.55,
+    "travelVolumeIndex": 48,
+    "hotels": {
+      "Gamo Highlands": { "rating": 4.0, "price": "$$" },
+      "Arba Minch View": { "rating": 4.2, "price": "$$$" },
+      "Chencha Lodge": { "rating": 3.9, "price": "$" }
+    },
+    "activities": {
+      "Highland Trek": { "duration": "Full day", "price": "$55" },
+      "Village Visit": { "duration": "4 hours", "price": "$40" },
+      "Coffee Plantation": { "duration": "3 hours", "price": "$35" }
+    }
+  },
+  {
+    "id": "13",
+    "name": "Lake Ziway",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Beautiful Rift Valley lake known for birdwatching, fishing, and lakeside resorts.",
+    "imageUrl": "https://images.unsplash.com/photo-1540206395-68808572332f?auto=format&fit=crop&w=800&q=80",
+    "lat": 7.9833,
+    "lng": 38.7167,
+    "travelVolumeIndex": 54,
+    "hotels": {
+      "Ziway Lake Resort": { "rating": 4.1, "price": "$$" },
+      "Lake View": { "rating": 3.8, "price": "$" },
+      "Bird Paradise": { "rating": 4.0, "price": "$$" }
+    },
+    "activities": {
+      "Bird Watching": { "duration": "Half day", "price": "$30" },
+      "Lake Boat": { "duration": "2 hours", "price": "$25" },
+      "Fishing Trip": { "duration": "3 hours", "price": "$40" }
+    }
+  },
+  {
+    "id": "14",
+    "name": "Mekelle",
+    "region": "Tigray",
+    "country": "Ethiopia",
+    "description": "Modern city with rich history, serving as gateway to northern Ethiopia's ancient sites.",
+    "imageUrl": "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=800&q=80",
+    "lat": 13.4967,
+    "lng": 39.4758,
+    "travelVolumeIndex": 72,
+    "hotels": {
+      "Planet Hotel": { "rating": 4.3, "price": "$$$" },
+      "Axum Hotel": { "rating": 4.0, "price": "$$" },
+      "Mekelle Lodge": { "rating": 4.1, "price": "$$" }
+    },
+    "activities": {
+      "City Tour": { "duration": "3 hours", "price": "$40" },
+      "Market Visit": { "duration": "2 hours", "price": "$25" },
+      "Historical Sites": { "duration": "Half day", "price": "$35" }
+    }
+  },
+  {
+    "id": "15",
+    "name": "Adama",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Growing industrial city known for its pleasant climate and proximity to Addis Ababa.",
+    "imageUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80",
+    "lat": 8.55,
+    "lng": 39.2833,
+    "travelVolumeIndex": 64,
+    "hotels": {
+      "Adama Palace": { "rating": 4.2, "price": "$$" },
+      "Rift Valley": { "rating": 3.9, "price": "$" },
+      "Climate Resort": { "rating": 4.0, "price": "$$" }
+    },
+    "activities": {
+      "Industrial Tour": { "duration": "2 hours", "price": "$30" },
+      "Climate Experience": { "duration": "3 hours", "price": "$35" },
+      "City Exploration": { "duration": "Half day", "price": "$40" }
+    }
+  },
+  {
+    "id": "16",
+    "name": "Debre Markos",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "Historic town surrounded by stunning mountains and traditional Amhara culture.",
+    "imageUrl": "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
+    "lat": 10.3333,
+    "lng": 37.6,
+    "travelVolumeIndex": 45,
+    "hotels": {
+      "Markos Hotel": { "rating": 3.8, "price": "$" },
+      "Mountain View": { "rating": 3.9, "price": "$$" },
+      "Amhara Heritage": { "rating": 4.0, "price": "$$" }
+    },
+    "activities": {
+      "Mountain Hike": { "duration": "4 hours", "price": "$45" },
+      "Cultural Dance": { "duration": "2 hours", "price": "$25" },
+      "Traditional Craft": { "duration": "3 hours", "price": "$30" }
+    }
+  },
+  {
+    "id": "17",
+    "name": "Weldiya",
+    "region": "Amhara",
+    "country": "Ethiopia",
+    "description": "Gateway town to the Simien Mountains with stunning mountain views and wildlife.",
+    "imageUrl": "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?auto=format&fit=crop&w=800&q=80",
+    "lat": 12.7,
+    "lng": 37.8833,
+    "travelVolumeIndex": 58,
+    "hotels": {
+      "Simien Gateway": { "rating": 4.2, "price": "$$" },
+      "Weldiya Lodge": { "rating": 4.0, "price": "$$" },
+      "Mountain Base": { "rating": 4.1, "price": "$$" }
+    },
+    "activities": {
+      "Wildlife Safari": { "duration": "Full day", "price": "$80" },
+      "Mountain Base": { "duration": "Half day", "price": "$40" },
+      "Village Tour": { "duration": "3 hours", "price": "$35" }
+    }
+  },
+  {
+    "id": "18",
+    "name": "Shashamane",
+    "region": "Oromia",
+    "country": "Ethiopia",
+    "description": "Strategic town connecting northern and southern Ethiopia routes.",
+    "imageUrl": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=800&q=80",
+    "lat": 7.2,
+    "lng": 38.6,
+    "travelVolumeIndex": 52,
+    "hotels": {
+      "Shashamane Hotel": { "rating": 3.9, "price": "$$" },
+      "Crossroads Inn": { "rating": 3.7, "price": "$" },
+      "Highland Stop": { "rating": 3.8, "price": "$" }
+    },
+    "activities": {
+      "Route Experience": { "duration": "2 hours", "price": "$25" },
+      "Local Market": { "duration": "3 hours", "price": "$30" },
+      "Highland View": { "duration": "1 hour", "price": "$20" }
+    }
+  }
+]

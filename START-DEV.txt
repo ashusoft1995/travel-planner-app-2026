@@ -1,0 +1,55 @@
+EthioTravel needs TWO terminals (two programs) running at the same time:
+
+  1) API SERVER (port 5000)  —  REQUIRED for login & sign-up
+  2) WEBSITE (port 3000)      —  the Next.js app you open in the browser
+
+If you only open the website and never start (1), you will see:
+  "Could not reach the account API..."
+
+--- Quick start (Windows) ---
+
+  Double-click:  start-dev.bat
+  (opens two windows — keep BOTH open)
+
+--- Or use two PowerShell / CMD windows yourself ---
+
+  Terminal A — from this folder (travel-planer):
+    npm run backend
+
+  Wait until you see something like: Backend running on http://localhost:5000
+
+  Terminal B:
+    npm run frontend
+
+  Then open: http://localhost:3000
+
+--- First-time setup (if npm install was never run) ---
+
+  cd backend
+  npm install
+  cd ..\frontend
+  npm install
+
+--- Check the API by hand ---
+
+  Open in browser: http://127.0.0.1:5000/api/health
+  You should see: {"ok":true}
+
+If that fails, the backend is not running or port 5000 is blocked.
+
+--- Error: EADDRINUSE address already in use :::5000 or :::3000 ---
+
+  Something is already using that port (usually an old Node window you left open).
+
+  From the project folder (travel-planer), double-click:  kill-dev-ports.bat
+  Or run:  npm run kill-ports
+
+  Then start backend and frontend again.
+
+--- npm run frontend ---
+
+  From INSIDE the "frontend" folder, use:  npm run dev
+  (or: npm run frontend — same thing)
+
+  From the project ROOT (travel-planer), use:  npm run frontend
+  That runs the frontend package for you.
