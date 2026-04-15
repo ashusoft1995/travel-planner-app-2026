@@ -8,7 +8,9 @@ import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import useFastRouting from "../../hooks/useFastRouting";
 
-export default function SignupPage() {
+import { Suspense } from "react";
+
+function SignupContent() {
   const router = useRouter();
   const { register, user, hydrated, isAdmin } = useAuth();
   const { handleLoginRedirect } = useFastRouting();
@@ -170,5 +172,13 @@ export default function SignupPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" /></div>}>
+      <SignupContent />
+    </Suspense>
   );
 }

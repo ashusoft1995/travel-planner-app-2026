@@ -12,7 +12,8 @@ import {
   FiActivity, 
   FiGrid, 
   FiChevronRight, 
-  FiX 
+  FiX,
+  FiClock
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import RequireAuth from "../../components/RequireAuth";
