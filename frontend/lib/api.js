@@ -25,6 +25,18 @@ export function getApiBase() {
 
 export const API_BASE = getApiBase();
 
+export function getApiUrl(path) {
+  return `${getApiBase()}/api${path.startsWith('/') ? path : '/' + path}`;
+}
+
+export function authHeaders() {
+  const token = getStoredToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+}
+
 export const TOKEN_KEY = "ethiotravel_token";
 
 export function getStoredToken() {

@@ -1,8 +1,14 @@
 "use client";
 
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FiSearch, FiMapPin, FiStar, FiCalendar, FiUsers, FiHome, FiTrendingUp, FiDollarSign, FiSun, FiMoon } from "react-icons/fi";
+import { useRouter } from "next/navigation";
+import {
+  FiSearch, FiMapPin, FiStar, FiCalendar, FiUsers, FiHome, 
+  FiTrendingUp, FiDollarSign, FiSun, FiMoon, FiArrowRight, 
+  FiGlobe, FiThermometer
+} from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "next-themes";
@@ -19,18 +25,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  FiArrowRight,
-  FiCalendar,
-  FiGlobe,
-  FiHome,
-  FiMapPin,
-  FiSearch,
-  FiStar,
-  FiThermometer,
-  FiTrendingUp,
-  FiUsers,
-} from "react-icons/fi";
 import {
   getDemoEconomics,
   getDestinationByName,

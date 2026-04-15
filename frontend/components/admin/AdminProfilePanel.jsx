@@ -20,7 +20,7 @@ import {
   FiKey,
   FiRefreshCw,
   FiTrash2,
-  FiCrown,
+  FiAward,
   FiSettings,
   FiActivity
 } from "react-icons/fi";
@@ -337,7 +337,7 @@ export default function AdminProfilePanel({ user, onSaved }) {
                 <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
                 {isSuperAdmin && (
                   <span className="ml-3 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium flex items-center">
-                    <FiCrown className="mr-1 h-3 w-3" />
+                    <FiAward className="mr-1 h-3 w-3" />
                     Super Admin
                   </span>
                 )}

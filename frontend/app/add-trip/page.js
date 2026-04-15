@@ -8,13 +8,13 @@ import {
   FiArrowRight, 
   FiCheck, 
   FiDollarSign, 
-  FiHotel, 
+  FiHome, 
   FiMapPin, 
   FiCalendar,
   FiInfo,
   FiPlus,
   FiMinus,
-  FiCalculator,
+  FiCreditCard,
   FiPercent,
   FiSearch
 } from "react-icons/fi";
@@ -505,7 +505,7 @@ function AddTripPageContent() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FiHotel className="inline mr-2 h-4 w-4" />
+                    <FiHome className="inline mr-2 h-4 w-4" />
                     Accommodation Type
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -535,7 +535,7 @@ function AddTripPageContent() {
                 {form.accommodationType && (
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <h3 className="font-medium text-gray-900 mb-3">
-                      <FiCalculator className="inline mr-2 h-4 w-4" />
+                      <FiCreditCard className="inline mr-2 h-4 w-4" />
                       Cost Breakdown
                     </h3>
                     <div className="space-y-2">

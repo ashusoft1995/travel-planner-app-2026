@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FiClock } from "react-icons/fi";
-import HistoryTracker from "../../../components/dashboard/HistoryTracker";
+import HistoryTracker from "../../../../components/dashboard/HistoryTracker";
 
 export default function AdminActivityPage() {
   return (

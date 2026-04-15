@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiCheck, FiX, FiShield, FiUser } from "react-icons/fi";
-import { getApiUrl, authHeaders, friendlyApiMessage } from "../../../lib/api";
+import { getApiUrl, authHeaders, friendlyApiMessage } from "../../lib/api";
 
 export default function AgentsPanel() {
   const [agents, setAgents] = useState([]);
