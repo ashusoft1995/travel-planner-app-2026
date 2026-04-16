@@ -34,6 +34,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { getApiUrl } from "../../lib/api";
 import { UndoProvider } from "../../context/UndoContext";
 import UndoPanel from "../../components/common/UndoPanel";
 import ResponsiveNav from "../../components/common/ResponsiveNav";
@@ -73,10 +74,10 @@ export default function EnhancedUserDashboard() {
   const fetchUserData = async () => {
     try {
       const [tripsResponse, notificationsResponse] = await Promise.all([
-        fetch("/api/trips", {
+        fetch(getApiUrl("/trips"), {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch("/api/notifications", {
+        fetch(getApiUrl("/notifications"), {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);

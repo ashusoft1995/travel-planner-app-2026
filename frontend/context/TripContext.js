@@ -50,7 +50,7 @@ export function TripProvider({ children }) {
       const { data: res } = await tripsApi.post("/trips", {
         ...trip,
       });
-      const newTrip = res?.data || res;
+      const newTrip = res.data || res;
       setTrips((prev) => [newTrip, ...prev]);
       return newTrip;
     },
@@ -59,7 +59,7 @@ export function TripProvider({ children }) {
 
   const updateTrip = useCallback(async (id, patch) => {
     const { data: res } = await tripsApi.put(`/trips/${id}`, patch);
-    const updated = res?.data || res;
+    const updated = res.data || res;
     setTrips((prev) => prev.map((t) => (t.id === id ? updated : t)));
     return updated;
   }, []);

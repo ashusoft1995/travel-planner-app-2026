@@ -103,7 +103,10 @@ export function AuthProvider({ children }) {
           username: username.trim().toLowerCase(),
           role,
         });
-        return res?.data;
+        flushSync(() => {
+          applySession(res.data?.token, res.data?.user);
+        });
+        return res?.data?.user;
       } catch (e) {
         throw new Error(friendlyApiMessage(e));
       }
@@ -113,6 +116,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (identifier, password) => {
+      try {
         const { data: res } = await loginAccount({
           identifier: identifier.trim(),
           password,

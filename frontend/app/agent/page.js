@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getApiUrl } from "../lib/api";
 import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -49,7 +50,7 @@ export default function AgentDashboard() {
 
   const fetchAgentStats = async () => {
     try {
-      const response = await fetch("/api/agent/stats", {
+      const response = await fetch(getApiUrl("/agent/stats"), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
