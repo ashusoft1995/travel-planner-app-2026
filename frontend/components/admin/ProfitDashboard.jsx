@@ -30,8 +30,8 @@ export default function ProfitDashboard() {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setProfitData(data);
+        const resJson = await response.json();
+        setProfitData(resJson.data || resJson);
       }
     } catch (error) {
       console.error("Failed to fetch profit data:", error);

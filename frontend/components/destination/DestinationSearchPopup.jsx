@@ -79,15 +79,15 @@ export default function DestinationSearchPopup({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-in fade-in duration-300">
       <div 
         ref={popupRef}
-        className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
+        className="bg-white dark:bg-brand-950 border border-gray-200 dark:border-white/10 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="border-b border-gray-200 p-4">
+        <div className="border-b border-gray-200 dark:border-white/10 p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Choose Your Destination</h2>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Choose Your Destination</h2>
             <button
               onClick={onClose}
               className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
@@ -106,7 +106,7 @@ export default function DestinationSearchPopup({
               value={searchTerm}
               onChange={handleSearchChange}
               placeholder="Search destinations..."
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-purple-500"
               autoFocus
             />
           </div>
@@ -134,14 +134,14 @@ export default function DestinationSearchPopup({
                   <div
                     key={destination.id || index}
                     onClick={() => handleSelect(destination)}
-                    className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all duration-200 bg-white"
+                    className="group border border-gray-200 dark:border-white/10 rounded-2xl p-4 cursor-pointer hover:border-purple-500 dark:hover:border-purple-500 hover:shadow-lg transition-all duration-300 bg-white dark:bg-white/5"
                   >
                     <div className="aspect-video bg-gray-200 rounded-lg mb-3 overflow-hidden">
-                      {destination.image ? (
+                      {(destination.image || destination.imageUrl) ? (
                         <img
-                          src={destination.image}
+                          src={destination.image || destination.imageUrl}
                           alt={destination.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -150,14 +150,14 @@ export default function DestinationSearchPopup({
                       )}
                     </div>
                     
-                    <h3 className="font-semibold text-gray-900 mb-1">{destination.name}</h3>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">{destination.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                       {destination.region && `${destination.region}, `}
-                      {destination.country}
+                      {destination.country || "Ethiopia"}
                     </p>
                     
                     {destination.description && (
-                      <p className="text-xs text-gray-500 line-clamp-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 line-clamp-2">
                         {destination.description}
                       </p>
                     )}

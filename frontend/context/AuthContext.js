@@ -62,11 +62,10 @@ export function AuthProvider({ children }) {
           const localUser = JSON.parse(raw);
           setUser(localUser);
           
-          // Verify with server
-          const { data } = await fetchSessionUser();
+          const { data: res } = await fetchSessionUser();
           if (!cancelled) {
-            if (data?.user) {
-              persistUser(data.user);
+            if (res?.data) {
+              persistUser(res.data);
             } else {
               // Server says no user for this token
               persistUser(null);
@@ -74,8 +73,8 @@ export function AuthProvider({ children }) {
             }
           }
         } else if (token && !raw) {
-          const { data } = await fetchSessionUser();
-          if (!cancelled && data?.user) persistUser(data.user);
+          const { data: res } = await fetchSessionUser();
+          if (!cancelled && res?.data) persistUser(res.data);
         } else {
           setUser(null);
           setStoredToken(null);
@@ -97,16 +96,14 @@ export function AuthProvider({ children }) {
   const register = useCallback(
     async (name, email, password, username, role = "user") => {
       try {
-        const { data } = await registerAccount({
+        const { data: res } = await registerAccount({
           name: name.trim(),
           email: email.trim(),
           password,
           username: username.trim().toLowerCase(),
           role,
         });
-        // We no longer call applySession here. Registration succeeds, 
-        // but the user must manually log in.
-        return data.user;
+        return res?.data;
       } catch (e) {
         throw new Error(friendlyApiMessage(e));
       }
@@ -116,15 +113,14 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (identifier, password) => {
-      try {
-        const { data } = await loginAccount({
+        const { data: res } = await loginAccount({
           identifier: identifier.trim(),
           password,
         });
         flushSync(() => {
-          applySession(data.token, data.user);
+          applySession(res.data?.token, res.data?.user);
         });
-        return data.user;
+        return res.data?.user;
       } catch (e) {
         const msg = e?.response?.data?.message;
         throw new Error(

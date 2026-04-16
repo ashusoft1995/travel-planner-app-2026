@@ -100,8 +100,8 @@ function SingleTripContent({ params }) {
         {/* Custom Header styling with cover image fade-in */}
         <div className="relative h-64 md:h-80 w-full overflow-hidden animate-fade-in card-surface group mb-8 relative border-0">
           <div className="h-48 md:h-64 w-full relative">
-            {trip.image ? (
-              <img src={trip.image} className="w-full h-full object-cover" alt="" />
+            {(trip.image || trip.imageUrl) ? (
+              <img src={trip.image || trip.imageUrl} className="w-full h-full object-cover" alt="" />
             ) : (
               <div className="w-full h-full bg-brand-900 flex items-center justify-center">
                 <FiMapPin size={48} className="text-brand-500/30" />

@@ -35,36 +35,26 @@ app.get('/api/health', (req, res) => {
 
 // Login endpoint
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, identifier, password } = req.body;
+  const loginEmail = email || identifier;
 
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'Email and password are required'
-    });
+  if (!loginEmail || !password) {
+    return res.status(400).json({ error: 'Email/Username and password are required' });
   }
 
-  // Find user by email
-  const { data: users, error } = await supabase
+  const { data: user, error } = await supabase
     .from('users')
     .select('*')
-    .eq('email', email);
+    .or(`email.eq.${loginEmail},username.eq.${loginEmail}`)
+    .single();
 
-  if (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Database error'
-    });
+  if (error && error.code !== 'PGRST116') {
+    return res.status(500).json({ success: false, message: 'Database error' });
   }
 
-  if (!users || users.length === 0) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid email or password'
-    });
+  if (!user) {
+    return res.status(401).json({ success: false, message: 'Invalid email or password' });
   }
-
-  const user = users[0];
 
   // Security check: Blocked status
   if (user.status === 'blocked') {
@@ -76,32 +66,12 @@ app.post('/api/auth/login', async (req, res) => {
 
   // Compare password
   const isValid = await bcrypt.compare(password, user.password_hash);
-
   if (!isValid) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid email or password'
-    });
+    return res.status(401).json({ success: false, message: 'Invalid email or password' });
   }
 
-  // Generate JWT token
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-
-  // Return user info without password
-  const { password_hash, ...userWithoutPassword } = user;
-
-  res.json({
-    success: true,
-    message: 'Login successful',
-    data: {
-      user: userWithoutPassword,
-      token: token
-    }
-  });
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ success: true, data: { user, token } });
 });
 
 // Get current user from token
@@ -115,19 +85,27 @@ app.get('/api/auth/me', async (req, res) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const { data: user, error } = await supabase
+    const { data, error } = await supabase
       .from('users')
       .select('id, email, name, role, status, username')
       .eq('id', decoded.id)
       .single();
 
-    if (error || !user) {
+    if (error || !data) {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
 
+    const user = { 
+      id: data.id, 
+      email: data.email, 
+      name: data.name, 
+      role: data.role, 
+      username: data.username,
+      status: data.status
+    };
     res.json({ success: true, data: user });
   } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
+    res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 });
 
@@ -348,7 +326,6 @@ app.post('/api/travel-requests', async (req, res) => {
   const { data, error } = await supabase
     .from('travel_requests')
     .insert([{
-      id: `req-${Date.now()}`,
       full_name: fullName,
       email,
       phone,
@@ -399,6 +376,53 @@ app.delete('/api/travel-requests/:id', async (req, res) => {
 // ============================================
 // CONTACT MESSAGES API
 // ============================================
+
+// POST create contact message
+app.post('/api/contact-messages', async (req, res) => {
+  const { name, email, subject, message, adminTarget, otherAdminDetail } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .insert([{ 
+      name, 
+      email, 
+      subject, 
+      message, 
+      admin_target: adminTarget, 
+      other_admin_detail: otherAdminDetail,
+      status: 'open' 
+    }])
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ success: true, data: data[0] });
+});
+
+// GET my contact messages
+app.get('/api/contact-messages/mine', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { data: user } = await supabase.from('users').select('email').eq('id', decoded.id).single();
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .select('*')
+      .eq('email', user.email)
+      .order('created_at', { ascending: false });
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
 
 // GET all contact messages
 app.get('/api/contact-messages', async (req, res) => {

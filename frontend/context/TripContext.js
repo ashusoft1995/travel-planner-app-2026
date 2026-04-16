@@ -27,10 +27,10 @@ export function TripProvider({ children }) {
         setTrips([]);
         return;
       }
-      const { data } = await tripsApi.get("/trips", {
+      const { data: res } = await tripsApi.get("/trips", {
         params: { ownerEmail: user.email },
       });
-      setTrips(Array.isArray(data) ? data : []);
+      setTrips(Array.isArray(res?.data) ? res.data : []);
     } catch (e) {
       setError(friendlyApiMessage(e));
       setTrips([]);
@@ -47,19 +47,21 @@ export function TripProvider({ children }) {
 
   const addTrip = useCallback(
     async (trip) => {
-      const { data } = await tripsApi.post("/trips", {
+      const { data: res } = await tripsApi.post("/trips", {
         ...trip,
       });
-      setTrips((prev) => [data, ...prev]);
-      return data;
+      const newTrip = res?.data || res;
+      setTrips((prev) => [newTrip, ...prev]);
+      return newTrip;
     },
     [user?.email]
   );
 
   const updateTrip = useCallback(async (id, patch) => {
-    const { data } = await tripsApi.put(`/trips/${id}`, patch);
-    setTrips((prev) => prev.map((t) => (t.id === id ? data : t)));
-    return data;
+    const { data: res } = await tripsApi.put(`/trips/${id}`, patch);
+    const updated = res?.data || res;
+    setTrips((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    return updated;
   }, []);
 
   const deleteTrip = useCallback(async (id) => {

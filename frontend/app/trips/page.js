@@ -65,7 +65,7 @@ export default function TripsPage() {
               placeholder="Search by name, region or historical site..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full rounded-3xl border border-white/10 bg-white/5 py-5 pl-14 pr-6 text-white text-lg placeholder:text-white/20 outline-none backdrop-blur focus:border-purple-500/50 transition-all shadow-2xl"
+              className="w-full rounded-3xl border border-brand-900/10 bg-brand-50/50 dark:bg-white/5 py-5 pl-14 pr-6 text-brand-950 dark:text-white text-lg placeholder:text-brand-900/40 dark:placeholder:text-white/20 outline-none backdrop-blur focus:border-purple-500/50 transition-all shadow-xl dark:shadow-2xl"
               aria-label="Search destinations"
             />
           </div>
@@ -86,7 +86,7 @@ export default function TripsPage() {
                     <div className="grid lg:grid-cols-2 gap-0">
                         <div className="relative h-72 lg:h-auto min-h-[400px]">
                             <Image 
-                                src={selectedDest.image} 
+                                src={selectedDest.image || selectedDest.imageUrl} 
                                 alt={selectedDest.name}
                                 fill
                                 className="object-cover"
@@ -140,7 +140,7 @@ export default function TripsPage() {
             >
               <div className="relative h-56 overflow-hidden rounded-[1.6rem]">
                 <Image
-                  src={dest.image}
+                  src={dest.image || dest.imageUrl}
                   alt={dest.name}
                   fill
                   className="object-cover transition duration-700 group-hover:scale-110"

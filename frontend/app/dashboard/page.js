@@ -82,13 +82,14 @@ export default function EnhancedUserDashboard() {
       ]);
 
       if (tripsResponse.ok) {
-        const tripsData = await tripsResponse.json();
-        setTrips(tripsData);
+        const resJson = await tripsResponse.json();
+        setTrips(resJson.data || []);
       }
 
       if (notificationsResponse.ok) {
-        const notificationsData = await notificationsResponse.json();
-        setNotifications(notificationsData.slice(0, 5)); // Show only 5 latest
+        const resJson = await notificationsResponse.json();
+        const data = resJson.data || [];
+        setNotifications(data.slice(0, 5)); // Show only 5 latest
       }
     } catch (error) {
       console.error("Failed to fetch user data:", error);

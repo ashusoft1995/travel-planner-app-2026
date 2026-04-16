@@ -109,7 +109,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchAnnouncements().then(res => {
-      setAnnouncements(res.data || []);
+      setAnnouncements(res.data?.data || []);
     }).catch(console.error);
     
     // Fetch destinations from API
@@ -370,7 +370,7 @@ export default function HomePage() {
                     onChange={(e) => setSearchQ(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && runSearch()}
                     placeholder="e.g. Lalibela, Gondar, Bale…"
-                    className="w-full rounded-2xl border border-white/20 bg-white/10 py-3.5 pl-11 pr-4 text-white placeholder:text-slate-400 outline-none backdrop-blur focus:border-accent-yellow/60 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+                    className="w-full rounded-2xl border border-white/20 bg-white/10 dark:border-gray-600 dark:bg-gray-800 py-3.5 pl-11 pr-4 text-white placeholder:text-slate-400 outline-none backdrop-blur focus:border-accent-yellow/60"
                     aria-label="Search destinations"
                   />
                   {suggestions.length > 0 && (
@@ -387,9 +387,9 @@ export default function HomePage() {
                             }}
                           >
                             <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
-                              {s.imageUrl ? (
+                              {(s.imageUrl || s.image) ? (
                                 <img
-                                  src={s.imageUrl}
+                                  src={s.imageUrl || s.image}
                                   alt={s.name}
                                   className="w-full h-full object-cover"
                                   onError={(e) => {
@@ -620,9 +620,9 @@ export default function HomePage() {
 
               <div className="grid lg:grid-cols-2">
                 <div className="relative h-80 lg:h-auto min-h-[450px]">
-                  {selected.imageUrl ? (
+                  {(selected.imageUrl || selected.image) ? (
                     <Image
-                      src={selected.imageUrl}
+                      src={selected.imageUrl || selected.image}
                       alt={selected.name}
                       fill
                       className="object-cover"
@@ -809,9 +809,9 @@ export default function HomePage() {
                 }}
               >
                 <div className="aspect-video overflow-hidden relative">
-                  {d.imageUrl ? (
+                  {(d.imageUrl || d.image) ? (
                     <img
-                      src={d.imageUrl}
+                      src={d.imageUrl || d.image}
                       alt={d.name}
                       className="w-full h-full object-cover transition group-hover:scale-105"
                       onError={(e) => {
@@ -821,7 +821,7 @@ export default function HomePage() {
                       }}
                     />
                   ) : null}
-                  <div className="fallback-image w-full h-full flex items-center justify-center bg-gray-200 absolute inset-0" style={{display: d.imageUrl ? 'none' : 'flex'}}>
+                  <div className="fallback-image w-full h-full flex items-center justify-center bg-gray-200 absolute inset-0" style={{display: (d.imageUrl || d.image) ? 'none' : 'flex'}}>
                     <FiMapPin className="h-12 w-12 text-gray-400" />
                   </div>
                 </div>

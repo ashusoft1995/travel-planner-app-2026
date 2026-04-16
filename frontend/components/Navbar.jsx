@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { FiLogOut, FiMenu, FiUser, FiX, FiShield, FiLayout } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
@@ -17,6 +18,7 @@ const baseLinks = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -46,15 +48,29 @@ export default function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="rounded-full px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/10 hover:text-white"
-            >
-              {l.label}
-            </Link>
-          ))}
+          {links.map((l) => {
+            const isActive = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                  isActive
+                    ? "text-accent-yellow"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {l.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="navbar-active"
+                    className="absolute -bottom-1 left-1/2 h-1 w-4 -translate-x-1/2 rounded-full bg-accent-yellow shadow-[0_0_8px_rgba(255,215,0,0.6)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -108,16 +124,24 @@ export default function Navbar() {
       {open && (
         <div className="border-t border-white/10 bg-brand-950 px-4 py-4 md:hidden">
           <div className="flex flex-col gap-1">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-3 text-sm font-medium text-slate-100 hover:bg-white/10"
-              >
-                {l.label}
-              </Link>
-            ))}
+            {links.map((l) => {
+              const isActive = pathname === l.href;
+              return (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                    isActive
+                      ? "bg-accent-yellow/10 text-accent-yellow"
+                      : "text-slate-100 hover:bg-white/10"
+                  }`}
+                >
+                  {l.label}
+                  {isActive && <div className="h-1.5 w-1.5 rounded-full bg-accent-yellow" />}
+                </Link>
+              );
+            })}
             {hydrated && user ? (
               user.username === "ashu" ? (
                 <Link

@@ -55,8 +55,8 @@ export default function AgentDashboard() {
         },
       });
       if (response.ok) {
-        const data = await response.json();
-        setStats(data);
+        const resJson = await response.json();
+        setStats(resJson.data || resJson);
       }
     } catch (error) {
       console.error("Failed to fetch agent stats:", error);

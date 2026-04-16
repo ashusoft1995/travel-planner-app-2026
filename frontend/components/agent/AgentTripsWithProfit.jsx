@@ -23,8 +23,8 @@ export default function AgentTripsWithProfit() {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setTrips(data);
+        const resJson = await response.json();
+        setTrips(resJson.data || []);
       }
     } catch (error) {
       toast.error("Failed to fetch trips");

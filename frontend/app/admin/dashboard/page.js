@@ -71,12 +71,12 @@ export default function AdminCommandCenter() {
       ]);
 
       setStats({
-        users: Array.isArray(uRes.data) ? uRes.data : [],
-        trips: Array.isArray(tRes.data) ? tRes.data : [],
-        requests: Array.isArray(rRes.data) ? rRes.data : [],
-        messages: Array.isArray(mRes.data) ? mRes.data : [],
-        activityLogs: Array.isArray(logRes.data) ? logRes.data : [],
-        internalMessages: Array.isArray(intMsgRes.data) ? intMsgRes.data : []
+        users: Array.isArray(uRes.data?.data) ? uRes.data.data : [],
+        trips: Array.isArray(tRes.data?.data) ? tRes.data.data : [],
+        requests: Array.isArray(rRes.data?.data) ? rRes.data.data : [],
+        messages: Array.isArray(mRes.data?.data) ? mRes.data.data : [],
+        activityLogs: Array.isArray(logRes.data?.data) ? logRes.data.data : [],
+        internalMessages: Array.isArray(intMsgRes.data?.data) ? intMsgRes.data.data : []
       });
     } catch (e) {
       toast.error("System sync failed: " + friendlyApiMessage(e));

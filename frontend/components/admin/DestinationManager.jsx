@@ -33,8 +33,8 @@ export default function DestinationManager() {
       });
       
       if (response.ok) {
-        const data = await response.json();
-        setDestinations(data);
+        const resJson = await response.json();
+        setDestinations(resJson.data || []);
       }
     } catch (error) {
       toast.error("Failed to fetch destinations");
