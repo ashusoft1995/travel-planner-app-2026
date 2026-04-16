@@ -127,7 +127,7 @@ export default function NotificationBell() {
                 >
                   <p className="font-semibold text-[var(--text)]">{n.title}</p>
                   <p className="mt-0.5 line-clamp-3 text-xs text-[var(--muted)]">{n.body}</p>
-                  <p className="mt-1 text-[10px] text-[var(--muted)]">
+                  <p className="mt-1 text-[10px] text-[var(--muted)]" suppressHydrationWarning>
                     {n.createdAt ? new Date(n.createdAt).toLocaleString() : ""}
                   </p>
                 </button>

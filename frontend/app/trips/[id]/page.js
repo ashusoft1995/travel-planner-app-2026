@@ -25,6 +25,9 @@ function SingleTripContent({ params }) {
   const [trip, setTrip] = useState(null);
   const [activeTab, setActiveTab] = useState("itinerary");
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Load trip from context or fetch
   useEffect(() => {
@@ -177,7 +180,7 @@ function SingleTripContent({ params }) {
                     <p className="text-xs opacity-80">Days until you leave</p>
                   </div>
                   <div className="text-2xl font-bold bg-white dark:bg-brand-950 px-3 py-1 rounded shadow-sm">
-                    {Math.max(0, Math.floor((new Date(trip.startDate) - new Date()) / (1000 * 60 * 60 * 24)))}
+                    {mounted ? Math.max(0, Math.floor((new Date(trip.startDate) - new Date()) / (1000 * 60 * 60 * 24))) : "—"}
                   </div>
                 </div>
               </div>

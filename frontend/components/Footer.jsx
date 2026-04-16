@@ -88,7 +88,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <p className="container mt-10 border-t border-white/10 pt-8 text-center text-xs text-slate-500">
+      <p className="container mt-10 border-t border-white/10 pt-8 text-center text-xs text-slate-500" suppressHydrationWarning>
         © {new Date().getFullYear()} EthioTravel. All rights reserved.
       </p>
     </footer>

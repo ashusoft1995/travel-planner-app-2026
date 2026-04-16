@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import { FiCalendar, FiMapPin, FiTrash2 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useTrips } from "../context/TripContext";
@@ -20,6 +21,9 @@ function formatDate(iso) {
 }
 
 export default function TripCard({ trip, showDelete = true }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const { deleteTrip } = useTrips();
   const img =
     trip.image ||
@@ -89,7 +93,7 @@ export default function TripCard({ trip, showDelete = true }) {
       <div className="space-y-3 p-5">
         <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
           <FiCalendar className="shrink-0 text-brand-500 dark:text-accent-yellow" />
-          {formatDate(trip.startDate)} — {formatDate(trip.endDate)}
+          {mounted ? `${formatDate(trip.startDate)} — ${formatDate(trip.endDate)}` : "Loading dates..."}
         </p>
         {trip.accommodation && (
           <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
