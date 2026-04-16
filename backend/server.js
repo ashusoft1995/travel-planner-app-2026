@@ -30,52 +30,76 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================
-// AUTHENTICATION API
+// LOGIN API
 // ============================================
 
-// Login endpoint
-app.post('/api/auth/login', async (req, res) => {
-  const { email, identifier, password } = req.body;
-  const loginEmail = email || identifier;
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
 
-  if (!loginEmail || !password) {
-    return res.status(400).json({ error: 'Email/Username and password are required' });
-  }
-
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .or(`email.eq.${loginEmail},username.eq.${loginEmail}`)
-    .single();
-
-  if (error && error.code !== 'PGRST116') {
-    return res.status(500).json({ success: false, message: 'Database error' });
-  }
-
-  if (!user) {
-    return res.status(401).json({ success: false, message: 'Invalid email or password' });
-  }
-
-  // Security check: Blocked status
-  if (user.status === 'blocked') {
-    return res.status(403).json({
+  if (!email || !password) {
+    return res.status(400).json({
       success: false,
-      message: 'Your account has been blocked. Please contact support.'
+      message: 'Email and password are required'
     });
   }
 
-  // Compare password
-  const isValid = await bcrypt.compare(password, user.password_hash);
-  if (!isValid) {
-    return res.status(401).json({ success: false, message: 'Invalid email or password' });
+  // Find user by email
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', email);
+
+  if (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Database error'
+    });
   }
 
-  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
-  res.json({ success: true, data: { user, token } });
+  if (!users || users.length === 0) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+  const user = users[0];
+
+  // Compare password
+  const isValid = await bcrypt.compare(password, user.password_hash);
+
+  if (!isValid) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  // Return user without password
+  const { password_hash, ...userWithoutPassword } = user;
+
+  res.json({
+    success: true,
+    message: 'Login successful',
+    data: {
+      user: userWithoutPassword,
+      token: token
+    }
+  });
 });
 
-// Get current user from token
-app.get('/api/auth/me', async (req, res) => {
+// ============================================
+// GET CURRENT USER (from token)
+// ============================================
+
+app.get('/api/me', async (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
 
   if (!token) {
@@ -85,27 +109,19 @@ app.get('/api/auth/me', async (req, res) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const { data, error } = await supabase
+    const { data: user, error } = await supabase
       .from('users')
       .select('id, email, name, role, status, username')
       .eq('id', decoded.id)
       .single();
 
-    if (error || !data) {
+    if (error || !user) {
       return res.status(401).json({ success: false, message: 'User not found' });
     }
 
-    const user = { 
-      id: data.id, 
-      email: data.email, 
-      name: data.name, 
-      role: data.role, 
-      username: data.username,
-      status: data.status
-    };
     res.json({ success: true, data: user });
   } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid or expired token' });
+    res.status(401).json({ success: false, message: 'Invalid token' });
   }
 });
 
@@ -326,6 +342,7 @@ app.post('/api/travel-requests', async (req, res) => {
   const { data, error } = await supabase
     .from('travel_requests')
     .insert([{
+      id: `req-${Date.now()}`,
       full_name: fullName,
       email,
       phone,
@@ -377,53 +394,6 @@ app.delete('/api/travel-requests/:id', async (req, res) => {
 // CONTACT MESSAGES API
 // ============================================
 
-// POST create contact message
-app.post('/api/contact-messages', async (req, res) => {
-  const { name, email, subject, message, adminTarget, otherAdminDetail } = req.body;
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-
-  const { data, error } = await supabase
-    .from('contact_messages')
-    .insert([{ 
-      name, 
-      email, 
-      subject, 
-      message, 
-      admin_target: adminTarget, 
-      other_admin_detail: otherAdminDetail,
-      status: 'open' 
-    }])
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-// GET my contact messages
-app.get('/api/contact-messages/mine', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const { data: user } = await supabase.from('users').select('email').eq('id', decoded.id).single();
-    if (!user) return res.status(404).json({ error: 'User not found' });
-
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .select('*')
-      .eq('email', user.email)
-      .order('created_at', { ascending: false });
-
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true, data });
-  } catch (err) {
-    res.status(401).json({ error: 'Invalid token' });
-  }
-});
-
 // GET all contact messages
 app.get('/api/contact-messages', async (req, res) => {
   const { data, error } = await supabase
@@ -435,30 +405,25 @@ app.get('/api/contact-messages', async (req, res) => {
   res.json({ success: true, data });
 });
 
-// Registration endpoint
-app.post('/api/auth/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
+// POST create contact message
+app.post('/api/contact-messages', async (req, res) => {
+  const { name, email, subject, message, adminTarget } = req.body;
 
-  const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
-  if (existing) return res.status(400).json({ error: 'Email already registered' });
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .insert([{
+      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      name,
+      email,
+      subject: subject || '',
+      message,
+      admin_target: adminTarget || null,
+      status: 'open'
+    }])
+    .select();
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = {
-    id: Date.now().toString(),
-    username: name.toLowerCase().replace(/\s+/g, ''),
-    name,
-    email,
-    password_hash: passwordHash,
-    role: 'user',
-    status: 'active'
-  };
-
-  const { data, error } = await supabase.from('users').insert([user]).select();
   if (error) return res.status(500).json({ error: error.message });
-
-  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
-  res.status(201).json({ success: true, data: { user: data[0], token } });
+  res.status(201).json({ success: true, data: data[0] });
 });
 
 // ============================================
@@ -520,10 +485,16 @@ app.get('/api/announcements', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📋 API Endpoints:`);
-  console.log(`   POST   /api/auth/login`);
-  console.log(`   POST   /api/auth/register`);
-  console.log(`   GET    /api/auth/me`);
+  console.log(`   POST   /api/login`);
+  console.log(`   GET    /api/me`);
   console.log(`   GET    /api/users`);
   console.log(`   GET    /api/trips`);
+  console.log(`   POST   /api/trips`);
+  console.log(`   PUT    /api/trips/:id`);
+  console.log(`   DELETE /api/trips/:id`);
   console.log(`   GET    /api/destinations`);
+  console.log(`   GET    /api/travel-requests`);
+  console.log(`   GET    /api/contact-messages`);
+  console.log(`   GET    /api/notifications`);
+  console.log(`   GET    /api/announcements`);
 });
