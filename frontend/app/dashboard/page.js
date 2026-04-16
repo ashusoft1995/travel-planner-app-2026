@@ -42,14 +42,7 @@ import ResponsiveNav from "../../components/common/ResponsiveNav";
 // Dynamic import for charts to avoid SSR issues
 const DashboardRecharts = dynamic(
   () => import("../../components/dashboard/DashboardRecharts"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    ),
-  }
+  { ssr: false }
 );
 
 export default function EnhancedUserDashboard() {
