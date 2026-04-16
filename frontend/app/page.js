@@ -30,7 +30,7 @@ import {
   getDemoEconomics,
   getDestinationByName,
 } from "../lib/destinations";
-import { fetchAnnouncements } from "../lib/api";
+import { fetchAnnouncements, getApiUrl } from "../lib/api";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=2000&q=80";
@@ -113,9 +113,10 @@ export default function HomePage() {
     }).catch(console.error);
     
     // Fetch destinations from API
-    fetch("/api/destinations")
+    fetch(getApiUrl("/destinations"))
       .then(res => res.json())
-      .then(data => {
+      .then(res => {
+        const data = res.data || [];
         setDestinations(data);
         setCounters(prev => ({ ...prev, destinations: data.length }));
       })
@@ -619,13 +620,19 @@ export default function HomePage() {
 
               <div className="grid lg:grid-cols-2">
                 <div className="relative h-80 lg:h-auto min-h-[450px]">
-                  <Image
-                    src={selected.image}
-                    alt={selected.name}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                  />
+                  {selected.imageUrl ? (
+                    <Image
+                      src={selected.imageUrl}
+                      alt={selected.name}
+                      fill
+                      className="object-cover"
+                      sizes="100vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-brand-900 flex items-center justify-center">
+                      <FiMapPin className="h-16 w-16 text-white/20" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-transparent to-transparent" />
                   <div className="absolute bottom-8 left-8">
                      <p className="text-xs font-black uppercase tracking-widest text-accent-yellow mb-2">{selected.region}</p>

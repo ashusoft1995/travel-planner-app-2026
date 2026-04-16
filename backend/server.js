@@ -18,12 +18,117 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this';
+
 // ============================================
 // HEALTH CHECK
 // ============================================
 
-app.get('/api/health', async (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
+});
+
+// ============================================
+// AUTHENTICATION API
+// ============================================
+
+// Login endpoint
+app.post('/api/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email and password are required'
+    });
+  }
+
+  // Find user by email
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', email);
+
+  if (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Database error'
+    });
+  }
+
+  if (!users || users.length === 0) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+  const user = users[0];
+
+  // Security check: Blocked status
+  if (user.status === 'blocked') {
+    return res.status(403).json({
+      success: false,
+      message: 'Your account has been blocked. Please contact support.'
+    });
+  }
+
+  // Compare password
+  const isValid = await bcrypt.compare(password, user.password_hash);
+
+  if (!isValid) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid email or password'
+    });
+  }
+
+  // Generate JWT token
+  const token = jwt.sign(
+    { id: user.id, email: user.email, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  // Return user info without password
+  const { password_hash, ...userWithoutPassword } = user;
+
+  res.json({
+    success: true,
+    message: 'Login successful',
+    data: {
+      user: userWithoutPassword,
+      token: token
+    }
+  });
+});
+
+// Get current user from token
+app.get('/api/auth/me', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, email, name, role, status, username')
+      .eq('id', decoded.id)
+      .single();
+
+    if (error || !user) {
+      return res.status(401).json({ success: false, message: 'User not found' });
+    }
+
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
 });
 
 // ============================================
@@ -53,7 +158,7 @@ app.get('/api/users/:id', async (req, res) => {
   res.json({ success: true, data });
 });
 
-// POST create user
+// POST create user (signup)
 app.post('/api/users', async (req, res) => {
   const { id, username, name, email, password, role, status } = req.body;
 
@@ -306,32 +411,37 @@ app.get('/api/contact-messages', async (req, res) => {
   res.json({ success: true, data });
 });
 
-// POST create contact message
-app.post('/api/contact-messages', async (req, res) => {
-  const { name, email, subject, message, adminTarget } = req.body;
+// Registration endpoint
+app.post('/api/auth/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
 
-  const { data, error } = await supabase
-    .from('contact_messages')
-    .insert([{
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      name,
-      email,
-      subject: subject || '',
-      message,
-      admin_target: adminTarget || null,
-      status: 'open'
-    }])
-    .select();
+  const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
+  if (existing) return res.status(400).json({ error: 'Email already registered' });
 
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = {
+    id: Date.now().toString(),
+    username: name.toLowerCase().replace(/\s+/g, ''),
+    name,
+    email,
+    password_hash: passwordHash,
+    role: 'user',
+    status: 'active'
+  };
+
+  const { data, error } = await supabase.from('users').insert([user]).select();
   if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
+
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '7d' });
+  res.status(201).json({ success: true, data: { user: data[0], token } });
 });
 
 // ============================================
 // NOTIFICATIONS API
 // ============================================
 
-// GET notifications for a user
+// GET notifications
 app.get('/api/notifications', async (req, res) => {
   const { userEmail, audience } = req.query;
 
@@ -380,170 +490,16 @@ app.get('/api/announcements', async (req, res) => {
 });
 
 // ============================================
-// AUTHENTICATION API
-// ============================================
-
-app.post('/api/auth/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
-
-  const { data: existing } = await supabase.from('users').select('id').eq('email', email).single();
-  if (existing) return res.status(400).json({ error: 'Email already registered' });
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = {
-    id: Date.now().toString(),
-    username: name.toLowerCase().replace(/\s+/g, ''),
-    name,
-    email,
-    password_hash: passwordHash,
-    role: 'user',
-    status: 'active'
-  };
-
-  const { data, error } = await supabase.from('users').insert([user]).select();
-  if (error) return res.status(500).json({ error: error.message });
-
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'ethiotravel-dev-secret-change-me', { expiresIn: '1d' });
-  
-  await supabase.from('activity_logs').insert([{
-    user_email: email, type: 'create', target_type: 'user', message: 'User registered'
-  }]);
-
-  res.status(201).json({ success: true, token, user: data[0] });
-});
-
-app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
-  const { data: user, error } = await supabase.from('users').select('*').eq('email', email).single();
-  
-  if (error || !user) return res.status(401).json({ error: 'Invalid email or password' });
-  if (user.status === 'blocked') return res.status(403).json({ error: 'Account blocked' });
-
-  const isValid = await bcrypt.compare(password, user.password_hash);
-  if (!isValid) return res.status(401).json({ error: 'Invalid email or password' });
-
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'ethiotravel-dev-secret-change-me', { expiresIn: '1d' });
-  res.json({ success: true, token, user });
-});
-
-app.get('/api/me', async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
-  
-  const token = authHeader.split(' ')[1];
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'ethiotravel-dev-secret-change-me');
-    const { data: user } = await supabase.from('users').select('*').eq('id', decoded.id).single();
-    if (!user) throw new Error();
-    res.json({ user });
-  } catch {
-    res.status(401).json({ error: 'Invalid token' });
-  }
-});
-
-// ============================================
-// AGENT REQUESTS API
-// ============================================
-
-app.get('/api/agent-requests', async (req, res) => {
-  const { data, error } = await supabase.from('agent_requests').select('*').order('requested_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
-});
-
-app.post('/api/agent-requests', async (req, res) => {
-  const { userId, userEmail, userName, phone, experience, qualifications, bio } = req.body;
-  const { data, error } = await supabase.from('agent_requests').insert([{
-    user_id: userId, user_email: userEmail, user_name: userName, phone,
-    experience, qualifications, bio, status: 'pending'
-  }]).select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-app.patch('/api/agent-requests/:id', async (req, res) => {
-  const { status, reviewNote, reviewedBy } = req.body;
-  const { data, error } = await supabase.from('agent_requests').update({
-    status, review_note: reviewNote, reviewed_by: reviewedBy, reviewed_at: new Date().toISOString()
-  }).eq('id', req.params.id).select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  
-  // If approved, update user role
-  if (status === 'approved' && data[0]) {
-    await supabase.from('users').update({ role: 'agent' }).eq('email', data[0].user_email);
-  }
-
-  res.json({ success: true, data: data[0] });
-});
-
-// ============================================
-// ACTIVITY LOGS API
-// ============================================
-
-app.get('/api/activity-logs', async (req, res) => {
-  const { data, error } = await supabase.from('activity_logs').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
-});
-
-app.post('/api/activity-logs', async (req, res) => {
-  const { data, error } = await supabase.from('activity_logs').insert([req.body]).select();
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-// ============================================
-// MESSAGES API
-// ============================================
-
-app.get('/api/messages', async (req, res) => {
-  const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
-});
-
-app.post('/api/messages', async (req, res) => {
-  const { data, error } = await supabase.from('messages').insert([req.body]).select();
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-app.get('/api/internal-messages', async (req, res) => {
-  const { data, error } = await supabase.from('internal_messages').select('*').order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
-});
-
-app.post('/api/internal-messages', async (req, res) => {
-  const { data, error } = await supabase.from('internal_messages').insert([{
-    sender_id: req.body.senderId,
-    sender_email: req.body.senderEmail,
-    content: req.body.body || req.body.content
-  }]).select();
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-// ============================================
 // START SERVER
 // ============================================
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📋 API Endpoints:`);
+  console.log(`   POST   /api/auth/login`);
+  console.log(`   POST   /api/auth/register`);
+  console.log(`   GET    /api/auth/me`);
   console.log(`   GET    /api/users`);
   console.log(`   GET    /api/trips`);
-  console.log(`   POST   /api/trips`);
-  console.log(`   PUT    /api/trips/:id`);
-  console.log(`   DELETE /api/trips/:id`);
   console.log(`   GET    /api/destinations`);
-  console.log(`   GET    /api/travel-requests`);
-  console.log(`   POST   /api/travel-requests`);
-  console.log(`   GET    /api/contact-messages`);
-  console.log(`   POST   /api/contact-messages`);
-  console.log(`   GET    /api/notifications`);
-  console.log(`   GET    /api/announcements`);
 });

@@ -8,19 +8,19 @@ const DEFAULT_API_ORIGIN = "http://127.0.0.1:5000";
  * Server (SSR): same default or INTERNAL_API_URL.
  */
 export function getApiBase() {
-  const explicit =
-    typeof process !== "undefined" ? process.env.NEXT_PUBLIC_API_URL : "";
+  // Priority: Environment Variable > Existing Window Origin (if no other choice)
+  const explicit = typeof process !== "undefined" ? process.env.NEXT_PUBLIC_API_URL : "";
+  
+  if (explicit && String(explicit).trim() !== "") {
+    return String(explicit).replace(/\/$/, "");
+  }
+
+  // fallback for local dev if window is present but no env var
   if (typeof window !== "undefined") {
-    if (explicit && String(explicit).trim() !== "") {
-      return String(explicit).replace(/\/$/, "");
-    }
     return DEFAULT_API_ORIGIN;
   }
-  return (
-    process.env.INTERNAL_API_URL ||
-    explicit ||
-    DEFAULT_API_ORIGIN
-  ).replace(/\/$/, "");
+
+  return (process.env.INTERNAL_API_URL || DEFAULT_API_ORIGIN).replace(/\/$/, "");
 }
 
 export const API_BASE = getApiBase();
