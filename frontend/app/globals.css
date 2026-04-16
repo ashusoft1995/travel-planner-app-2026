@@ -7,9 +7,11 @@
   --surface: #ffffff;
   --panel: #ffffff;
   --border: rgba(0, 0, 0, 0.08);
+  --text: #111827;
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --text-muted: #9ca3af;
+  --muted: #666666;
   --accent: #6366f1;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
@@ -19,9 +21,11 @@
   --surface: #12122a;
   --panel: rgba(255, 255, 255, 0.03);
   --border: rgba(255, 255, 255, 0.1);
+  --text: #ffffff;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
   --text-muted: rgba(255, 255, 255, 0.3);
+  --muted: #a0a0a0;
   --accent: #8b5cf6;
   --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
 }
@@ -68,11 +72,31 @@ body {
   color: #fff;
   font-weight: 600;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 18px 36px rgba(31, 91, 181, 0.28);
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  transform: scale(0.5);
+}
+
+.btn-primary:hover::after {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .btn-secondary {
@@ -123,29 +147,6 @@ body {
 .stagger-2 { animation-delay: 0.2s; opacity: 0; }
 .stagger-3 { animation-delay: 0.3s; opacity: 0; }
 
-/* Glow Effects */
-.btn-primary {
-  position: relative;
-  overflow: hidden;
-}
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  transform: scale(0.5);
-}
-.btn-primary:hover::after {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Glow Effects */
 .text-glow {
   text-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
 }
@@ -156,7 +157,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Custom Scrollbar for better UI feel */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -172,14 +173,12 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* --- Mobile Feature Guarantees --- */
+/* Mobile Features */
 @media (max-width: 768px) {
-  /* Readable font size: Minimum 16px on mobile to prevent zooming */
   html {
     font-size: 16px !important;
   }
 
-  /* Touch-friendly buttons: Minimum 44px touch target per HIG/Material guidelines */
   button, 
   .btn-primary,
   .btn-secondary,
@@ -190,10 +189,8 @@ body {
     min-height: 44px;
   }
 
-  /* Responsive grid: Enforce single-column on small screens when this helper is applied */
   .mobile-grid-1 {
     display: grid !important;
     grid-template-columns: 1fr !important;
   }
 }
-
