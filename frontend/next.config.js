@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   distDir: '.next',
+  transpilePackages: ['framer-motion'],
   images: {
     unoptimized: true,
   },
