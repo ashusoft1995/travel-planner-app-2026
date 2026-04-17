@@ -67,23 +67,24 @@ export default function AgentStats({ stats = {} }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-[#12122a] rounded-lg shadow-sm border border-white/10 p-6 hover:shadow-md transition-shadow relative overflow-hidden group"
             >
-              <div className="flex items-center justify-between">
+              <div className={`absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent blur-2xl opacity-50 transition group-hover:scale-110`} />
+              <div className="flex items-center justify-between relative">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{stat.title}</p>
+                  <p className="text-2xl font-black text-white mt-1">{stat.value}</p>
                   <div className="flex items-center mt-2">
-                    <span className={`text-sm font-medium ${
-                      stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${
+                      stat.changeType === 'increase' ? 'text-emerald-400' : 'text-red-400'
                     }`}>
                       {stat.change}
                     </span>
-                    <span className="text-sm text-gray-500 ml-2">from last month</span>
+                    <span className="text-[10px] text-white/20 ml-2 uppercase font-medium">from last month</span>
                   </div>
                 </div>
-                <div className={`p-3 rounded-lg ${stat.color}`}>
-                  <Icon className="h-6 w-6 text-white" />
+                <div className={`p-3 rounded-xl bg-white/5 border border-white/10 group-hover:scale-110 transition-transform`}>
+                  <Icon className={`h-6 w-6 text-white`} />
                 </div>
               </div>
             </motion.div>
@@ -92,8 +93,10 @@ export default function AgentStats({ stats = {} }) {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+      <div className="bg-[#12122a] rounded-2xl shadow-sm border border-white/10 p-6">
+        <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-widest flex items-center gap-2">
+           <FiActivity className="text-purple-400" /> Operational Activity
+        </h3>
         <div className="space-y-4">
           {[
             {
@@ -126,29 +129,29 @@ export default function AgentStats({ stats = {} }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50"
+              className="flex items-center space-x-3 p-4 rounded-xl border border-white/5 bg-white/[0.02] transition hover:bg-white/[0.04]"
             >
               <div className={`w-2 h-2 rounded-full ${
                 activity.type === 'trip' ? 'bg-blue-500' :
                 activity.type === 'message' ? 'bg-purple-500' :
-                activity.type === 'success' ? 'bg-green-500' :
+                activity.type === 'success' ? 'bg-emerald-500' :
                 'bg-emerald-500'
-              }`} />
+              } shadow-[0_0_8px_rgba(0,0,0,0.5)]`} />
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                <p className="text-sm text-gray-500">{activity.details}</p>
+                <p className="text-xs font-black text-white uppercase tracking-tight">{activity.action}</p>
+                <p className="text-[10px] text-white/40 mt-0.5">{activity.details}</p>
               </div>
-              <span className="text-xs text-gray-400">{activity.time}</span>
+              <span className="text-[10px] text-white/20 font-bold uppercase">{activity.time}</span>
             </motion.div>
           ))}
         </div>
       </div>
 
       {/* Performance Chart */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Overview</h3>
-        <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-          <p className="text-gray-500">Performance chart will be displayed here</p>
+      <div className="bg-[#12122a] rounded-2xl shadow-sm border border-white/10 p-6">
+        <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-widest">Performance Protocol</h3>
+        <div className="h-64 flex items-center justify-center bg-white/5 border border-dashed border-white/10 rounded-xl">
+          <p className="text-[10px] text-white/20 font-black uppercase tracking-widest">Telemetry Visualization Idle</p>
         </div>
       </div>
     </div>

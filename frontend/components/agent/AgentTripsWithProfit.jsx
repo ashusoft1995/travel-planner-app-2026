@@ -83,56 +83,38 @@ export default function AgentTripsWithProfit() {
     <div className="space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Trips</p>
-              <p className="text-2xl font-bold text-gray-900">{totalStats.totalTrips}</p>
-            </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <FiMapPin className="h-6 w-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-              <p className="text-2xl font-bold text-gray-900">${totalStats.totalRevenue.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <FiDollarSign className="h-6 w-6 text-green-600" />
+        {[
+          { label: "Total Trips", val: totalStats.totalTrips, icon: FiMapPin, color: "bg-blue-500/20", text: "text-blue-400" },
+          { label: "Total Revenue", val: `$${totalStats.totalRevenue.toLocaleString()}`, icon: FiDollarSign, color: "bg-emerald-500/20", text: "text-emerald-400" },
+          { label: "My Commission", val: `$${totalStats.totalCommission.toLocaleString()}`, icon: FiTrendingUp, color: "bg-purple-500/20", text: "text-purple-400" },
+        ].map((s, i) => (
+          <div key={i} className="bg-[#12122a] rounded-xl shadow-sm border border-white/10 p-4 group transition hover:border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{s.label}</p>
+                <p className={`text-2xl font-black mt-1 ${s.text}`}>{s.val}</p>
+              </div>
+              <div className={`p-3 ${s.color} rounded-lg ring-1 ring-white/10 group-hover:scale-110 transition-transform`}>
+                <s.icon className={`h-6 w-6 ${s.text}`} />
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">My Commission</p>
-              <p className="text-2xl font-bold text-blue-600">${totalStats.totalCommission.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <FiTrendingUp className="h-6 w-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex space-x-1 p-1 bg-gray-100 rounded-lg">
+      <div className="flex gap-2 p-1 bg-white/5 rounded-2xl w-fit border border-white/5">
         {["all", "pending", "approved", "rejected"].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition ${
               filter === status
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
+                : "text-white/40 hover:text-white hover:bg-white/5"
             }`}
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status}
           </button>
         ))}
       </div>
@@ -142,19 +124,19 @@ export default function AgentTripsWithProfit() {
         {trips.map((trip) => {
           const profit = calculateTripProfit(trip);
           return (
-            <div key={trip.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-start justify-between mb-4">
+            <div key={trip.id} className="bg-[#12122a] rounded-2xl shadow-sm border border-white/10 p-6 group hover:border-white/20 transition-all">
+              <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{trip.destination}</h3>
-                  <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
+                  <h3 className="text-sm font-black text-white uppercase tracking-tight">{trip.destination}</h3>
+                  <div className="flex items-center space-x-4 mt-2 text-[10px] font-bold text-white/30 uppercase tracking-widest">
                     <span className="flex items-center">
-                      <FiCalendar className="mr-1 h-4 w-4" />
+                      <FiCalendar className="mr-1.5 h-3.5 w-3.5" />
                       {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
                     </span>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      trip.approvalStatus === "approved" ? "bg-green-100 text-green-800" :
-                      trip.approvalStatus === "pending" ? "bg-yellow-100 text-yellow-800" :
-                      "bg-red-100 text-red-800"
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                      trip.approvalStatus === "approved" ? "bg-emerald-500/10 text-emerald-400" :
+                      trip.approvalStatus === "pending" ? "bg-amber-500/10 text-amber-400" :
+                      "bg-red-500/10 text-red-400"
                     }`}>
                       {trip.approvalStatus}
                     </span>
@@ -166,14 +148,14 @@ export default function AgentTripsWithProfit() {
                     <>
                       <button
                         onClick={() => handleTripAction(trip.id, "approve")}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                        className="p-2 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg transition"
                         title="Approve"
                       >
                         <FiCheck className="h-5 w-5" />
                       </button>
                       <button
                         onClick={() => handleTripAction(trip.id, "reject")}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-lg transition"
                         title="Reject"
                       >
                         <FiX className="h-5 w-5" />
@@ -182,7 +164,7 @@ export default function AgentTripsWithProfit() {
                   )}
                   <button
                     onClick={() => setSelectedTrip(trip)}
-                    className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                    className="p-2 bg-white/5 text-white/30 hover:text-white hover:bg-white/10 rounded-lg transition"
                     title="View Details"
                   >
                     <FiEye className="h-5 w-5" />
@@ -191,44 +173,33 @@ export default function AgentTripsWithProfit() {
               </div>
 
               {/* Profit Breakdown */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs text-gray-600">Total</p>
-                  <p className="text-lg font-bold text-gray-900">${profit.total.toLocaleString()}</p>
-                </div>
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-600">My Commission (7%)</p>
-                  <p className="text-lg font-bold text-blue-600">${profit.agentCommission.toLocaleString()}</p>
-                </div>
-                <div className="text-center p-3 bg-purple-50 rounded-lg">
-                  <p className="text-xs text-purple-600">Admin Commission (3%)</p>
-                  <p className="text-lg font-bold text-purple-600">${profit.adminCommission.toLocaleString()}</p>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-xs text-green-600">Company Profit</p>
-                  <p className="text-lg font-bold text-green-600">${profit.companyProfit.toLocaleString()}</p>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                {[
+                  { label: "Total", val: `$${profit.total.toLocaleString()}`, color: "bg-white/5 text-white" },
+                  { label: "Commission (7%)", val: `$${profit.agentCommission.toLocaleString()}`, color: "bg-blue-500/10 text-blue-400" },
+                  { label: "Admin (3%)", val: `$${profit.adminCommission.toLocaleString()}`, color: "bg-purple-500/10 text-purple-400" },
+                  { label: "Company Profit", val: `$${profit.companyProfit.toLocaleString()}`, color: "bg-emerald-500/10 text-emerald-400" },
+                ].map((p, i) => (
+                  <div key={i} className={`text-center p-3 rounded-xl border border-white/5 ${p.color}`}>
+                    <p className="text-[9px] font-black uppercase tracking-widest opacity-60 mb-1">{p.label}</p>
+                    <p className="text-lg font-black">{p.val}</p>
+                  </div>
+                ))}
               </div>
 
               {/* Trip Details */}
-              <div className="border-t pt-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="border-t border-white/5 pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[11px] font-bold uppercase tracking-widest">
                   <div>
-                    <p className="text-gray-600">Accommodation:</p>
-                    <p className="font-medium text-gray-900">{trip.accommodation || "Not specified"}</p>
+                    <p className="text-white/30 mb-1">Accommodation:</p>
+                    <p className="text-white">{trip.accommodation || "Standard Mission Base"}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Activities:</p>
-                    <p className="font-medium text-gray-900">
-                      {trip.activities?.join(", ") || "No activities"}
+                    <p className="text-white/30 mb-1">Operational Activities:</p>
+                    <p className="text-white">
+                      {trip.activities?.join(", ") || "No extra protocols"}
                     </p>
                   </div>
-                  {trip.notes && (
-                    <div className="md:col-span-2">
-                      <p className="text-gray-600">Notes:</p>
-                      <p className="font-medium text-gray-900">{trip.notes}</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -238,48 +209,52 @@ export default function AgentTripsWithProfit() {
 
       {/* Trip Details Modal */}
       {selectedTrip && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-gray-900">Trip Details</h3>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#0d0d1a] border border-white/10 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+          >
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black text-white uppercase tracking-widest">Mission <span className="text-purple-400">Analysis</span></h3>
                 <button
                   onClick={() => setSelectedTrip(null)}
-                  className="p-2 text-gray-400 hover:text-gray-600"
+                  className="p-2 text-white/30 hover:text-white transition"
                 >
-                  <FiX className="h-5 w-5" />
+                  <FiX className="h-6 w-6" />
                 </button>
               </div>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-gray-900">{selectedTrip.destination}</h4>
-                  <p className="text-gray-600">
+                  <h4 className="text-lg font-black text-white uppercase">{selectedTrip.destination}</h4>
+                  <p className="text-xs text-white/40 font-bold uppercase tracking-widest mt-1">
                     {new Date(selectedTrip.startDate).toLocaleDateString()} - {new Date(selectedTrip.endDate).toLocaleDateString()}
                   </p>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-900 mb-3">Profit Analysis</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
+                <div className="bg-[#12122a] border border-white/10 rounded-2xl p-6">
+                  <h4 className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-4">Financial Breakdown</h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs text-white/50">
                       <span>Subtotal:</span>
-                      <span>${calculateTripProfit(selectedTrip).subtotal.toLocaleString()}</span>
+                      <span className="font-bold">${calculateTripProfit(selectedTrip).subtotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-blue-600">
+                    <div className="flex justify-between text-xs text-blue-400">
                       <span>Your Commission (7%):</span>
-                      <span>${calculateTripProfit(selectedTrip).agentCommission.toLocaleString()}</span>
+                      <span className="font-bold">${calculateTripProfit(selectedTrip).agentCommission.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-purple-600">
+                    <div className="flex justify-between text-xs text-purple-400">
                       <span>Admin Commission (3%):</span>
-                      <span>${calculateTripProfit(selectedTrip).adminCommission.toLocaleString()}</span>
+                      <span className="font-bold">${calculateTripProfit(selectedTrip).adminCommission.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-green-600">
+                    <div className="flex justify-between text-xs text-emerald-400">
                       <span>Company Profit:</span>
-                      <span>${calculateTripProfit(selectedTrip).companyProfit.toLocaleString()}</span>
+                      <span className="font-bold">${calculateTripProfit(selectedTrip).companyProfit.toLocaleString()}</span>
                     </div>
-                    <div className="border-t pt-2 flex justify-between font-bold">
-                      <span>Total:</span>
+                    <div className="border-t border-white/10 pt-3 flex justify-between text-sm font-black text-white">
+                      <span className="uppercase tracking-widest">Total Asset Flow:</span>
                       <span>${calculateTripProfit(selectedTrip).total.toLocaleString()}</span>
                     </div>
                   </div>
@@ -287,22 +262,22 @@ export default function AgentTripsWithProfit() {
 
                 {selectedTrip.notes && (
                   <div>
-                    <h4 className="font-semibold text-gray-900">Notes</h4>
-                    <p className="text-gray-600">{selectedTrip.notes}</p>
+                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Protocol Notes</h4>
+                    <p className="text-xs text-white/60 leading-relaxed italic border-l-2 border-purple-500 pl-4">{selectedTrip.notes}</p>
                   </div>
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {trips.length === 0 && (
-        <div className="text-center py-12">
-          <FiMapPin className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No trips found</h3>
-          <p className="mt-1 text-sm text-gray-500">
-            {filter === "all" ? "No trips assigned to you yet" : `No ${filter} trips found`}
+        <div className="text-center py-20 bg-[#12122a] rounded-2xl border border-white/5 border-dashed">
+          <FiMapPin className="mx-auto h-12 w-12 text-white/10 mb-4" />
+          <h3 className="text-sm font-black text-white uppercase tracking-widest">No Operational Data</h3>
+          <p className="mt-2 text-[10px] text-white/20 uppercase font-bold">
+            {filter === "all" ? "No missions assigned in the current sector" : `No ${filter} missions recorded`}
           </p>
         </div>
       )}

@@ -11,25 +11,13 @@ import {
   FiBarChart2, 
   FiCalendar,
   FiTrendingUp,
-  FiUsers,
-  FiMessageSquare,
-  FiBell,
-  FiSearch,
-  FiFilter,
-  FiEye,
-  FiEdit,
-  FiTrash2,
-  FiCheckCircle,
-  FiXCircle,
-  FiAlertCircle,
-  FiActivity,
   FiGlobe,
-  FiStar,
-  FiHeart,
-  FiShare2,
-  FiBookmark,
-  FiSettings,
-  FiLogOut
+  FiCheckCircle,
+  FiEye,
+  FiActivity,
+  FiShield,
+  FiMessageSquare,
+  FiSearch
 } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -45,7 +33,7 @@ const DashboardRecharts = dynamic(
   { ssr: false }
 );
 
-export default function EnhancedUserDashboard() {
+export default function UserCommandCenter() {
   const { user, token, logout } = useAuth();
   const router = useRouter();
   const [trips, setTrips] = useState([]);
@@ -54,7 +42,6 @@ export default function EnhancedUserDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -83,7 +70,7 @@ export default function EnhancedUserDashboard() {
       if (notificationsResponse.ok) {
         const resJson = await notificationsResponse.json();
         const data = resJson.data || [];
-        setNotifications(data.slice(0, 5)); // Show only 5 latest
+        setNotifications(data.slice(0, 5));
       }
     } catch (error) {
       console.error("Failed to fetch user data:", error);
@@ -105,387 +92,318 @@ export default function EnhancedUserDashboard() {
     const totalBudget = trips.reduce((sum, trip) => sum + (trip.budget || 0), 0);
     const upcoming = trips.filter(trip => new Date(trip.startDate) >= new Date()).length;
     const completed = trips.filter(trip => new Date(trip.endDate) < new Date()).length;
-    const pending = trips.filter(trip => trip.approvalStatus === "pending").length;
-
+    
     return {
       totalTrips: trips.length,
       totalBudget,
       upcoming,
       completed,
-      pending,
-      averageBudget: trips.length > 0 ? Math.round(totalBudget / trips.length) : 0
     };
   }, [trips]);
 
-  const PIE_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444", "#06b6d4"];
-
-  const lineData = useMemo(() => {
-    const byMonth = {};
-    trips.forEach((t) => {
-      if (!t.startDate) return;
-      const d = new Date(t.startDate);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      const label = d.toLocaleString("default", { month: "short", year: "numeric" });
-      if (!byMonth[key]) byMonth[key] = { key, label, budget: 0 };
-      byMonth[key].budget += Number(t.budget || 0);
-    });
-    return Object.values(byMonth)
-      .sort((a, b) => a.key.localeCompare(b.key))
-      .map(({ label, budget }) => ({ month: label, budget }));
-  }, [trips]);
-
-  const pieData = useMemo(() => {
-    const byAcc = {};
-    trips.forEach((t) => {
-      const k = t.accommodation?.trim() || "Unspecified";
-      byAcc[k] = (byAcc[k] || 0) + Number(t.budget || 0);
-    });
-    return Object.entries(byAcc).map(([name, value]) => ({ name, value }));
-  }, [trips]);
-
-  const upcomingTrips = useMemo(() => {
-    return trips
-      .filter(trip => new Date(trip.startDate) >= new Date())
-      .sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
-      .slice(0, 3);
-  }, [trips]);
-
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
-
-  const tabs = [
-    { id: "overview", label: "Overview", icon: FiBarChart2 },
-    { id: "trips", label: "My Trips", icon: FiMap },
-    { id: "analytics", label: "Analytics", icon: FiTrendingUp },
-    { id: "messages", label: "Messages", icon: FiMessageSquare },
-  ];
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-[#0d0d1a] flex items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent shadow-lg shadow-blue-500/20" />
       </div>
     );
   }
 
   return (
     <UndoProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Responsive Navigation */}
-        <ResponsiveNav
-          user={user}
-          onLogout={handleLogout}
-          showNotifications={true}
+      <div className="min-h-screen bg-[#0d0d1a] text-white">
+        <ResponsiveNav 
+          user={user} 
+          onLogout={logout} 
+          showNotifications={true} 
           notificationCount={notifications.length}
-          onToggleNotifications={() => setShowNotifications(!showNotifications)}
         />
 
-        {/* Main Content */}
-        <main className="pt-20 md:pt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-          {/* Page Title and Search */}
-          <div className="mb-6 md:mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Travel Dashboard</h1>
-            <p className="mt-2 text-gray-600">Manage your trips and explore destinations</p>
-            
-            {/* Mobile Search */}
-            <div className="mt-4 md:hidden">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiSearch className="h-5 w-5 text-gray-400" />
+        <main className="pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+          {/* Header Area */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight text-white md:text-4xl uppercase">
+                Traveler <span className="text-blue-400 text-glow">Dashboard</span>
+              </h1>
+              <p className="mt-2 text-sm text-white/50 font-medium">
+                Welcome back, {user?.name}. Your global itineraries are synchronized.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/add-trip">
+                <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:bg-blue-500 shadow-lg shadow-blue-600/20 active:scale-95">
+                  <FiPlusCircle size={16} /> Plan New Mission
+                </button>
+              </Link>
+            </div>
+          </div>
+
+          {/* KPI Grid */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+            {[
+              { label: "Total Voyages", val: stats.totalTrips, icon: FiMap, color: "from-blue-500/20", text: "text-blue-400", sub: "Lifetime trips" },
+              { label: "Mission Capital", val: `$${stats.totalBudget.toLocaleString()}`, icon: FiDollarSign, color: "from-emerald-500/20", text: "text-emerald-400", sub: "Allocated budget" },
+              { label: "Active Deployments", val: stats.upcoming, icon: FiCalendar, color: "from-amber-500/20", text: "text-amber-400", sub: "Upcoming trips" },
+              { label: "Completed Operations", val: stats.completed, icon: FiCheckCircle, color: "from-purple-500/20", text: "text-purple-400", sub: "Past travels" },
+            ].map((kpi, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#12122a] p-5 shadow-2xl transition hover:border-white/20"
+              >
+                <div className={`absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br ${kpi.color} to-transparent blur-2xl opacity-50 transition group-hover:scale-110`} />
+                <div className="relative flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{kpi.label}</p>
+                    <p className="mt-1 text-2xl font-black text-white">{kpi.val}</p>
+                    <p className="mt-1 text-[10px] text-white/30">{kpi.sub}</p>
+                  </div>
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 ${kpi.text} ring-1 ring-white/10 transition group-hover:bg-white/10 group-hover:scale-110`}>
+                    <kpi.icon size={22} />
+                  </div>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search trips..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Search & Tabs */}
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="lg:col-span-2 flex-1 space-y-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex gap-2 p-1 bg-white/5 rounded-2xl w-fit border border-white/5">
+                  {["overview", "trips", "analytics", "messages"].map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setActiveTab(m)}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition ${
+                        activeTab === m 
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                          : "text-white/40 hover:text-white hover:bg-white/5"
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="relative group">
+                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-blue-400 transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="SCAN TRIPS..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs font-bold uppercase tracking-widest text-white outline-none focus:border-blue-500/50 transition-all w-full sm:w-64"
+                  />
+                </div>
               </div>
-            </div>
-          </div>
 
-          {/* Desktop Search Bar */}
-          <div className="hidden md:flex mb-6">
-            <div className="relative flex-1 max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search trips..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Tab Navigation - Mobile Optimized */}
-          <div className="mb-6 md:mb-8">
-            <nav className="flex flex-col sm:flex-row sm:space-x-1 md:space-x-8 border-b border-gray-200 sm:border-0">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center py-3 px-2 sm:py-4 sm:px-1 border-b-2 sm:border-0 font-medium text-sm transition-colors ${
-                      activeTab === tab.id
-                        ? "border-blue-500 text-blue-600 sm:bg-blue-50 sm:rounded-lg"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 sm:hover:bg-gray-50 sm:rounded-lg"
-                    }`}
-                  >
-                    <Icon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    <span className="text-xs sm:text-sm">{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-
-        {/* Tab Content */}
-        <AnimatePresence mode="wait">
-          {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-6"
-            >
-              {/* Stats Grid - Mobile Optimized */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-                {[
-                  { label: "Trips", value: stats.totalTrips, icon: FiMap, color: "bg-blue-500" },
-                  { label: "Budget", value: `$${stats.totalBudget.toLocaleString()}`, icon: FiDollarSign, color: "bg-green-500" },
-                  { label: "Upcoming", value: stats.upcoming, icon: FiCalendar, color: "bg-yellow-500" },
-                  { label: "Completed", value: stats.completed, icon: FiCheckCircle, color: "bg-purple-500" },
-                ].map((stat, index) => (
+              <AnimatePresence mode="wait">
+                {activeTab === "overview" && (
                   <motion.div
-                    key={stat.label}
-                    initial={{ opacity: 0, y: 20 }}
+                    key="overview"
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 hover:shadow-md transition-shadow"
+                    exit={{ opacity: 0, y: -10 }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                      <div className="mb-2 sm:mb-0">
-                        <p className="text-xs md:text-sm font-medium text-gray-600">{stat.label}</p>
-                        <p className="text-lg md:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                    {/* Recent Trips Table-like View */}
+                    <div className="rounded-2xl border border-white/10 bg-[#12122a] p-6 shadow-2xl">
+                      <div className="mb-6 flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                          <FiActivity className="text-blue-400" /> RECENT DEPLOYMENTS
+                        </h3>
+                        <Link href="/trips" className="text-[10px] font-black text-white/30 hover:text-blue-400 uppercase tracking-widest transition">View All</Link>
                       </div>
-                      <div className={`p-2 md:p-3 rounded-lg ${stat.color} self-start sm:self-auto`}>
-                        <stat.icon className="h-4 w-4 md:h-6 md:w-6 text-white" />
+                      <div className="space-y-4">
+                        {trips.slice(0, 4).map((trip) => (
+                          <div key={trip.id} className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02] transition hover:bg-white/[0.04]">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-black">
+                                {trip.destination?.charAt(0)}
+                              </div>
+                              <div>
+                                <p className="text-xs font-black text-white uppercase tracking-tight">{trip.destination}</p>
+                                <p className="text-[10px] text-white/30 mt-0.5">{new Date(trip.startDate).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                              trip.approvalStatus === 'approved' ? 'bg-emerald-500/10 text-emerald-400' :
+                              trip.approvalStatus === 'pending' ? 'bg-amber-500/10 text-amber-400' :
+                              'bg-red-500/10 text-red-400'
+                            }`}>
+                              {trip.approvalStatus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="rounded-2xl border border-white/10 bg-[#12122a] p-6 shadow-2xl">
+                        <h3 className="text-sm font-bold text-white mb-4 uppercase tracking-widest">Protocol Support</h3>
+                        <p className="text-xs text-white/40 leading-relaxed mb-6">Need assistance with your itinerary? Initiate a support transmission to our global dispatch team.</p>
+                        <Link href="/contact">
+                          <button className="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white hover:bg-white/10 transition active:scale-95">
+                            Contact Dispatch
+                          </button>
+                        </Link>
+                      </div>
+                      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/10 to-transparent p-6 shadow-2xl">
+                        <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Discovery Hub</h3>
+                        <p className="text-xs text-white/40 mb-6">Explore new destinations and expand your global footprint.</p>
+                        <Link href="/about">
+                          <button className="w-full py-3 bg-blue-600 text-[10px] font-black uppercase tracking-widest text-white rounded-xl shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition">
+                            Explore Map
+                          </button>
+                        </Link>
                       </div>
                     </div>
                   </motion.div>
-                ))}
-              </div>
+                )}
 
-              {/* Recent Activity - Mobile Optimized */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-                {/* Upcoming Trips */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
-                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Upcoming Trips</h3>
-                  <div className="space-y-3 md:space-y-4">
-                    {upcomingTrips.length > 0 ? (
-                      upcomingTrips.slice(0, 3).map((trip) => (
-                        <div key={trip.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border border-gray-200 rounded-lg">
-                          <div className="mb-2 sm:mb-0">
-                            <p className="font-medium text-gray-900 text-sm">{trip.destination}</p>
-                            <p className="text-xs text-gray-500">
+                {activeTab === "trips" && (
+                  <motion.div
+                    key="trips"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="rounded-2xl border border-white/10 bg-[#12122a] p-6 shadow-2xl overflow-x-auto"
+                  >
+                    <table className="w-full text-left text-xs">
+                      <thead className="text-[10px] uppercase font-black text-white/20 border-b border-white/5">
+                        <tr>
+                          <th className="pb-3 px-2">Destination</th>
+                          <th className="pb-3">Timeline</th>
+                          <th className="pb-3">Budget</th>
+                          <th className="pb-3">Status</th>
+                          <th className="pb-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {filteredTrips.map((trip) => (
+                          <tr key={trip.id} className="group transition hover:bg-white/[0.02]">
+                            <td className="py-4 px-2">
+                              <p className="font-black text-white uppercase tracking-tight">{trip.destination}</p>
+                              <p className="text-[10px] text-white/30 uppercase">{trip.accommodation || "Standard Base"}</p>
+                            </td>
+                            <td className="py-4 text-white/50 font-medium">
                               {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              trip.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
-                              trip.approvalStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
-                              {trip.approvalStatus}
-                            </span>
-                            <button className="p-1 text-gray-400 hover:text-gray-600">
-                              <FiEye className="h-4 w-4" />
-                            </button>
-                          </div>
+                            </td>
+                            <td className="py-4 font-black text-blue-400">
+                              ${(trip.budget || 0).toLocaleString()}
+                            </td>
+                            <td className="py-4">
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
+                                trip.approvalStatus === 'approved' ? 'bg-emerald-500/10 text-emerald-400' :
+                                trip.approvalStatus === 'pending' ? 'bg-amber-500/10 text-amber-400' :
+                                'bg-red-500/10 text-red-400'
+                              }`}>
+                                {trip.approvalStatus}
+                              </span>
+                            </td>
+                            <td className="py-4 text-right">
+                              <button className="p-2 rounded-lg bg-white/5 text-white/30 hover:text-white hover:bg-white/10 transition opacity-0 group-hover:opacity-100">
+                                <FiEye />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </motion.div>
+                )}
+
+                {activeTab === "analytics" && (
+                  <motion.div
+                    key="analytics"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-2xl border border-white/10 bg-[#12122a] p-6 shadow-2xl"
+                  >
+                    <h3 className="text-sm font-bold text-white mb-8 uppercase tracking-widest">Global Asset Telemetry</h3>
+                    <div className="h-[400px]">
+                      <DashboardRecharts 
+                        lineData={[]} // Placeholder for actual logic
+                        pieData={[]} 
+                        pieColors={["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"]} 
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Sidebar Oversight */}
+            <div className="lg:w-80 space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-transparent p-6 shadow-2xl backdrop-blur-sm"
+              >
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/50 shadow-lg shadow-blue-500/10">
+                    <FiShield size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white uppercase tracking-widest">Protocol Oversight</h3>
+                    <p className="text-[10px] text-blue-400/60 font-medium">Personal Access Enabled</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">TELEMETRY</p>
+                    <div className="flex justify-between items-end">
+                      <span className="text-2xl font-black text-white">{(trips.length > 0 ? "STABLE" : "IDLE")}</span>
+                      <FiActivity className="text-emerald-400 mb-1 animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-2">SYSTEM NOTIFICATIONS</p>
+                    <div className="space-y-2">
+                      {notifications.slice(0, 3).map((n, i) => (
+                        <div key={i} className="text-[10px] text-white/50 flex gap-2">
+                          <span className="text-blue-400">•</span>
+                          <span className="truncate">{n.title}</span>
                         </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-center py-4 text-sm">No upcoming trips</p>
-                    )}
-                  </div>
-                  <div className="mt-3 md:mt-4">
-                    <Link href="/trips">
-                      <button className="w-full bg-blue-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-md hover:bg-blue-700 transition-colors text-sm">
-                        View All Trips
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
-                  <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Quick Actions</h3>
-                  <div className="space-y-2 md:space-y-3">
-                    <Link href="/add-trip">
-                      <button className="w-full flex items-center justify-center px-3 py-2 md:px-4 md:py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm">
-                        <FiPlusCircle className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                        Plan New Trip
-                      </button>
-                    </Link>
-                    <Link href="/contact">
-                      <button className="w-full flex items-center justify-center px-3 py-2 md:px-4 md:py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm">
-                        <FiMessageSquare className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                        Contact Support
-                      </button>
-                    </Link>
-                    <Link href="/about">
-                      <button className="w-full flex items-center justify-center px-3 py-2 md:px-4 md:py-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm">
-                        <FiGlobe className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-                        Explore Destinations
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "trips" && (
-            <motion.div
-              key="trips"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-gray-900">My Trips</h2>
-                    <div className="flex items-center space-x-3">
-                      <select
-                        value={filterStatus}
-                        onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-                      <Link href="/add-trip">
-                        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                          <FiPlusCircle className="inline mr-2 h-4 w-4" />
-                          Add Trip
-                        </button>
-                      </Link>
+                      ))}
+                      {notifications.length === 0 && <p className="text-[10px] text-white/20 italic">No alerts in queue</p>}
                     </div>
                   </div>
                 </div>
-                <div className="divide-y divide-gray-200">
-                  {filteredTrips.length > 0 ? (
-                    filteredTrips.map((trip) => (
-                      <div key={trip.id} className="p-6 hover:bg-gray-50">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-900">{trip.destination}</h3>
-                            <p className="text-sm text-gray-500">
-                              {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                            </p>
-                            <p className="text-sm text-gray-500">Budget: ${trip.budget || 0}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              trip.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
-                              trip.approvalStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
-                              {trip.approvalStatus}
-                            </span>
-                            <button className="p-2 text-gray-400 hover:text-gray-600">
-                              <FiEye className="h-4 w-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-gray-600">
-                              <FiEdit className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
+              </motion.div>
+
+              <div className="rounded-2xl border border-white/10 bg-[#12122a] p-6 shadow-2xl">
+                <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <FiClock size={16} className="text-amber-400" /> MISSION UPDATES
+                </h3>
+                <div className="space-y-4">
+                  {trips.filter(t => t.approvalStatus === 'pending').map((t, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="h-1 w-1 rounded-full bg-amber-400 mt-2" />
+                      <div>
+                        <p className="text-[10px] font-black text-white uppercase">{t.destination}</p>
+                        <p className="text-[9px] text-white/30 uppercase">Awaiting admin clearance</p>
                       </div>
-                    ))
-                  ) : (
-                    <div className="p-12 text-center">
-                      <FiMap className="mx-auto h-12 w-12 text-gray-400" />
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">No trips found</h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {searchTerm || filterStatus !== "all" 
-                          ? "Try adjusting your search or filter criteria"
-                          : "Get started by planning your first trip"}
-                      </p>
-                      <Link href="/add-trip">
-                        <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                          Plan Your First Trip
-                        </button>
-                      </Link>
                     </div>
+                  ))}
+                  {trips.filter(t => t.approvalStatus === 'pending').length === 0 && (
+                    <p className="text-[10px] text-white/20 italic">All protocols cleared</p>
                   )}
                 </div>
               </div>
-            </motion.div>
-          )}
+            </div>
+          </div>
+        </main>
 
-          {activeTab === "analytics" && (
-            <motion.div
-              key="analytics"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Travel Analytics</h2>
-                {trips.length > 0 && lineData.length > 0 ? (
-                  <DashboardRecharts lineData={lineData} pieData={pieData} pieColors={PIE_COLORS} />
-                ) : (
-                  <div className="text-center py-12">
-                    <FiBarChart2 className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No data available</h3>
-                    <p className="mt-1 text-sm text-gray-500">Plan some trips to see your travel analytics</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "messages" && (
-            <motion.div
-              key="messages"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-6">Messages</h2>
-                <div className="text-center py-12">
-                  <FiMessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No messages yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Your messages will appear here</p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      {/* Undo Panel - Fixed on the right side */}
-      <div className="fixed right-4 bottom-4 w-80 max-h-96 overflow-hidden">
-        <UndoPanel compact={true} maxItems={5} />
+        <div className="fixed right-4 bottom-4 w-80 max-h-96 overflow-hidden z-50">
+          <UndoPanel compact={true} maxItems={5} />
+        </div>
       </div>
-    </div>
     </UndoProvider>
   );
 }
