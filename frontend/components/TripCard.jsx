@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { FiCalendar, FiMapPin, FiTrash2 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useTrips } from "../context/TripContext";
@@ -21,9 +20,6 @@ function formatDate(iso) {
 }
 
 export default function TripCard({ trip, showDelete = true }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   const { deleteTrip } = useTrips();
   const img =
     trip.image ||
@@ -93,7 +89,7 @@ export default function TripCard({ trip, showDelete = true }) {
       <div className="space-y-3 p-5">
         <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
           <FiCalendar className="shrink-0 text-brand-500 dark:text-accent-yellow" />
-          {mounted ? `${formatDate(trip.startDate)} — ${formatDate(trip.endDate)}` : "Loading dates..."}
+          {formatDate(trip.startDate)} — {formatDate(trip.endDate)}
         </p>
         {trip.accommodation && (
           <p className="flex items-center gap-2 text-sm text-[var(--muted)]">
@@ -102,7 +98,7 @@ export default function TripCard({ trip, showDelete = true }) {
           </p>
         )}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3">
-          <span className="text-lg font-bold text-brand-600 dark:text-accent-yellow">
+          <span className="text-lg font-bold text-brand-600 dark:thiext-accent-yellow">
             ${Number(trip.budget || 0).toLocaleString()}
           </span>
           <span className="text-xs text-[var(--muted)]">

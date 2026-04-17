@@ -132,7 +132,7 @@ function AddTripPageContent() {
     const tid = setTimeout(async () => {
       try {
         const { data } = await searchDestinations({ q, limit: 12 });
-        setDestHits(Array.isArray(data?.results) ? data.results : []);
+        setDestHits(Array.isArray(data?.data) ? data.data : []);
       } catch {
         setDestHits([]);
       }
@@ -145,7 +145,7 @@ function AddTripPageContent() {
     const fetchAllDestinations = async () => {
       try {
         const { data } = await searchDestinations({ q: "", limit: 50 });
-        setAllDestinations(Array.isArray(data?.results) ? data.results : []);
+        setAllDestinations(Array.isArray(data?.data) ? data.data : []);
       } catch {
         setAllDestinations([]);
       }

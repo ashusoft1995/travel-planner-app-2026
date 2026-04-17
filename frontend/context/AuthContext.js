@@ -15,6 +15,7 @@ import {
   loginAccount,
   registerAccount,
   fetchSessionUser,
+  patchSessionUser,
   friendlyApiMessage,
 } from "../lib/api";
 
@@ -24,6 +25,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
   const [hydrated, setHydrated] = useState(false);
 
   const persistUser = useCallback((u) => {
@@ -46,6 +48,7 @@ export function AuthProvider({ children }) {
   const applySession = useCallback(
     (token, u) => {
       setStoredToken(token || null);
+      setToken(token || null);
       persistUser(u);
     },
     [persistUser]
@@ -61,6 +64,7 @@ export function AuthProvider({ children }) {
         if (raw && token) {
           const localUser = JSON.parse(raw);
           setUser(localUser);
+          setToken(token);
           
           const { data: res } = await fetchSessionUser();
           if (!cancelled) {
@@ -70,14 +74,17 @@ export function AuthProvider({ children }) {
               // Server says no user for this token
               persistUser(null);
               setStoredToken(null);
+              setToken(null);
             }
           }
         } else if (token && !raw) {
+          setToken(token);
           const { data: res } = await fetchSessionUser();
           if (!cancelled && res?.data) persistUser(res.data);
         } else {
           setUser(null);
           setStoredToken(null);
+          setToken(null);
         }
       } catch (e) {
         if (!cancelled) {
@@ -150,6 +157,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     setStoredToken(null);
+    setToken(null);
     persistUser(null);
   }, [persistUser]);
 
@@ -160,6 +168,7 @@ export function AuthProvider({ children }) {
   const value = useMemo(
     () => ({
       user,
+      token,
       hydrated,
       register,
       login,
@@ -168,7 +177,7 @@ export function AuthProvider({ children }) {
       requestPasswordReset,
       isAdmin: user?.role === "admin",
     }),
-    [user, hydrated, register, login, logout, updateAccount, requestPasswordReset]
+    [user, token, hydrated, register, login, logout, updateAccount, requestPasswordReset]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
