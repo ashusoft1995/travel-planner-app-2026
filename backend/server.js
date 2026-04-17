@@ -45,19 +45,26 @@ app.post('/api/login', async (req, res) => {
   }
 
   // Find user by email OR username
+  console.log('--- LOGIN ATTEMPT ---');
+  console.log('Identifier:', loginId);
+
   const { data: users, error } = await supabase
     .from('users')
     .select('*')
-    .or(`email.eq.${loginId},username.eq.${loginId}`);
+    .or(`email.eq."${loginId}",username.eq."${loginId}"`); // Added quotes for safety
 
   if (error) {
+    console.error('Database error:', error);
     return res.status(500).json({
       success: false,
       message: 'Database error: ' + error.message
     });
   }
 
+  console.log('Users found:', users?.length || 0);
+
   if (!users || users.length === 0) {
+    console.log('Result: User not found');
     return res.status(401).json({
       success: false,
       message: 'Invalid credentials'

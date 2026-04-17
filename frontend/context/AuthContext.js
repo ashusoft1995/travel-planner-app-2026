@@ -110,10 +110,14 @@ export function AuthProvider({ children }) {
           username: username.trim().toLowerCase(),
           role,
         });
+        
+        // Correctly access the nested 'data' from the backend response
+        const authData = res.data; 
+        
         flushSync(() => {
-          applySession(res.data?.token, res.data?.user);
+          applySession(authData?.token, authData?.user);
         });
-        return res?.data?.user;
+        return authData?.user;
       } catch (e) {
         throw new Error(friendlyApiMessage(e));
       }
@@ -128,10 +132,14 @@ export function AuthProvider({ children }) {
           identifier: identifier.trim(),
           password,
         });
+
+        // Correctly access the nested 'data' from the backend response
+        const authData = res.data;
+
         flushSync(() => {
-          applySession(res.data?.token, res.data?.user);
+          applySession(authData?.token, authData?.user);
         });
-        return res.data?.user;
+        return authData?.user;
       } catch (e) {
         const msg = e?.response?.data?.message;
         throw new Error(

@@ -3,11 +3,11 @@
 import { FiBriefcase, FiClock, FiCheckCircle, FiTrendingUp, FiUsers, FiDollarSign } from "react-icons/fi";
 import { motion } from "framer-motion";
 
-export default function AgentStats({ stats }) {
+export default function AgentStats({ stats = {} }) {
   const statCards = [
     {
       title: "Total Trips",
-      value: stats.totalTrips || 0,
+      value: stats?.totalTrips || 0,
       icon: FiBriefcase,
       color: "bg-blue-500",
       change: "+12%",
