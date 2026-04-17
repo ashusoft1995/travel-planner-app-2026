@@ -34,32 +34,33 @@ app.get('/api/health', (req, res) => {
 // ============================================
 
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, identifier, password } = req.body;
+  const loginId = identifier || email; // Support both field names
 
-  if (!email || !password) {
+  if (!loginId || !password) {
     return res.status(400).json({
       success: false,
-      message: 'Email and password are required'
+      message: 'Email/Username and password are required'
     });
   }
 
-  // Find user by email
+  // Find user by email OR username
   const { data: users, error } = await supabase
     .from('users')
     .select('*')
-    .eq('email', email);
+    .or(`email.eq.${loginId},username.eq.${loginId}`);
 
   if (error) {
     return res.status(500).json({
       success: false,
-      message: 'Database error'
+      message: 'Database error: ' + error.message
     });
   }
 
   if (!users || users.length === 0) {
     return res.status(401).json({
       success: false,
-      message: 'Invalid email or password'
+      message: 'Invalid credentials'
     });
   }
 
@@ -71,7 +72,7 @@ app.post('/api/login', async (req, res) => {
   if (!isValid) {
     return res.status(401).json({
       success: false,
-      message: 'Invalid email or password'
+      message: 'Invalid credentials'
     });
   }
 
@@ -156,26 +157,53 @@ app.get('/api/users/:id', async (req, res) => {
 app.post('/api/users', async (req, res) => {
   const { id, username, name, email, password, role, status } = req.body;
 
-  let passwordHash;
-  if (password) {
-    passwordHash = await bcrypt.hash(password, 10);
+  if (!email || !password || !username) {
+    return res.status(400).json({ success: false, message: 'Email, Username, and Password are required' });
   }
+
+  // Hash the password
+  const passwordHash = await bcrypt.hash(password, 10);
 
   const { data, error } = await supabase
     .from('users')
     .insert([{
-      id: id || Date.now().toString(),
-      username,
+      id: id || crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      username: username.toLowerCase(),
       name,
-      email,
+      email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
       status: status || 'active'
     }])
     .select();
 
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
+  if (error) {
+    if (error.code === '23505') {
+      return res.status(400).json({ success: false, message: 'Email or Username already exists' });
+    }
+    return res.status(500).json({ success: false, message: error.message });
+  }
+
+  const newUser = data[0];
+
+  // Generate JWT token so they are logged in immediately
+  const token = jwt.sign(
+    { id: newUser.id, email: newUser.email, role: newUser.role },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  // Remove password before returning
+  const { password_hash, ...userWithoutPassword } = newUser;
+
+  res.status(201).json({
+    success: true,
+    message: 'User created successfully',
+    data: {
+      user: userWithoutPassword,
+      token: token
+    }
+  });
 });
 
 // PUT update user
