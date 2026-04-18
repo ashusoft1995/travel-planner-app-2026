@@ -8,6 +8,7 @@ import { FiLogOut, FiMenu, FiUser, FiX, FiShield, FiLayout } from "react-icons/f
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
+import Image from "next/image";
 
 const baseLinks = [
   { href: "/", label: "Home" },
@@ -40,8 +41,19 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl">
       <div className="container flex h-20 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 text-xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">
-          <span className="text-blue-600">Ethio</span>Travel
+        <Link href="/" className="flex items-center gap-3 text-xl font-black text-[#051128] dark:text-white uppercase tracking-tighter group">
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl bg-blue-600 shadow-lg shadow-blue-600/20 transition-transform group-hover:scale-110">
+            <Image 
+              src="/logo.png" 
+              alt="EthioTravel Logo" 
+              fill 
+              className="object-cover"
+            />
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-blue-600 text-lg">Ethio</span>
+            <span className="text-xs tracking-[0.3em] text-slate-400 group-hover:text-blue-400 transition-colors">Travel</span>
+          </div>
         </Link>
 
         <nav className="hidden items-center gap-2 md:flex">

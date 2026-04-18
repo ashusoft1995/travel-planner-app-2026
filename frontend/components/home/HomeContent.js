@@ -119,18 +119,27 @@ export default function HomeContent() {
   const router = useRouter();
 
   useEffect(() => {
-    fetchAnnouncements().then(res => setAnnouncements(res.data?.data || [])).catch(console.error);
-    fetch(getApiUrl("/destinations"))
-      .then(res => res.json())
+    fetchAnnouncements()
+      .then(res => setAnnouncements(res.data?.data || []))
+      .catch(console.error);
+
+    fetch(getApiUrl("/api/destinations"))
+      .then(async res => {
+        if (!res.ok) throw new Error("API failed");
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+           throw new Error("Invalid JSON");
+        }
+        return res.json();
+      })
       .then(res => {
         const data = res.data || [];
-        // Fallback to library data if API fails or returns less than 25
         const finalData = data.length >= 25 ? data : DESTINATION_DETAILS;
         setDestinations(finalData);
         setCounters(prev => ({ ...prev, destinations: finalData.length }));
       })
       .catch(e => {
-        console.error(e);
+        console.error("Fetch error:", e);
         setDestinations(DESTINATION_DETAILS);
         setCounters(prev => ({ ...prev, destinations: DESTINATION_DETAILS.length }));
       });
@@ -227,7 +236,7 @@ export default function HomeContent() {
     else router.push(`/login?next=${encodeURIComponent(dest)}`);
   };
 
-  const displayedDestinations = destinations.slice(0, 25);
+  const displayedDestinations = destinations;
 
   return (
     <main className="page-shell bg-white dark:bg-[var(--bg)]">

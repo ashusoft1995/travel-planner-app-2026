@@ -5,6 +5,8 @@ import { FiMenu, FiX, FiHome, FiMap, FiUser, FiSettings, FiLogOut, FiBell, FiSea
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
+import Image from 'next/image';
+
 export default function ResponsiveNav({ 
   user, 
   onLogout, 
@@ -78,9 +80,16 @@ export default function ResponsiveNav({
           <div className="flex items-center">
             <button
               onClick={() => router.push('/')}
-              className="flex items-center space-x-2 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
+              className="flex items-center space-x-3 text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors group"
             >
-              <FiMap className="h-6 w-6" />
+              <div className="relative h-8 w-8 overflow-hidden rounded-lg bg-blue-600">
+                <Image 
+                  src="/logo.png" 
+                  alt="Logo" 
+                  fill 
+                  className="object-cover"
+                />
+              </div>
               <span className="hidden sm:inline">EthioTravel</span>
             </button>
           </div>

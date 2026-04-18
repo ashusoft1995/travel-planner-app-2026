@@ -51,7 +51,7 @@ app.post('/api/login', async (req, res) => {
   const { data: users, error } = await supabase
     .from('users')
     .select('*')
-    .or(`email.eq."${loginId}",username.eq."${loginId}"`); // Added quotes for safety
+    .or(`email.eq.${loginId},username.eq.${loginId}`);
 
   if (error) {
     console.error('Database error:', error);
@@ -162,7 +162,7 @@ app.get('/api/users/:id', async (req, res) => {
 
 // POST create user (signup)
 app.post('/api/users', async (req, res) => {
-  const { id, username, name, email, password, role, status } = req.body;
+  const { id, username, name, email, password, role, status, phone, expertise, about, legal_paper_photo, experience_cv, experience_image, national_id_photo } = req.body;
 
   if (!email || !password || !username) {
     return res.status(400).json({ success: false, message: 'Email, Username, and Password are required' });
@@ -180,7 +180,14 @@ app.post('/api/users', async (req, res) => {
       email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
-      status: status || 'active'
+      status: status || 'active',
+      phone: phone || null,
+      expertise: expertise || [],
+      about: about || null,
+      legal_paper_photo: legal_paper_photo || null,
+      experience_cv: experience_cv || null,
+      experience_image: experience_image || null,
+      national_id_photo: national_id_photo || null
     }])
     .select();
 

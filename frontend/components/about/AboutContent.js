@@ -2,14 +2,31 @@
 
 import { motion } from "framer-motion";
 import { 
-  FiAward, FiGlobe, FiHeart, FiUsers, FiLeaf, FiShield, FiDroplet, FiStar, FiChevronRight 
+  FiLeaf, FiShield, FiDroplet, FiStar 
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
 
+function SustainabilityCard({ icon, title, desc, bg, whiteIcon }) {
+  return (
+    <motion.div 
+      whileHover={{ y: -10 }}
+      className={`p-10 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-white/10 transition-all ${bg}`}
+    >
+      <div className={`mb-8 text-3xl ${whiteIcon ? "text-white" : ""}`}>
+        {icon}
+      </div>
+      <h4 className="text-xl font-black mb-4 tracking-tight uppercase">{title}</h4>
+      <p className={`text-sm leading-relaxed ${bg.includes('white') ? 'text-slate-500 dark:text-slate-400' : 'opacity-70 font-medium'}`}>
+        {desc}
+      </p>
+    </motion.div>
+  );
+}
+
 export default function AboutContent() {
   return (
-    <main className="bg-white dark:bg-[#050b18] text-slate-900 dark:text-white">
+    <main className="bg-white dark:bg-[#050b18] text-slate-900 dark:text-white min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
         <Image 
@@ -30,7 +47,7 @@ export default function AboutContent() {
             <p className="text-xs font-black uppercase tracking-[0.4em] text-white/70 mb-4">
               Our Legacy
             </p>
-            <h1 className="text-6xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9]">
+            <h1 className="text-6xl lg:text-8xl font-black tracking-tighter text-white leading-[0.9] uppercase">
               The Heart of <br />
               <span className="text-blue-400">EthioTravel</span>
             </h1>
@@ -96,6 +113,7 @@ export default function AboutContent() {
               title="Pure Safety"
               desc="80% of our budget stays within local communities for security and wealth."
               bg="bg-[#051128] text-white"
+              whiteIcon
             />
             <SustainabilityCard 
               icon={<FiDroplet className="text-blue-500" />}
@@ -119,7 +137,7 @@ export default function AboutContent() {
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="space-y-10">
-              <h2 className="text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-none">THE <br /> ABYSSINIAN <br /> LEGACY</h2>
+              <h2 className="text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-none uppercase">THE <br /> ABYSSINIAN <br /> LEGACY</h2>
               <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                 EthioTravel emerged from a passion to showcase the unparalleled majesty of the Horn of Africa. We believe that luxury is about exclusive access to stories untold and paths untraveled.
               </p>
@@ -157,22 +175,5 @@ export default function AboutContent() {
         </div>
       </footer>
     </main>
-  );
-}
-
-function SustainabilityCard({ icon, title, desc, bg, whiteIcon }) {
-  return (
-    <motion.div 
-      whileHover={{ y: -10 }}
-      className={`p-10 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-white/10 transition-all ${bg}`}
-    >
-      <div className={`mb-8 text-3xl ${whiteIcon ? "text-white" : ""}`}>
-        {icon}
-      </div>
-      <h4 className="text-xl font-black mb-4 tracking-tight">{title}</h4>
-      <p className={`text-sm leading-relaxed ${bg.includes('white') ? 'text-slate-500 dark:text-slate-400' : 'opacity-70 font-medium'}`}>
-        {desc}
-      </p>
-    </motion.div>
   );
 }

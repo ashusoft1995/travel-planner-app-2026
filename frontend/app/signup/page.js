@@ -12,11 +12,12 @@ import Image from "next/image";
 
 function SignupContent() {
   const router = useRouter();
-  const { register, user, hydrated, isAdmin } = useAuth();
+  const { register, user, hydrated } = useAuth();
   const { handleLoginRedirect } = useFastRouting();
   const [form, setForm] = useState({ 
     name: "", email: "", username: "", password: "", confirm: "", role: "user",
-    phone: "", expertise: [], about: ""
+    phone: "", expertise: [], about: "",
+    legal_paper_photo: null, experience_cv: null, experience_image: null, national_id_photo: null
   });
   const [loading, setLoading] = useState(false);
 
@@ -41,9 +42,17 @@ function SignupContent() {
         form.name, form.email, form.password, 
         form.username || form.email.split('@')[0], 
         form.role,
-        { phone: form.phone, expertise: form.expertise, about: form.about }
+        { 
+          phone: form.phone, 
+          expertise: form.expertise, 
+          about: form.about,
+          legal_paper_photo: form.legal_paper_photo,
+          experience_cv: form.experience_cv,
+          experience_image: form.experience_image,
+          national_id_photo: form.national_id_photo
+        }
       );
-      toast.success(form.role === "agent" ? "Expert application submitted for review!" : "Account created successfully!");
+      toast.success(form.role === "agent" ? "Expert application submitted!" : "Account created!");
       setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -55,59 +64,64 @@ function SignupContent() {
   };
 
   return (
-    <main className="relative min-h-[100vh] w-full flex items-center justify-center py-20 px-6 bg-[#050510]">
-      {/* Immersive Background */}
+    <main className="relative min-h-screen w-full flex items-center justify-center py-32 px-6 bg-[#050510] overflow-hidden">
+      {/* Immersive Background (Synced with Login) */}
       <div className="fixed inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1585016495481-9161353f1ba2?q=80&w=2000" 
           alt="Ancient Aksum"
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/80 via-transparent to-[#050510]" />
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`relative z-10 w-full ${form.role === "agent" ? "max-w-[450px]" : "max-w-[360px]"} bg-white/5 dark:bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] p-8 lg:p-10 shadow-3xl border border-white/10 transition-all duration-500 my-20`}
+        className={`relative z-10 w-full ${form.role === "agent" ? "max-w-[480px]" : "max-w-[400px]"} bg-[#121421]/60 backdrop-blur-3xl rounded-[3.5rem] p-10 lg:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] border border-white/10 transition-all duration-500`}
       >
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-black text-white tracking-tighter uppercase mb-1">Join Azure</h1>
-          <p className="text-white/40 text-[9px] font-black uppercase tracking-widest">Global Travel Network</p>
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Join Azure</h1>
+          <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Global Travel Network</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-8">
+        {/* Role Selector */}
+        <div className="grid grid-cols-2 gap-4 mb-10">
           <RoleCard 
             active={form.role === "user"} 
             onClick={() => setForm({...form, role: "user"})}
-            icon={<FiSearch className="text-blue-400 text-lg" />}
+            icon={<FiSearch className="text-lg" />}
             title="Traveler"
           />
           <RoleCard 
             active={form.role === "agent"} 
             onClick={() => setForm({...form, role: "agent"})}
-            icon={<FiHeadphones className="text-blue-400 text-lg" />}
+            icon={<FiHeadphones className="text-lg" />}
             title="Expert"
           />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
-            <input 
-              type="text" 
-              placeholder="Full Name"
-              value={form.name}
-              onChange={(e) => setForm({...form, name: e.target.value})}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
-              required
-            />
+          <div className="space-y-3">
+            <div className="relative">
+              <FiUser className="absolute left-6 top-1/2 -translate-y-1/2 text-white/30" />
+              <input 
+                type="text" 
+                placeholder="Full Name"
+                value={form.name}
+                onChange={(e) => setForm({...form, name: e.target.value})}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-14 pr-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                required
+              />
+            </div>
+            
             <div className="grid grid-cols-2 gap-3">
               <input 
                 type="text" 
                 placeholder="Username"
                 value={form.username}
                 onChange={(e) => setForm({...form, username: e.target.value})}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                 required
               />
               <input 
@@ -115,7 +129,7 @@ function SignupContent() {
                 placeholder="Email Address"
                 value={form.email}
                 onChange={(e) => setForm({...form, email: e.target.value})}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                 required
               />
             </div>
@@ -125,56 +139,37 @@ function SignupContent() {
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="space-y-3 pt-4 border-t border-white/5"
+              className="space-y-4 pt-6 border-t border-white/5"
             >
-              <p className="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-4">Expert Verification</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-400">Professional Verification</p>
               
               <div className="grid grid-cols-2 gap-3">
                 <input 
                   type="tel" 
-                  placeholder="Phone Number"
+                  placeholder="Phone"
                   value={form.phone}
                   onChange={(e) => setForm({...form, phone: e.target.value})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                   required
                 />
                 <input 
                   type="text" 
-                  placeholder="Destinations (e.g. Lalibela)"
+                  placeholder="Destinations"
                   value={form.expertise}
                   onChange={(e) => setForm({...form, expertise: e.target.value.split(",")})}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                 <div className="relative group">
-                    <label className="flex flex-col items-center justify-center h-24 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer group-hover:bg-white/10 transition-all">
-                       <span className="text-[8px] font-black uppercase text-white/40 group-hover:text-blue-400">Legal Permit</span>
-                       <span className="text-[7px] text-white/20 mt-1">Upload JPG/PNG</span>
-                    </label>
+                 <div className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group">
+                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400">Permit Photo</span>
+                    <span className="text-[8px] text-white/20 mt-1">Upload Required</span>
                  </div>
-                 <div className="relative group">
-                    <label className="flex flex-col items-center justify-center h-24 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer group-hover:bg-white/10 transition-all">
-                       <span className="text-[8px] font-black uppercase text-white/40 group-hover:text-blue-400">ID / Kebele</span>
-                       <span className="text-[7px] text-white/20 mt-1">Front & Back</span>
-                    </label>
-                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                 <div className="relative group">
-                    <label className="flex flex-col items-center justify-center h-24 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer group-hover:bg-white/10 transition-all">
-                       <span className="text-[8px] font-black uppercase text-white/40 group-hover:text-blue-400">Professional CV</span>
-                       <span className="text-[7px] text-white/20 mt-1">Experience Doc</span>
-                    </label>
-                 </div>
-                 <div className="relative group">
-                    <label className="flex flex-col items-center justify-center h-24 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer group-hover:bg-white/10 transition-all">
-                       <span className="text-[8px] font-black uppercase text-white/40 group-hover:text-blue-400">Portfolio</span>
-                       <span className="text-[7px] text-white/20 mt-1">Tour Images</span>
-                    </label>
+                 <div className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group">
+                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400">ID / Kebele</span>
+                    <span className="text-[8px] text-white/20 mt-1">Both Sides</span>
                  </div>
               </div>
             </motion.div>
@@ -186,7 +181,7 @@ function SignupContent() {
               placeholder="Password"
               value={form.password}
               onChange={(e) => setForm({...form, password: e.target.value})}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
               required
             />
             <input 
@@ -194,7 +189,7 @@ function SignupContent() {
               placeholder="Confirm"
               value={form.confirm}
               onChange={(e) => setForm({...form, confirm: e.target.value})}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
               required
             />
           </div>
@@ -202,30 +197,21 @@ function SignupContent() {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-[10px] py-5 rounded-2xl transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2 mt-4"
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs py-5 rounded-2xl transition-all shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] flex items-center justify-center gap-3 mt-6 active:scale-95"
           >
-            {loading ? "Verifying Credentials..." : form.role === "agent" ? "Submit Expert Application" : "Create Traveler Account"} <FiArrowRight size={14} />
+            {loading ? "Verifying..." : form.role === "agent" ? "Apply as Expert" : "Create Account"} <FiArrowRight size={16} />
           </button>
         </form>
 
-        <div className="mt-6">
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="absolute w-full border-t border-white/5"></div>
-              <span className="relative z-10 px-4 bg-[#050510]/50 rounded-full text-[8px] font-black uppercase tracking-widest text-white/30">Auth Sync</span>
-            </div>
-
-            <button className="w-full bg-white/5 text-white font-black uppercase tracking-widest text-[9px] py-3.5 rounded-2xl border border-white/10 flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
-               <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" className="w-4 h-4" alt="Google" /> Continue with Google
-            </button>
+        <div className="mt-10 pt-8 border-t border-white/5 text-center">
+            <p className="text-white/40 text-[10px] font-bold">
+              ALREADY A MEMBER? <Link href="/login" className="text-blue-400 font-black uppercase tracking-tighter hover:underline ml-1">LOG IN HERE</Link>
+            </p>
         </div>
-
-        <p className="mt-8 text-center text-[10px] font-bold text-white/40">
-          Member? <Link href="/login" className="text-blue-400 font-black uppercase tracking-tighter hover:underline ml-1">Log in here</Link>
-        </p>
       </motion.div>
 
-      {/* Back to Home Link */}
-      <Link href="/" className="fixed bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition group z-10">
+      {/* Back Link */}
+      <Link href="/" className="fixed bottom-10 left-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-white transition group z-10">
         <FiArrowRight className="rotate-180 group-hover:-translate-x-1 transition-transform" /> Back to exploration
       </Link>
     </main>
@@ -237,14 +223,16 @@ function RoleCard({ active, onClick, icon, title }) {
     <button 
       type="button"
       onClick={onClick}
-      className={`p-4 rounded-[2rem] border transition-all flex flex-col items-center gap-2 flex-1 ${
+      className={`p-6 rounded-3xl border transition-all flex flex-col items-center gap-3 flex-1 ${
         active 
-          ? "bg-white/10 border-blue-600 shadow-xl shadow-blue-600/10" 
-          : "bg-white/[0.02] border-white/5 grayscale hover:grayscale-0 hover:bg-white/5"
+          ? "bg-blue-600 border-blue-500 shadow-[0_15px_30px_-5px_rgba(37,99,235,0.3)]" 
+          : "bg-white/5 border-white/5 grayscale hover:grayscale-0 hover:bg-white/10"
       }`}
     >
-      {icon}
-      <span className="text-[9px] font-black uppercase tracking-widest text-white">{title}</span>
+      <div className={`${active ? "text-white" : "text-blue-400"}`}>
+        {icon}
+      </div>
+      <span className={`text-[10px] font-black uppercase tracking-widest ${active ? "text-white" : "text-white/60"}`}>{title}</span>
     </button>
   );
 }

@@ -9,7 +9,7 @@ const EXPERIENCES = [
   {
     title: "The Coffee Ceremony",
     desc: "Immerse yourself in the birthplace of Arabica. Witness the rhythmic ritual of roasting, grinding, and brewing in a traditional Ethiopian home.",
-    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1510797215324-95aa89f29763?auto=format&fit=crop&w=1200&q=80",
     icon: <FiCoffee />,
     tag: "Cultural"
   },
@@ -23,14 +23,14 @@ const EXPERIENCES = [
   {
     title: "Timket Festival",
     desc: "Join thousands of pilgrims in Gondar for the Feast of Epiphany, a kaleidoscope of white robes, gold umbrellas, and spiritual song.",
-    image: "https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1596431718871-3375b432e6fc?auto=format&fit=crop&w=1200&q=80",
     icon: <FiMusic />,
     tag: "Spiritual"
   },
   {
     title: "Simien Wildlife Safari",
     desc: "Trek alongside Gelada monkeys and scan the cliffs for the rare Walia Ibex in the roof of Africa.",
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
     icon: <FiCamera />,
     tag: "Nature"
   }

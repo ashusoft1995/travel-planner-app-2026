@@ -195,7 +195,7 @@ export default function ContactContent() {
                 className="relative h-[300px] rounded-[3rem] overflow-hidden bg-slate-200 shadow-lg border-4 border-white dark:border-white/10"
              >
                 <Image 
-                 src="https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=800&q=80" 
+                 src="https://images.unsplash.com/photo-1548391355-1698a72af27a?auto=format&fit=crop&w=800&q=80" 
                  alt="Map Placeholder"
                  fill
                  className="object-cover opacity-50 grayscale"
@@ -281,7 +281,7 @@ export default function ContactContent() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {[
-              { city: "Addis Ababa", addr: "Bole Medhanialem Road, Crystal Tower, 4th Floor", tel: "+251 11 661 2345", image: "https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=800&q=80" },
+              { city: "Addis Ababa", addr: "Bole Medhanialem Road, Crystal Tower, 4th Floor", tel: "+251 11 661 2345", image: "https://images.unsplash.com/photo-1548391355-1698a72af27a?auto=format&fit=crop&w=800&q=80" },
               { city: "Gondar", addr: "Fasilides Square, Heritage House, Suite 12", tel: "+251 58 211 6789", image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80" },
             ].map((office) => (
               <div key={office.city} className="group relative h-[350px] rounded-[3rem] overflow-hidden shadow-2xl">

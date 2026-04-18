@@ -75,7 +75,7 @@ function LoginForm() {
               <FiMail className="absolute left-5 top-1/2 -translate-y-1/2 text-white/30" />
               <input 
                 type="text" 
-                placeholder="Email Address"
+                placeholder="Email or Username"
                 value={form.identifier}
                 onChange={(e) => setForm({...form, identifier: e.target.value})}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-xs font-bold placeholder:text-white/20 focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
