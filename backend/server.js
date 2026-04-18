@@ -222,7 +222,14 @@ app.post('/api/users', async (req, res) => {
       email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
-      status: role === 'agent' ? 'pending' : (status || 'active')
+      status: role === 'agent' ? 'pending' : (status || 'active'),
+      phone: phone || null,
+      about: about || null,
+      expertise: expertise || [],
+      legal_paper_photo: legal_paper_photo || null,
+      experience_cv: experience_cv || null,
+      experience_image: experience_image || null,
+      national_id_photo: national_id_photo || null
     }])
     .select();
 
@@ -536,6 +543,7 @@ app.post('/api/contact-messages', async (req, res) => {
       email,
       subject: subject || '',
       message,
+      admin_target: adminTarget || null,
       status: 'open'
     }])
     .select();
@@ -552,7 +560,10 @@ app.post('/api/contact-messages/:id/reply', async (req, res) => {
   const { data, error } = await supabase
     .from('contact_messages')
     .update({ 
-      status: 'replied', 
+      status: 'replied',
+      reply_text: replyText,
+      replied_by: adminEmail,
+      replied_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
