@@ -268,6 +268,33 @@ export default function HomeContent() {
                   className="w-full rounded-2xl bg-white/10 border border-white/20 p-4 pl-12 text-white outline-none focus:border-accent-yellow/50 backdrop-blur-md transition-all uppercase tracking-widest text-xs font-bold" 
                   placeholder="Where do you want to go?"
                 />
+                <AnimatePresence>
+                  {suggestions.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#051128] rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 overflow-hidden z-50 text-left"
+                    >
+                      {suggestions.map((dest, i) => (
+                        <div
+                          key={i}
+                          onClick={() => {
+                            setSearchQ("");
+                            router.push(`/trips?destination=${encodeURIComponent(dest.name)}`);
+                          }}
+                          className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-50 dark:border-white/5 last:border-0 transition-colors"
+                        >
+                          <div>
+                            <p className="text-sm font-black text-[#051128] dark:text-white uppercase">{dest.name}</p>
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{dest.region}</p>
+                          </div>
+                          <FiArrowRight className="text-blue-600" />
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <button onClick={runSearch} className="rounded-2xl bg-accent-yellow px-8 py-4 font-black uppercase tracking-widest text-black shadow-xl shadow-accent-yellow/20 hover:scale-105 active:scale-95 transition-all">Search</button>
             </div>

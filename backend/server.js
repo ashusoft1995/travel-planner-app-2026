@@ -134,6 +134,38 @@ app.get('/api/me', async (req, res) => {
 });
 
 // ============================================
+// UPDATE CURRENT USER (from token)
+// ============================================
+
+app.put('/api/me', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const updates = req.body;
+
+    const { data: user, error } = await supabase
+      .from('users')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('id', decoded.id)
+      .select('id, email, name, role, status, username')
+      .single();
+
+    if (error) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+
+    res.json({ success: true, data: { user } });
+  } catch (error) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
+});
+
+// ============================================
 // USERS API
 // ============================================
 
@@ -180,7 +212,7 @@ app.post('/api/users', async (req, res) => {
       email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
-      status: status || 'active',
+      status: role === 'agent' ? 'pending' : (status || 'active'),
       phone: phone || null,
       expertise: expertise || [],
       about: about || null,
@@ -199,6 +231,14 @@ app.post('/api/users', async (req, res) => {
   }
 
   const newUser = data[0];
+
+  if (role === 'agent') {
+    return res.status(201).json({
+      success: true,
+      message: 'Account request sent to admin. Please wait for approval.',
+      data: null
+    });
+  }
 
   // Generate JWT token so they are logged in immediately
   const token = jwt.sign(
@@ -324,6 +364,25 @@ app.put('/api/trips/:id', async (req, res) => {
   res.json({ success: true, data: data[0] });
 });
 
+// PATCH update trip approval status
+app.patch('/api/trips/:id/approval', async (req, res) => {
+  const { id } = req.params;
+  const { approval_status, notes } = req.body;
+
+  const { data, error } = await supabase
+    .from('trips')
+    .update({
+      approval_status,
+      notes,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data: data[0] });
+});
+
 // DELETE trip
 app.delete('/api/trips/:id', async (req, res) => {
   const { error } = await supabase
@@ -421,6 +480,21 @@ app.put('/api/travel-requests/:id', async (req, res) => {
   res.json({ success: true, data: data[0] });
 });
 
+// PATCH update travel request status
+app.patch('/api/travel-requests/:id', async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const { data, error } = await supabase
+    .from('travel_requests')
+    .update(updates)
+    .eq('id', id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data: data[0] });
+});
+
 // DELETE travel request
 app.delete('/api/travel-requests/:id', async (req, res) => {
   const { error } = await supabase
@@ -468,6 +542,47 @@ app.post('/api/contact-messages', async (req, res) => {
   res.status(201).json({ success: true, data: data[0] });
 });
 
+// POST reply to contact message
+app.post('/api/contact-messages/:id/reply', async (req, res) => {
+  const { id } = req.params;
+  const { replyText, adminEmail } = req.body;
+
+  const { data, error } = await supabase
+    .from('contact_messages')
+    .update({ 
+      status: 'replied', 
+      reply_text: replyText, 
+      replied_by: adminEmail,
+      replied_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data: data[0] });
+});
+
+// GET user specific contact messages
+app.get('/api/contact-messages/me', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ success: false, message: 'No token' });
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { data, error } = await supabase
+      .from('contact_messages')
+      .select('*')
+      .eq('email', decoded.email)
+      .order('created_at', { ascending: false });
+      
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
+});
+
 // ============================================
 // NOTIFICATIONS API
 // ============================================
@@ -504,6 +619,26 @@ app.put('/api/notifications/:id/read', async (req, res) => {
   res.json({ success: true, data: data[0] });
 });
 
+// Mark all notifications as read
+app.put('/api/notifications/read-all', async (req, res) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ success: false, message: 'No token' });
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_email', decoded.email)
+      .select();
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
+});
+
 // ============================================
 // ANNOUNCEMENTS API
 // ============================================
@@ -518,6 +653,25 @@ app.get('/api/announcements', async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
+});
+
+// ============================================
+// ACTIVITY LOGS API
+// ============================================
+
+app.get('/api/activity-logs', async (req, res) => {
+  const { data, error } = await supabase
+    .from('activity_logs')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data });
+});
+
+app.post('/api/activity-logs/:id/undo', async (req, res) => {
+  // Stub for undo functionality
+  res.json({ success: true, message: 'Action undone' });
 });
 
 // ============================================

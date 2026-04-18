@@ -200,6 +200,39 @@ function TripsContent() {
               onChange={(e) => setQuery(e.target.value)}
               className="w-full rounded-[2rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.03] py-6 pl-16 pr-8 text-[#051128] dark:text-white text-lg font-bold placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600/30 transition-all shadow-xl shadow-blue-900/5"
             />
+            <AnimatePresence>
+              {query.trim().length > 0 && !selectedDest && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full left-0 right-0 mt-4 bg-white dark:bg-[#051128] rounded-3xl shadow-2xl border border-slate-100 dark:border-white/10 z-50 overflow-hidden"
+                >
+                  {filteredDestinations.slice(0, 5).map((dest, i) => (
+                    <div
+                      key={dest.name}
+                      onClick={() => {
+                        setSelectedDest(dest);
+                        setQuery("");
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="px-8 py-5 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/10 border-b border-slate-50 dark:border-white/5 last:border-0 flex items-center justify-between transition-colors group/item"
+                    >
+                      <div className="flex items-center gap-4">
+                         <div className="h-10 w-10 rounded-full overflow-hidden relative">
+                           <Image src={dest.image || dest.imageUrl} alt={dest.name} fill className="object-cover" />
+                         </div>
+                         <div>
+                           <p className="text-lg font-black text-[#051128] dark:text-white uppercase">{dest.name}</p>
+                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{dest.region}</p>
+                         </div>
+                      </div>
+                      <FiArrowRight className="text-blue-600 opacity-0 group-hover/item:opacity-100 transition-opacity -translate-x-4 group-hover/item:translate-x-0" />
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 

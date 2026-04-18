@@ -23,7 +23,7 @@ const EXPERIENCES = [
   {
     title: "Timket Festival",
     desc: "Join thousands of pilgrims in Gondar for the Feast of Epiphany, a kaleidoscope of white robes, gold umbrellas, and spiritual song.",
-    image: "https://images.unsplash.com/photo-1533174000223-380d0d82998a?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
     icon: <FiMusic />,
     tag: "Spiritual"
   },
