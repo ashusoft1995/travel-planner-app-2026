@@ -15,6 +15,11 @@ export const metadata = {
     "Plan Ethiopian adventures with itinerary management, budget tracking, maps, and multi-user roles.",
   keywords:
     "EthioTravel, travel planner, Ethiopia trip management, itinerary, budget tracker",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {

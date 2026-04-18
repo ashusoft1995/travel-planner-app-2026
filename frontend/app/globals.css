@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f3f4f6;
+  --bg: #f8faff;
   --surface: #ffffff;
   --panel: #ffffff;
-  --border: rgba(0, 0, 0, 0.08);
-  --text: #111827;
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
-  --muted: #666666;
-  --accent: #6366f1;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --border: rgba(0, 0, 0, 0.05);
+  --text: #051128;
+  --text-primary: #051128;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --shadow: 0 10px 30px rgba(5, 17, 40, 0.03);
 }
 
 .dark {
@@ -66,14 +66,18 @@ body {
 }
 
 .btn-primary {
-  border-radius: 999px;
-  padding: 0.95rem 1.6rem;
-  background: linear-gradient(135deg, #1f5bb5, #2aa65a);
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   color: #fff;
-  font-weight: 600;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {

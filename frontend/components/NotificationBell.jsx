@@ -86,7 +86,7 @@ export default function NotificationBell() {
       >
         <FiBell size={18} />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-accent-yellow px-1 text-[10px] font-bold text-brand-950">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-bold text-white shadow-lg">
             {unread > 9 ? "9+" : unread}
           </span>
         )}
@@ -102,7 +102,7 @@ export default function NotificationBell() {
               <button
                 type="button"
                 onClick={onReadAll}
-                className="text-xs font-semibold text-brand-600 hover:underline dark:text-accent-yellow"
+                className="text-xs font-semibold text-blue-600 hover:underline"
               >
                 Mark all read
               </button>
@@ -122,7 +122,7 @@ export default function NotificationBell() {
                   type="button"
                   onClick={() => onReadOne(n)}
                   className={`block w-full border-b border-[var(--border)] px-3 py-3 text-left text-sm last:border-0 hover:bg-black/[0.04] dark:hover:bg-white/5 ${
-                    n.read ? "opacity-70" : "bg-brand-500/5 dark:bg-accent-yellow/10"
+                    n.read ? "opacity-70" : "bg-blue-500/5 dark:bg-blue-400/10"
                   }`}
                 >
                   <p className="font-semibold text-[var(--text)]">{n.title}</p>

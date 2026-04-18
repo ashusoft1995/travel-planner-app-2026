@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { 
@@ -216,9 +218,9 @@ function TripsContent() {
 
         {filteredDestinations.length === 0 && (
           <div className="py-32 text-center">
-             <FiSearch className="mx-auto text-6xl text-white/5 mb-6" />
-             <p className="text-2xl font-black text-white/20 uppercase tracking-widest">No Node Protocol Matches Query</p>
-             <button onClick={() => setQuery("")} className="mt-6 text-purple-500 font-black uppercase tracking-widest text-xs hover:text-purple-400 transition-colors">Reset System filters</button>
+             <FiSearch className="mx-auto text-6xl text-slate-100 dark:text-white/5 mb-6" />
+             <p className="text-2xl font-black text-slate-300 dark:text-white/20 uppercase tracking-widest">No destinations found</p>
+             <button onClick={() => setQuery("")} className="mt-6 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-xs hover:underline transition-all">Clear all filters</button>
           </div>
         )}
       </div>
@@ -229,8 +231,8 @@ function TripsContent() {
 export default function TripsPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#06060c] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent shadow-lg shadow-purple-500/20"></div>
+      <div className="min-h-screen bg-white dark:bg-[#06060c] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent shadow-lg shadow-blue-600/20"></div>
       </div>
     }>
       <TripsContent />
