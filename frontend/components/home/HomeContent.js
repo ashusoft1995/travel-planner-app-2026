@@ -336,18 +336,39 @@ export default function HomeContent() {
                 className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" 
                 sizes="(max-width: 768px) 100vw, 25vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent opacity-90" />
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="h-1 w-8 bg-blue-600 rounded-full" />
-                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{dest.region}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent opacity-90 group-hover:from-blue-600/90 group-hover:via-blue-600/40 transition-all duration-500" />
+              
+              {/* Hot Indicator */}
+              {(dest.name === "Lalibela" || dest.name === "Gondar" || dest.name === "Simien Mountains" || dest.name === "Dallol") && (
+                <div className="absolute top-6 right-6 z-20">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-20" />
+                    <div className="bg-red-600 text-[8px] font-black text-white px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-red-900/20 flex items-center gap-1.5 border border-red-500/50">
+                      <div className="h-1 w-1 bg-white rounded-full animate-pulse" />
+                      Hot
+                    </div>
+                  </div>
                 </div>
-                <h4 className="text-3xl font-black text-[#051128] mb-2 uppercase tracking-tighter">{dest.name}</h4>
+              )}
+
+              {/* Click Hint */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="px-6 py-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 text-[10px] font-black uppercase tracking-widest text-white animate-bounce">
+                  Explore Now
+                </div>
+              </div>
+
+              <div className="absolute bottom-0 left-0 right-0 p-8 transform group-hover:-translate-y-4 transition-transform duration-500">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-1 w-8 bg-blue-600 group-hover:bg-white rounded-full transition-colors" />
+                  <span className="text-[10px] font-black text-slate-500 group-hover:text-white/70 uppercase tracking-widest">{dest.region}</span>
+                </div>
+                <h4 className="text-3xl font-black text-[#051128] group-hover:text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-xl font-black text-blue-600">{dest.price}</p>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm">
-                    <FiStar className="fill-blue-600 text-blue-600" size={12} />
-                    <span className="text-[10px] font-black text-[#051128]">{dest.rating}</span>
+                  <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}</p>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-md border border-slate-100 dark:border-white/20 shadow-sm">
+                    <FiStar className="fill-blue-600 group-hover:fill-white text-blue-600 group-hover:text-white" size={12} />
+                    <span className="text-[10px] font-black text-[#051128] dark:text-white">{dest.rating}</span>
                   </div>
                 </div>
               </div>

@@ -21,6 +21,7 @@ export default function ContactContent() {
     message: "",
   });
   const [loading, setLoading] = useState(false);
+  const [adminTarget, setAdminTarget] = useState("Ashu");
 
   useEffect(() => {
     if (!hydrated || !user) return;
@@ -44,7 +45,7 @@ export default function ContactContent() {
         email: form.email.trim(),
         subject: inquiryType,
         message: form.message.trim(),
-        adminTarget: "Ashenafi Abebe",
+        adminTarget: adminTarget,
       });
       toast.success(`Message sent. Our designers will reach out shortly.`);
       setForm({
@@ -98,6 +99,26 @@ export default function ContactContent() {
                     onChange={(e) => setForm({...form, email: e.target.value})}
                     className="w-full bg-[#f0f4ff] border-none rounded-2xl px-6 py-4 text-slate-900 font-bold placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 transition-all"
                   />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-3">Assign Concierge</label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {["Ashu", "Jemile", "Bire", "Elsa"].map((admin) => (
+                    <button
+                      key={admin}
+                      type="button"
+                      onClick={() => setAdminTarget(admin)}
+                      className={`py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all border-2 ${
+                        adminTarget === admin 
+                        ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                        : "bg-[#f0f4ff] border-transparent text-slate-400 hover:bg-slate-100"
+                      }`}
+                    >
+                      {admin}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -157,14 +178,14 @@ export default function ContactContent() {
               <ContactInfoCard 
                 icon={<FiPhone className="text-blue-600" />}
                 title="Concierge Desk"
-                desc="+251 911 123 456"
-                sub="Available 24/7 for active travelers"
+                desc="0997255611"
+                sub="Telegram: @Ashubro"
               />
               <ContactInfoCard 
                 icon={<FiMail className="text-blue-600" />}
                 title="Email Enquiries"
-                desc="hello@ethiotravel.com"
-                sub="concierge@ethiotravel.com"
+                desc="ashenafiabebe@gmail.com"
+                sub="Official: hello@ethiotravel.com"
               />
             </motion.div>
 
@@ -300,13 +321,21 @@ export default function ContactContent() {
               <p className="text-sm text-slate-400 mt-4 max-w-xs font-medium">Crafting bespoke adventures across the historic and natural wonders of Ethiopia since 2012.</p>
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-300 mt-8">© 2026 EthioTravel. All rights reserved.</p>
             </div>
-            <div className="grid grid-cols-2 gap-16">
+            <div className="grid grid-cols-3 gap-16">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">Company</p>
                 <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-slate-600">
                   <li><Link href="/about" className="hover:text-blue-600 transition">About Us</Link></li>
                   <li><Link href="/about" className="hover:text-blue-600 transition">Sustainability</Link></li>
                   <li><Link href="/contact" className="hover:text-blue-600 transition">Partner with us</Link></li>
+                </ul>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">Connect</p>
+                <ul className="space-y-3 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                  <li><a href="https://t.me/Ashubro" className="hover:text-blue-600 transition">Telegram</a></li>
+                  <li><a href="https://github.com/ashu" className="hover:text-blue-600 transition">GitHub</a></li>
+                  <li><a href="mailto:ashenafiabebe@gmail.com" className="hover:text-blue-600 transition">Email Ashu</a></li>
                 </ul>
               </div>
               <div>

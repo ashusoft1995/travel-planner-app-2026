@@ -13,7 +13,7 @@ export default function AboutContent() {
       {/* Hero Section */}
       <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
         <Image 
-          src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=1920&q=80" 
+          src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?q=80&w=1200" 
           alt="Abyssinian Highlands"
           fill
           className="object-cover"
@@ -53,7 +53,7 @@ export default function AboutContent() {
               className="relative aspect-square rounded-[3rem] overflow-hidden shadow-2xl"
             >
               <Image 
-                src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=80" 
+                src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200" 
                 alt="Lalibela Heritage"
                 fill
                 className="object-cover"
@@ -139,10 +139,10 @@ export default function AboutContent() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { name: "Ashu", role: "Chief Experience Architect", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=400&q=80" },
-              { name: "Jemile", role: "Head of Cultural Heritage", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=400&q=80" },
-              { name: "Bire", role: "Logistics Specialist", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&h=400&q=80" },
-              { name: "Elsa", role: "Guest Relations Director", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&h=400&q=80" },
+              { name: "Ashu", role: "Founder & CEO", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800" },
+              { name: "Jemile", role: "Head of Cultural Heritage", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800" },
+              { name: "Bire", role: "Logistics Specialist", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800" },
+              { name: "Elsa", role: "Guest Relations Director", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=800" },
             ].map((member, idx) => (
               <motion.div
                 key={member.name}
@@ -169,7 +169,7 @@ export default function AboutContent() {
         <div className="container">
           <div className="relative rounded-[3rem] overflow-hidden bg-slate-900 min-h-[500px] flex items-center">
             <Image 
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1200&q=80" 
+              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200" 
               alt="Concierge"
               fill
               className="object-cover opacity-60 grayscale"
@@ -250,7 +250,7 @@ export default function AboutContent() {
             <div className="lg:w-1/2 relative">
                <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl">
                   <Image 
-                    src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80" 
+                    src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1200" 
                     alt="Global Vision"
                     fill
                     className="object-cover"

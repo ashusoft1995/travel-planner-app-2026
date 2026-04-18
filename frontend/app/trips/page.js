@@ -69,8 +69,93 @@ function TripsContent() {
           </motion.div>
         </div>
 
+        {/* Discovery Display (Top Level Detail View) */}
+        <AnimatePresence mode="wait">
+          {selectedDest && (
+            <motion.div 
+              key="selected-display"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-24 relative overflow-hidden rounded-[4rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-3xl"
+            >
+              <div className="grid lg:grid-cols-2">
+                {/* Left: Visuals & Map */}
+                <div className="relative h-[400px] lg:h-auto overflow-hidden">
+                   <Image src={selectedDest.image} alt={selectedDest.name} fill className="object-cover" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                   <div className="absolute bottom-12 left-12 right-12">
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="px-4 py-2 rounded-full bg-red-600 text-white text-[8px] font-black uppercase tracking-widest shadow-lg animate-pulse">Live Selection</span>
+                        <span className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest border border-white/30">{selectedDest.region}</span>
+                      </div>
+                      <h2 className="text-6xl font-black text-white uppercase tracking-tighter mb-4">{selectedDest.name}</h2>
+                      <div className="flex items-center gap-4 text-white/80">
+                         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                           <FiMapPin className="text-blue-400" /> {selectedDest.distanceKm} KM From Capital
+                         </div>
+                         <div className="h-4 w-[1px] bg-white/30" />
+                         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                           <FiActivity className="text-emerald-400" /> {selectedDest.avgTempDry}
+                         </div>
+                      </div>
+                   </div>
+                   <button 
+                     onClick={() => setSelectedDest(null)}
+                     className="absolute top-8 right-8 z-50 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition backdrop-blur-xl border border-white/20"
+                   >
+                     <FiX size={20} />
+                   </button>
+                </div>
+
+                {/* Right: Rich Details & Plan */}
+                <div className="p-10 lg:p-20 bg-slate-50 dark:bg-slate-950 flex flex-col justify-between space-y-12">
+                   <div className="space-y-8">
+                      <div className="space-y-4">
+                         <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Official Description</h4>
+                         <p className="text-2xl text-[#051128] dark:text-white/80 font-black leading-tight tracking-tight italic">
+                           "{selectedDest.description}"
+                         </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                         <div className="p-6 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Travel Advisory</p>
+                            <p className="text-sm font-black text-[#051128] dark:text-white">{selectedDest.bestMonths}</p>
+                         </div>
+                         <div className="p-6 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10">
+                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Concierge Rate</p>
+                            <p className="text-sm font-black text-[#051128] dark:text-white">{selectedDest.price}</p>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="pt-12 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-8">
+                      <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Next Available Slot</p>
+                         <p className="text-lg font-black text-[#051128] dark:text-white">Tomorrow, 08:00 AM</p>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if (!user) {
+                            toast.error("Please sign in to begin planning your journey.");
+                            return;
+                          }
+                          router.push(`/add-trip?destination=${encodeURIComponent(selectedDest.name)}`);
+                        }}
+                        className="w-full sm:w-auto px-12 py-6 rounded-2xl bg-[#051128] dark:bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                      >
+                        Plan Your Journey <FiArrowRight />
+                      </button>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Search Interface */}
-        <div className="mt-8 mb-16">
+        <div className="mb-16">
           <div className="relative max-w-3xl group">
             <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-600 transition-colors" size={24} />
             <input
@@ -89,10 +174,18 @@ function TripsContent() {
             <motion.div
                 key={dest.name}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => setSelectedDest(dest)}
-                className="group relative cursor-pointer overflow-hidden rounded-[3rem] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#0d0d1a] p-3 transition-all hover:border-blue-600/30 hover:shadow-2xl hover:shadow-blue-900/10"
+                onClick={() => {
+                  setSelectedDest(dest);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`group relative cursor-pointer overflow-hidden rounded-[3rem] border transition-all hover:shadow-2xl hover:shadow-blue-900/10 ${
+                  selectedDest?.name === dest.name 
+                  ? "border-blue-600 bg-blue-50 dark:bg-blue-900/10 ring-4 ring-blue-600/10" 
+                  : "border-slate-100 dark:border-white/5 bg-white dark:bg-[#0d0d1a]"
+                } p-3`}
             >
               <div className="relative h-64 overflow-hidden rounded-[1.8rem]">
                 <Image
@@ -101,7 +194,7 @@ function TripsContent() {
                   fill
                   className="object-cover transition duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/80 dark:from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6">
                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-1">{dest.region}</p>
                    <p className="text-2xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">{dest.name}</p>
@@ -109,7 +202,7 @@ function TripsContent() {
               </div>
               <div className="p-5 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  <FiMapPin className="text-blue-600" /> Professional Guide
+                  <FiMapPin className="text-blue-600" /> {dest.distanceKm} KM
                 </div>
                 <span className="text-sm font-black text-blue-600">{dest.price}</span>
               </div>
@@ -117,104 +210,13 @@ function TripsContent() {
           ))}
         </div>
 
-        {/* Detail Modal */}
-        <AnimatePresence>
-          {selectedDest && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }} 
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedDest(null)}
-                className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-              />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="relative w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-[3rem] bg-[#0d0d1a] border border-white/10 shadow-3xl grid lg:grid-cols-2"
-              >
-                <button 
-                  onClick={() => setSelectedDest(null)}
-                  className="absolute top-8 right-8 z-50 p-3 rounded-full bg-black/50 text-white/50 hover:text-white transition backdrop-blur-md border border-white/10"
-                >
-                  <FiX size={24} />
-                </button>
-
-                {/* Left: Visuals & Map */}
-                <div className="relative flex flex-col h-full bg-[#f8faff] dark:bg-[#080814]">
-                   <div className="relative h-1/2">
-                      <Image src={selectedDest.image} alt={selectedDest.name} fill className="object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#f8faff] dark:from-[#080814] via-transparent to-transparent" />
-                      <div className="absolute bottom-8 left-8">
-                        <span className="px-4 py-2 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest mb-4 inline-block shadow-lg shadow-blue-600/20">Featured Destination</span>
-                        <h2 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">{selectedDest.name}</h2>
-                      </div>
-                   </div>
-                   <div className="flex-1 p-8">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-4 flex items-center gap-2"><FiActivity /> Location & Access</h4>
-                      <div className="h-full rounded-[2.5rem] bg-white dark:bg-slate-50 border border-slate-100 dark:border-white/10 overflow-hidden relative shadow-sm">
-                         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                               <FiNavigation size={48} className="text-blue-600 mb-4 mx-auto animate-pulse" />
-                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Coordinates: {selectedDest.lat}, {selectedDest.lng}</p>
-                               <p className="text-2xl font-black text-[#051128] dark:text-white mt-2 uppercase">{selectedDest.distanceKm} KM From Addis Ababa</p>
-                            </div>
-                         </div>
-                      </div>
-                   </div>
-                </div>
-
-                {/* Right: Rich Details */}
-                <div className="p-10 lg:p-16 overflow-y-auto custom-scrollbar space-y-12">
-                   <div className="space-y-4">
-                      <p className="text-xl text-white/70 font-medium leading-relaxed italic border-l-4 border-purple-500 pl-6">
-                        "{selectedDest.description}"
-                      </p>
-                   </div>
-
-                   <div className="grid grid-cols-2 gap-6">
-                      <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10">
-                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Climate Protocol</p>
-                         <p className="text-white font-bold">{selectedDest.avgTempDry}</p>
-                         <p className="text-[10px] text-slate-400 mt-1 uppercase">{selectedDest.climateNote}</p>
-                      </div>
-                      <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10">
-                         <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Optimal Window</p>
-                         <p className="text-white font-bold">{selectedDest.bestMonths}</p>
-                         <p className="text-[10px] text-slate-400 mt-1 uppercase">High Season Priority</p>
-                      </div>
-                   </div>
-
-                   <div>
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6 flex items-center gap-2"><FiHome /> Recommended Lodging Nodes</h4>
-                      <div className="space-y-3">
-                         {selectedDest.hotels?.map((hotel, idx) => (
-                           <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-white/5 group hover:bg-white/10 transition-colors">
-                              <span className="text-xs font-black text-white uppercase tracking-widest">{hotel}</span>
-                              <span className="text-[10px] font-bold text-blue-600 uppercase">Premium Select</span>
-                           </div>
-                         ))}
-                      </div>
-                   </div>
-
-                   <div className="pt-8 border-t border-white/5 flex items-center justify-between">
-                      <div>
-                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Package Price</p>
-                         <p className="text-3xl font-black text-blue-600">{selectedDest.price}</p>
-                      </div>
-                      <Link href={user ? `/add-trip?destination=${encodeURIComponent(selectedDest.name)}` : "/login"}>
-                         <button className="px-10 py-5 rounded-2xl bg-purple-600 text-white font-black uppercase tracking-widest text-xs shadow-2xl shadow-purple-600/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-                           Plan Your Trip <FiArrowRight />
-                         </button>
-                      </Link>
-                   </div>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        {filteredDestinations.length === 0 && (
+          <div className="py-32 text-center">
+             <FiSearch className="mx-auto text-6xl text-slate-100 dark:text-white/5 mb-6" />
+             <p className="text-2xl font-black text-slate-300 dark:text-white/20 uppercase tracking-widest">No destinations found</p>
+             <button onClick={() => setQuery("")} className="mt-6 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-xs hover:underline transition-all">Clear all filters</button>
+          </div>
+        )}
 
         {filteredDestinations.length === 0 && (
           <div className="py-32 text-center">

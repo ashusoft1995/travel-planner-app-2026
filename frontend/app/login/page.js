@@ -48,14 +48,14 @@ function LoginForm() {
   };
 
   return (
-    <main className="relative min-h-screen w-full flex items-center justify-center p-6 overflow-hidden">
+    <main className="relative min-h-screen w-full flex items-center justify-center py-24 px-6 overflow-y-auto">
       {/* Dynamic Background Image */}
       <div className="absolute inset-0 z-0">
         <Image 
-          src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=1920&q=80" 
+          src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?q=80&w=2000" 
           alt="Ethiopian Highlands"
           fill
-          className="object-cover scale-100"
+          className="object-cover"
           priority
         />
         <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
@@ -64,7 +64,7 @@ function LoginForm() {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 w-full max-w-[400px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[3rem] p-8 lg:p-10 shadow-2xl border border-white/30 dark:border-white/10"
+        className="relative z-10 w-full max-w-[380px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[2.5rem] p-8 lg:p-10 shadow-2xl border border-white/30 dark:border-white/10 mt-[8vh] mb-24"
       >
         <div className="text-center mb-10">
           <p className="text-2xl font-black text-[#051128] uppercase tracking-tighter mb-4">EthioTravel</p>
