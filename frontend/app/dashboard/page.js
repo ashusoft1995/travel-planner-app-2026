@@ -33,6 +33,11 @@ const DashboardRecharts = dynamic(
   { ssr: false }
 );
 
+const Sparkline = dynamic(
+  () => import("../../components/dashboard/DashboardRecharts").then(mod => mod.Sparkline),
+  { ssr: false }
+);
+
 export default function UserCommandCenter() {
   const { user, token, logout } = useAuth();
   const router = useRouter();
@@ -155,15 +160,23 @@ export default function UserCommandCenter() {
                 className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#12122a] p-5 shadow-2xl transition hover:border-white/20"
               >
                 <div className={`absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br ${kpi.color} to-transparent blur-2xl opacity-50 transition group-hover:scale-110`} />
-                <div className="relative flex items-center justify-between">
+                <div className="relative flex items-center justify-between mb-4">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{kpi.label}</p>
                     <p className="mt-1 text-2xl font-black text-white">{kpi.val}</p>
-                    <p className="mt-1 text-[10px] text-white/30">{kpi.sub}</p>
                   </div>
                   <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 ${kpi.text} ring-1 ring-white/10 transition group-hover:bg-white/10 group-hover:scale-110`}>
                     <kpi.icon size={22} />
                   </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] text-white/30">{kpi.sub}</p>
+                  <Sparkline 
+                    data={[
+                      { value: 10 }, { value: 15 }, { value: 8 }, { value: 22 }, { value: 18 }, { value: 30 }
+                    ]} 
+                    color="#a855f7" 
+                  />
                 </div>
               </motion.div>
             ))}

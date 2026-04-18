@@ -29,6 +29,7 @@ import {
 import {
   getDemoEconomics,
   getDestinationByName,
+  DESTINATION_DETAILS
 } from "../../lib/destinations";
 import { fetchAnnouncements, getApiUrl } from "../../lib/api";
 
@@ -225,20 +226,209 @@ export default function HomeContent() {
         )}
       </AnimatePresence>
 
+      {/* Stats Section */}
       <section className="container py-16" ref={statsRef}>
-        <div className="grid grid-cols-3 gap-8">
-           <div className="text-center">
-             <p className="text-4xl font-bold text-brand-600 dark:text-accent-yellow">{counters.travelers.toLocaleString()}+</p>
-             <p className="text-sm text-slate-500">Travelers</p>
-           </div>
-           <div className="text-center">
-             <p className="text-4xl font-bold text-brand-600 dark:text-accent-yellow">{counters.destinations}</p>
-             <p className="text-sm text-slate-500">Destinations</p>
-           </div>
-           <div className="text-center">
-             <p className="text-4xl font-bold text-brand-600 dark:text-accent-yellow">{counters.hotels}</p>
-             <p className="text-sm text-slate-500">Hotels</p>
-           </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
+           >
+             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.travelers.toLocaleString()}+</p>
+             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Travelers Served</p>
+           </motion.div>
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ delay: 0.1 }}
+             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
+           >
+             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.destinations}</p>
+             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Global Destinations</p>
+           </motion.div>
+           <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ delay: 0.2 }}
+             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
+           >
+             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.hotels}</p>
+             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Premium Hotels</p>
+           </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Destinations */}
+      <section className="container py-24">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Explore</h2>
+            <h3 className="text-4xl font-bold text-slate-900 dark:text-white">Featured Destinations</h3>
+          </div>
+          <Link href="/trips" className="flex items-center gap-2 text-brand-600 dark:text-accent-yellow font-bold group">
+            View all destinations <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {DESTINATION_DETAILS.slice(0, 4).map((dest, idx) => (
+            <motion.div
+              key={dest.name}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="group relative h-[400px] overflow-hidden rounded-3xl bg-slate-100"
+            >
+              <Image 
+                src={dest.image} 
+                alt={dest.name} 
+                fill 
+                className="object-cover transition-transform duration-500 group-hover:scale-110" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <FiMapPin className="text-accent-yellow" />
+                  <span className="text-xs font-bold text-white/80 uppercase tracking-wider">{dest.region}</span>
+                </div>
+                <h4 className="text-2xl font-bold text-white mb-2">{dest.name}</h4>
+                <div className="flex items-center justify-between">
+                  <p className="text-accent-yellow font-bold">{dest.price}</p>
+                  <div className="flex items-center gap-1">
+                    <FiStar className="fill-accent-yellow text-accent-yellow" />
+                    <span className="text-sm font-bold text-white">{dest.rating}</span>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => { setSelected(dest); scrollToResult(); }}
+                className="absolute inset-0 z-10 opacity-0"
+                aria-label={`View ${dest.name}`}
+              />
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Market Analytics Graph */}
+      <section className="container py-24 bg-slate-50 dark:bg-brand-950/30 rounded-[3rem] my-12" ref={demoStatsRef}>
+        <div className="grid lg:grid-cols-5 gap-12 items-center">
+          <div className="lg:col-span-2">
+            <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Insights</h2>
+            <h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">Market Overview</h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-8">
+              Experience data-driven travel planning. Our real-time analytics help you understand travel trends, peak seasons, and budget optimizations for each destination.
+            </p>
+            
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
+                  <FiUsers size={24} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{demoCounters.visitors.toLocaleString()}</p>
+                  <p className="text-sm text-slate-500">Monthly Visitors</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-accent-yellow/10 flex items-center justify-center text-accent-yellow">
+                  <FiDollarSign size={24} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{demoCounters.spendETB.toLocaleString()} ETB</p>
+                  <p className="text-sm text-slate-500">Average Spend</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="lg:col-span-3 h-[400px] w-full bg-white dark:bg-white/5 rounded-3xl p-6 border border-slate-200 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={DESTINATION_DETAILS.slice(0, 6)}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} opacity={0.3} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#f8fafc' }}
+                  itemStyle={{ color: '#f8fafc' }}
+                />
+                <Bar yAxisId="left" dataKey="travelVolumeIndex" fill="#a855f7" radius={[6, 6, 0, 0]} barSize={40} name="Travel Volume" />
+                <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#d8b4fe" strokeWidth={3} dot={{ r: 6, fill: '#d8b4fe', strokeWidth: 0 }} name="Rating" />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="container py-24">
+        <div className="text-center mb-16">
+          <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Testimonials</h2>
+          <h3 className="text-4xl font-bold text-slate-900 dark:text-white">What Our Travelers Say</h3>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {TESTIMONIALS.map((t, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative p-10 rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/30 dark:shadow-none"
+            >
+              <div className="absolute top-8 right-10 text-brand-100 dark:text-white/5">
+                <svg width="60" height="45" viewBox="0 0 60 45" fill="currentColor">
+                  <path d="M14.4 0C22.4 0 28.8 6.4 28.8 14.4C28.8 22.4 22.4 28.8 14.4 28.8H7.2V36H14.4V45H0V28.8C0 12.9 12.9 0 28.8 0H14.4ZM45.6 0C53.6 0 60 6.4 60 14.4C60 22.4 53.6 28.8 45.6 28.8H38.4V36H45.6V45H31.2V28.8C31.2 12.9 44.1 0 60 0H45.6Z" />
+                </svg>
+              </div>
+              <p className="text-xl text-slate-700 dark:text-slate-300 italic mb-8 relative z-10">
+                "{t.quote}"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-brand-500">
+                  <Image src={t.photo} alt={t.name} fill className="object-cover" />
+                </div>
+                <div>
+                  <h5 className="font-bold text-slate-900 dark:text-white">{t.name}</h5>
+                  <p className="text-sm text-slate-500">{t.role}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container py-24">
+        <div className="relative overflow-hidden rounded-[3.5rem] bg-brand-600 dark:bg-brand-900 p-12 lg:p-24 text-center">
+          <div className="absolute inset-0 opacity-20">
+            <Image src={HERO_IMAGE} alt="CTA BG" fill className="object-cover" />
+          </div>
+          <div className="relative z-10 max-w-3xl mx-auto">
+            <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">Ready to plan your next getaway?</h2>
+            <p className="text-brand-100 text-lg mb-10">
+              Join thousands of travelers who have discovered the wonders of Ethiopia through our personalized planning tools.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button 
+                onClick={e => handleProtectedAction(e, "/add-trip")} 
+                className="w-full sm:w-auto px-10 py-5 bg-accent-yellow text-black font-extrabold rounded-2xl hover:scale-105 transition-transform"
+              >
+                Create My Trip
+              </button>
+              <Link 
+                href="/contact" 
+                className="w-full sm:w-auto px-10 py-5 bg-white/10 text-white font-bold rounded-2xl border border-white/20 backdrop-blur-md hover:bg-white/20 transition-all"
+              >
+                Talk to an Expert
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </main>

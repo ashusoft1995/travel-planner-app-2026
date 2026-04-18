@@ -13,9 +13,29 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  LineChart,
+  Line,
 } from "recharts";
 
-const COLORS = ["#10b981", "#3b82f6", "#a855f7", "#f43f5e", "#f59e0b"];
+const COLORS = ["#a855f7", "#7c3aed", "#6366f1", "#4f46e5", "#c084fc"];
+
+export function Sparkline({ data, color = "#a855f7" }) {
+  return (
+    <div className="h-12 w-24">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 function ChartCard({ title, subtitle, children, delay = 0 }) {
   return (
@@ -51,8 +71,8 @@ export default function DashboardRecharts({ lineData, pieData }) {
               <AreaChart data={lineData}>
                 <defs>
                    <linearGradient id="colorBudget" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" vertical={false} />
@@ -71,7 +91,7 @@ export default function DashboardRecharts({ lineData, pieData }) {
                 <Area 
                   type="monotone" 
                   dataKey="budget" 
-                  stroke="#3b82f6" 
+                  stroke="#a855f7" 
                   strokeWidth={3} 
                   fillOpacity={1} 
                   fill="url(#colorBudget)"
