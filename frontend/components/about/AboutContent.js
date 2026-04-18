@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { 
-  FiLeaf, FiShield, FiDroplet, FiStar 
+  FiHeart, FiShield, FiDroplet, FiStar 
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
@@ -103,7 +103,7 @@ export default function AboutContent() {
         <div className="container">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <SustainabilityCard 
-              icon={<FiLeaf className="text-blue-500" />}
+              icon={<FiHeart className="text-blue-500" />}
               title="Eco-Heritage"
               desc="We preserve the wonders we explore through active reforestation."
               bg="bg-white dark:bg-slate-900"
