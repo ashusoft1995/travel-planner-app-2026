@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { 
   FiPlus, FiSearch, FiMapPin, FiCalendar, FiStar, 
@@ -15,8 +15,10 @@ import { motion, AnimatePresence } from "framer-motion";
 function TripsContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectedDest, setSelectedDest] = useState(null);
+  const [viewMode, setViewMode] = useState("photo"); // "photo" or "map"
 
   useEffect(() => {
     const destName = searchParams.get("destination");
@@ -61,7 +63,7 @@ function TripsContent() {
                </Link>
             ) : (
                <Link href="/login">
-                <button className="px-8 py-4 rounded-2xl bg-white dark:bg-slate-50 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-black uppercase tracking-widest text-xs hover:bg-slate-50 dark:hover:bg-white/10 transition-all shadow-sm">
+                <button className="px-8 py-4 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-600/30 hover:bg-blue-500 hover:scale-105 transition-all flex items-center justify-center">
                   Log in to Plan
                 </button>
                </Link>
@@ -81,9 +83,39 @@ function TripsContent() {
             >
               <div className="grid lg:grid-cols-2">
                 {/* Left: Visuals & Map */}
-                <div className="relative h-[400px] lg:h-auto overflow-hidden">
-                   <Image src={selectedDest.image} alt={selectedDest.name} fill className="object-cover" />
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="relative h-[500px] lg:h-auto overflow-hidden bg-slate-100 dark:bg-slate-950">
+                   {viewMode === "photo" ? (
+                      <>
+                        <Image src={selectedDest.image} alt={selectedDest.name} fill className="object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      </>
+                   ) : (
+                      <iframe
+                        title="Destination Map"
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        src={`https://www.google.com/maps?q=${selectedDest.lat},${selectedDest.lng}&z=12&output=embed`}
+                        className="grayscale invert dark:grayscale-0 dark:invert-0 opacity-80"
+                      />
+                   )}
+                   
+                   {/* Map/Photo Toggle */}
+                   <div className="absolute top-8 left-8 flex gap-2">
+                      <button 
+                        onClick={() => setViewMode("photo")}
+                        className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${viewMode === "photo" ? "bg-blue-600 text-white shadow-lg" : "bg-white/20 text-white backdrop-blur-md border border-white/20"}`}
+                      >
+                        Photo
+                      </button>
+                      <button 
+                        onClick={() => setViewMode("map")}
+                        className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all ${viewMode === "map" ? "bg-blue-600 text-white shadow-lg" : "bg-white/20 text-white backdrop-blur-md border border-white/20"}`}
+                      >
+                        Map
+                      </button>
+                   </div>
+
                    <div className="absolute bottom-12 left-12 right-12">
                       <div className="flex items-center gap-3 mb-4">
                         <span className="px-4 py-2 rounded-full bg-red-600 text-white text-[8px] font-black uppercase tracking-widest shadow-lg animate-pulse">Live Selection</span>
@@ -101,7 +133,10 @@ function TripsContent() {
                       </div>
                    </div>
                    <button 
-                     onClick={() => setSelectedDest(null)}
+                     onClick={() => {
+                        setSelectedDest(null);
+                        setViewMode("photo");
+                     }}
                      className="absolute top-8 right-8 z-50 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition backdrop-blur-xl border border-white/20"
                    >
                      <FiX size={20} />
@@ -135,15 +170,15 @@ function TripsContent() {
                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Next Available Slot</p>
                          <p className="text-lg font-black text-[#051128] dark:text-white">Tomorrow, 08:00 AM</p>
                       </div>
-                      <button 
+                       <button 
                         onClick={() => {
                           if (!user) {
-                            toast.error("Please sign in to begin planning your journey.");
+                            router.push(`/login?next=${encodeURIComponent(`/add-trip?destination=${selectedDest.name}`)}`);
                             return;
                           }
                           router.push(`/add-trip?destination=${encodeURIComponent(selectedDest.name)}`);
                         }}
-                        className="w-full sm:w-auto px-12 py-6 rounded-2xl bg-[#051128] dark:bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl hover:scale-105 transition-all flex items-center justify-center gap-3"
+                        className="w-full sm:w-auto px-12 py-6 rounded-2xl bg-blue-600 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl shadow-blue-600/20 hover:scale-105 transition-all flex items-center justify-center gap-3"
                       >
                         Plan Your Journey <FiArrowRight />
                       </button>

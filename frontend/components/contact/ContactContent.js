@@ -189,23 +189,28 @@ export default function ContactContent() {
               />
             </motion.div>
 
-            <motion.div 
-               initial={{ opacity: 0, scale: 0.95 }}
-               animate={{ opacity: 1, scale: 1 }}
-               className="relative h-[300px] rounded-[3rem] overflow-hidden bg-slate-200 shadow-lg border-4 border-white"
-            >
-               <Image 
-                src="https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=800&q=80" 
-                alt="Map Placeholder"
-                fill
-                className="object-cover opacity-50 grayscale"
-               />
-               <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl flex items-center gap-2">
-                    <FiNavigation className="text-blue-600" /> Open in Navigation
-                  </button>
-               </div>
-            </motion.div>
+             <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative h-[300px] rounded-[3rem] overflow-hidden bg-slate-200 shadow-lg border-4 border-white dark:border-white/10"
+             >
+                <Image 
+                 src="https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=800&q=80" 
+                 alt="Map Placeholder"
+                 fill
+                 className="object-cover opacity-50 grayscale"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                   <a 
+                     href="https://www.google.com/maps/search/?api=1&query=Bole+Road+Mega+Building+Addis+Ababa+Ethiopia" 
+                     target="_blank" 
+                     rel="noopener noreferrer"
+                     className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white shadow-xl flex items-center gap-2 hover:bg-blue-600 hover:text-white transition-all transform hover:scale-105"
+                   >
+                     <FiNavigation className="text-blue-600 group-hover:text-white" /> Open in Navigation
+                   </a>
+                </div>
+             </motion.div>
 
             <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm">
                <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2"><FiClock /> Service Hours</h4>

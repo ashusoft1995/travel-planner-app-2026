@@ -9,14 +9,14 @@ const EXPERIENCES = [
   {
     title: "The Coffee Ceremony",
     desc: "Immerse yourself in the birthplace of Arabica. Witness the rhythmic ritual of roasting, grinding, and brewing in a traditional Ethiopian home.",
-    image: "https://images.unsplash.com/photo-1524350303359-868355c0a78b?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80",
     icon: <FiCoffee />,
     tag: "Cultural"
   },
   {
     title: "Dallol Volcanic Trek",
     desc: "Explore the neon-colored hydrothermal fields of the Danakil Depression, the hottest inhabited place on Earth.",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1544198365-f5d60b6d8190?auto=format&fit=crop&w=1200&q=80",
     icon: <FiCompass />,
     tag: "Adventure"
   },
@@ -38,7 +38,7 @@ const EXPERIENCES = [
 
 export default function ExperiencesPage() {
   return (
-    <main className="bg-white dark:bg-[var(--bg)] text-slate-900 dark:text-white min-h-screen">
+    <main className="bg-white dark:bg-[#050b18] text-slate-900 dark:text-white min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[500px] overflow-hidden">
         <Image 
@@ -48,7 +48,7 @@ export default function ExperiencesPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-white dark:to-[var(--bg)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-white dark:to-[#050b18]" />
         
         <div className="container relative h-full flex flex-col justify-center">
           <motion.div
@@ -81,7 +81,7 @@ export default function ExperiencesPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="group relative h-[600px] rounded-[3.5rem] overflow-hidden shadow-2xl shadow-blue-900/10"
+                className="group relative h-[600px] rounded-[3.5rem] overflow-hidden shadow-2xl shadow-blue-900/10 border border-slate-100 dark:border-white/5"
               >
                 <Image src={exp.image} alt={exp.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#051128] via-[#051128]/40 to-transparent" />
@@ -100,8 +100,8 @@ export default function ExperiencesPage() {
                     {exp.desc}
                   </p>
                   <Link href="/contact">
-                    <button className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white hover:text-blue-400 transition-colors group/btn">
-                      Request Private Booking <FiArrowRight className="transition-transform group-hover/btn:translate-x-1" />
+                    <button className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-[10px] px-8 py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 flex items-center gap-2">
+                      Request Private Plan <FiArrowRight />
                     </button>
                   </Link>
                 </div>

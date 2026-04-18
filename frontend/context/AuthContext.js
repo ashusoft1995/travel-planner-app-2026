@@ -101,7 +101,7 @@ export function AuthProvider({ children }) {
   }, [persistUser]);
 
   const register = useCallback(
-    async (name, email, password, username, role = "user") => {
+    async (name, email, password, username, role = "user", metadata = {}) => {
       try {
         const { data: res } = await registerAccount({
           name: name.trim(),
@@ -109,6 +109,7 @@ export function AuthProvider({ children }) {
           password,
           username: username.trim().toLowerCase(),
           role,
+          ...metadata,
         });
         
         // Correctly access the nested 'data' from the backend response

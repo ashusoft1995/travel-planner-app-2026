@@ -6,13 +6,10 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$299",
     rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=900&q=80",
-    description:
-      "UNESCO rock-hewn churches and Ethiopian Orthodox heritage. Compact town, walkable sites, strong cultural tourism infrastructure.",
+    image: "https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?q=80&w=1200",
+    description: "UNESCO rock-hewn churches and Ethiopian Orthodox heritage. Compact town, walkable sites, strong cultural tourism infrastructure.",
     avgTempDry: "15–24°C",
-    climateNote:
-      "Highland climate: mild days, cool nights. Rainy season Jul–Sep; drier Oct–May with stable trekking weather in core months.",
+    climateNote: "Highland climate: mild days, cool nights. Rainy season Jul–Sep; drier Oct–May.",
     bestMonths: "Oct – Mar",
     travelVolumeIndex: 92,
     lat: 12.0319,
@@ -25,13 +22,10 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$219",
     rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=900&q=80",
-    description:
-      "The ‘Camelot of Africa’: Royal Enclosure castles, Debre Berhan Selassie church, and easy access to Simien Mountains staging.",
+    image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
+    description: "The ‘Camelot of Africa’: Royal Enclosure castles, Debre Berhan Selassie church, and easy access to Simien Mountains staging.",
     avgTempDry: "16–26°C",
-    climateNote:
-      "Temperate highland pattern. Rain Jul–Sep. Outside rainy season, temperatures are pleasant with lower humidity — good for city + castle touring.",
+    climateNote: "Temperate highland pattern. Rain Jul–Sep. Pleasant outside rainy season.",
     bestMonths: "Oct – Jun",
     travelVolumeIndex: 88,
     lat: 12.6,
@@ -44,13 +38,10 @@ export const DESTINATION_DETAILS = [
     region: "Tigray",
     price: "$249",
     rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Ancient stelae field, church traditions, and deep historical significance on the northern circuit.",
+    image: "https://images.unsplash.com/photo-1585016495481-9161353f1ba2?q=80&w=1200",
+    description: "Ancient stelae field, church traditions, and deep historical significance on the northern circuit.",
     avgTempDry: "18–28°C",
-    climateNote:
-      "Warmer than Gondar/Lalibela. Two rainy seasons possible (Mar–May, Jul–Sep). Plan around regional advisories and seasonal road conditions.",
+    climateNote: "Warmer than Gondar. Plan around regional advisories and seasonal road conditions.",
     bestMonths: "Oct – Feb",
     travelVolumeIndex: 72,
     lat: 14.1211,
@@ -63,13 +54,10 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$389",
     rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Dramatic escarpments, endemic wildlife (Gelada, Walia ibex), and multi-day trekking in Simien Mountains National Park.",
-    avgTempDry: "10–20°C (trail level varies)",
-    climateNote:
-      "Altitude-driven weather changes quickly. Dry season trekking is most predictable; carry layers year-round.",
+    image: "https://images.unsplash.com/photo-1526749837599-b4efa9fd255e?q=80&w=1200",
+    description: "Dramatic escarpments, endemic wildlife (Gelada, Walia ibex), and multi-day trekking in Simien Mountains National Park.",
+    avgTempDry: "10–20°C",
+    climateNote: "Altitude-driven weather changes quickly. carry layers year-round.",
     bestMonths: "Oct – Mar",
     travelVolumeIndex: 78,
     lat: 13.2405,
@@ -82,14 +70,11 @@ export const DESTINATION_DETAILS = [
     region: "Afar",
     price: "$459",
     rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Extreme landscapes: salt flats, active geology, and guided expeditions. Best as an organized multi-day tour.",
-    avgTempDry: "Very hot days (often 35°C+)",
-    climateNote:
-      "One of Earth’s hottest regions. Travel is highly seasonal and logistics-dependent — use vetted operators only.",
-    bestMonths: "Nov – Mar (relative)",
+    image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1200",
+    description: "Extreme landscapes: salt flats, active geology, and guided expeditions. Best as an organized tour.",
+    avgTempDry: "35°C+",
+    climateNote: "One of Earth’s hottest regions. Travel is highly seasonal and logistics-dependent.",
+    bestMonths: "Nov – Mar",
     travelVolumeIndex: 55,
     lat: 14.2417,
     lng: 40.3,
@@ -101,13 +86,10 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$199",
     rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Island monasteries, birdlife, and boat culture near Bahir Dar — a relaxed complement to the northern historic route.",
+    image: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=1200",
+    description: "Island monasteries, birdlife, and boat culture near Bahir Dar — a relaxed complement to the northern route.",
     avgTempDry: "18–28°C",
-    climateNote:
-      "Generally stable outside heavy rains. Winds on the lake can affect boat schedules.",
+    climateNote: "Generally stable outside heavy rains. Winds on the lake can affect schedules.",
     bestMonths: "Sep – Mar",
     travelVolumeIndex: 81,
     lat: 11.5,
@@ -120,13 +102,10 @@ export const DESTINATION_DETAILS = [
     region: "Sidama",
     price: "$179",
     rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Lakeside city with coffee country access, birding, and a calmer pace for Rift Valley stops.",
+    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1200",
+    description: "Lakeside city with coffee country access, birding, and a calmer pace for Rift Valley stops.",
     avgTempDry: "16–27°C",
-    climateNote:
-      "Rift Valley pattern: two rainy seasons. Lake breezes moderate heat; malaria risk can exist seasonally — consult travel health guidance.",
+    climateNote: "Rift Valley pattern: two rainy seasons. Lake breezes moderate heat.",
     bestMonths: "Oct – Mar",
     travelVolumeIndex: 64,
     lat: 7.05,
@@ -139,13 +118,10 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$349",
     rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Afro-alpine moorland, Ethiopian wolf habitat, and quieter trekking compared to the northern circuit.",
-    avgTempDry: "8–18°C (Sanetti plateau cooler)",
-    climateNote:
-      "Weather shifts fast with altitude. Dry season offers the most predictable road access to high camps.",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200",
+    description: "Afro-alpine moorland, Ethiopian wolf habitat, and quieter trekking compared to the northern circuit.",
+    avgTempDry: "8–18°C",
+    climateNote: "Altitude-driven weather. Dry season offers best road access to high camps.",
     bestMonths: "Nov – Mar",
     travelVolumeIndex: 58,
     lat: 6.8833,
@@ -159,13 +135,10 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$159",
     rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Crater lakes and lakeside lodges a short drive from Addis — ideal weekend escapes, birding, and calm water views.",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200",
+    description: "Crater lakes and lakeside lodges a short drive from Addis — ideal weekend escapes and birding.",
     avgTempDry: "16–26°C",
-    climateNote:
-      "Mild highland Rift fringe. Afternoon breezes on the lakes; rainy Jul–Sep can be misty — still pleasant for short stays.",
+    climateNote: "Mild highland Rift fringe. Afternoon breezes on the lakes.",
     bestMonths: "Oct – May",
     travelVolumeIndex: 70,
     lat: 8.7522,
@@ -179,13 +152,10 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$169",
     rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Brown-sand Rift Valley lake with resorts, swimming, and watersports — a classic stop between Addis and the south.",
+    image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1200",
+    description: "Brown-sand Rift Valley lake with resorts, swimming, and watersports — a classic Rift Valley stop.",
     avgTempDry: "18–30°C",
-    climateNote:
-      "Warm days year-round; two rainy seasons. Harmattan-style haze possible — check local water quality guidance before swimming.",
+    climateNote: "Warm days year-round. Check local water quality guidance before swimming.",
     bestMonths: "Oct – Mar",
     travelVolumeIndex: 62,
     lat: 7.3167,
@@ -199,13 +169,10 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$189",
     rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Dramatic crater lake reached by hike or horse; island monastery and community eco-tourism above rolling highland farms.",
+    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1200",
+    description: "Dramatic crater lake reached by hike or horse; island monastery and community eco-tourism.",
     avgTempDry: "14–24°C",
-    climateNote:
-      "Cooler than the Rift floor; rain and mud on trails in Jul–Sep. Start early for clearer views.",
+    climateNote: "Cooler than the Rift floor. Mud on trails in Jul–Sep.",
     bestMonths: "Oct – May",
     travelVolumeIndex: 52,
     lat: 9.2167,
@@ -219,13 +186,10 @@ export const DESTINATION_DETAILS = [
     region: "Southern Nations",
     price: "$209",
     rating: 4.6,
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Gateway to Nechisar National Park between Lakes Abaya and Chamo — boat trips, hippos, and the famous ‘crocodile market’.",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200",
+    description: "Gateway to Nechisar National Park — boat trips, hippos, and the famous ‘crocodile market’.",
     avgTempDry: "20–32°C",
-    climateNote:
-      "Warm Rift climate. Heavy rains Apr–May and Jul–Sep; roads in the park can be tricky when wet.",
+    climateNote: "Warm Rift climate. Roads in the park can be tricky when wet.",
     bestMonths: "Jun – Feb",
     travelVolumeIndex: 60,
     lat: 6.0333,
@@ -239,13 +203,10 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$139",
     rating: 4.7,
-    image:
-      "https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Tis Issat — one of Ethiopia’s great water spectacles near Bahir Dar; pair with Lake Tana monasteries on the same trip.",
+    image: "https://images.unsplash.com/photo-1547036967-23d11aaca7dc?q=80&w=1200",
+    description: "Tis Issat — one of Ethiopia’s great water spectacles near Bahir Dar; pair with Lake Tana.",
     avgTempDry: "18–29°C",
-    climateNote:
-      "Flow is highest after rains (roughly Jul–Sep). In dry months the falls are smaller but still scenic.",
+    climateNote: "Flow is highest after rains (roughly Jul–Sep). Smaller in dry months.",
     bestMonths: "Sep – Mar",
     travelVolumeIndex: 74,
     lat: 11.4964,
@@ -259,13 +220,10 @@ export const DESTINATION_DETAILS = [
     region: "Afar / Oromia",
     price: "$199",
     rating: 4.4,
-    image:
-      "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
-    description:
-      "Savanna wildlife, volcanic landscapes, and the Awash River gorge with waterfalls — an easy eastern circuit from the capital.",
+    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1200",
+    description: "Savanna wildlife, volcanic landscapes, and the Awash River gorge with waterfalls.",
     avgTempDry: "22–34°C",
-    climateNote:
-      "Hot and dry much of the year. Short rains Mar–May; cooler mornings Dec–Feb.",
+    climateNote: "Hot and dry much of the year. Cooler mornings Dec–Feb.",
     bestMonths: "Nov – Mar",
     travelVolumeIndex: 48,
     lat: 9.0167,
@@ -279,10 +237,8 @@ export const DESTINATION_DETAILS = [
     region: "Addis Ababa",
     price: "$150",
     rating: 4.8,
-    image:
-      "https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=900&q=80",
-    description:
-      "The diplomatic capital of Africa. Museums, vibrant markets like Merkato, and high-altitude forest views from Entoto.",
+    image: "https://images.unsplash.com/photo-1548391355-1698a72af27a?q=80&w=1200",
+    description: "The diplomatic capital of Africa. Museums, vibrant markets, and high-altitude forest views.",
     avgTempDry: "16–25°C",
     climateNote: "Mild highland climate. Rainy Jun–Sep. Always carry a light jacket.",
     bestMonths: "Oct – May",
@@ -298,12 +254,10 @@ export const DESTINATION_DETAILS = [
     region: "Harari",
     price: "$210",
     rating: 4.9,
-    image:
-      "https://images.unsplash.com/photo-1512100356132-d02fe1c4f74d?auto=format&fit=crop&w=900&q=80",
-    description:
-      "The walled city of Jugol, spiritual heritage, and the unique Hyena feeding tradition. A colorful, ancient trading hub.",
+    image: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6?q=80&w=1200",
+    description: "The walled city of Jugol, spiritual heritage, and the unique Hyena feeding tradition.",
     avgTempDry: "18–28°C",
-    climateNote: "Warm and dry. Drier than the central highlands.",
+    climateNote: "Warm and dry. Historically a colorful trading hub.",
     bestMonths: "Oct – Feb",
     travelVolumeIndex: 68,
     lat: 9.3167,
@@ -317,10 +271,8 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$180",
     rating: 4.5,
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80",
-    description:
-      "The heart of coffee culture. Visit the Aba Jifar palace and lush tropical forests where Arabica coffee was born.",
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200",
+    description: "The heart of coffee culture. Aba Jifar palace and lush tropical forests of Arabica birth.",
     avgTempDry: "17–28°C",
     climateNote: "Tropical highland climate. Very lush and green year-round.",
     bestMonths: "Nov – Mar",
@@ -336,10 +288,8 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$140",
     rating: 4.4,
-    image:
-      "https://images.unsplash.com/photo-1510797215324-95aa89f29763?auto=format&fit=crop&w=900&q=80",
-    description:
-      "A bustling transportation and economic hub. Famous for its warm weather, vibrant nightlife, and proximity to the Rift Valley.",
+    image: "https://images.unsplash.com/photo-1510797215324-95aa89f29763?q=80&w=1200",
+    description: "A bustling transportation hub. Famous for warm weather and proximity to the Rift Valley.",
     avgTempDry: "20–30°C",
     climateNote: "Warm Rift Valley fringe. Relatively dry compared to Addis.",
     bestMonths: "Sep – Jun",
@@ -355,7 +305,7 @@ export const DESTINATION_DETAILS = [
     region: "Tigray",
     price: "$280",
     rating: 4.9,
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1605335198971-d64e8e09f9f2?q=80&w=1200",
     description: "Dramatic sandstone cliffs housing some of the world's most inaccessible rock-hewn churches.",
     avgTempDry: "18–30°C",
     climateNote: "Semi-arid. Best for adventure seekers and climbers.",
@@ -372,7 +322,7 @@ export const DESTINATION_DETAILS = [
     region: "Southern Nations",
     price: "$260",
     rating: 4.7,
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1523438097201-5121b33c6a55?q=80&w=1200",
     description: "Gateway to the Omo Valley and home to the South Omo Research Center.",
     avgTempDry: "20–32°C",
     climateNote: "Tropical savanna. Rains can impact road access.",
@@ -389,8 +339,8 @@ export const DESTINATION_DETAILS = [
     region: "Dire Dawa",
     price: "$170",
     rating: 4.5,
-    image: "https://images.unsplash.com/photo-1512100356132-d02fe1c4f74d?auto=format&fit=crop&w=900&q=80",
-    description: "Mix of French-colonial architecture and traditional culture with vibrant spice markets.",
+    image: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?q=80&w=1200",
+    description: "French-colonial architecture and traditional culture with vibrant spice markets.",
     avgTempDry: "22–35°C",
     climateNote: "Hot and dry. A pleasant stop between Addis and Harar.",
     bestMonths: "Oct – Feb",
@@ -406,7 +356,7 @@ export const DESTINATION_DETAILS = [
     region: "Afar",
     price: "$300",
     rating: 4.3,
-    image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200",
     description: "The capital of Afar. Staging point for Danakil and home to the Lucy museum.",
     avgTempDry: "25–42°C",
     climateNote: "Extreme desert heat. Only for the prepared traveler.",
@@ -422,7 +372,7 @@ export const DESTINATION_DETAILS = [
     region: "Gambela",
     price: "$220",
     rating: 4.2,
-    image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=1200",
     description: "Vast wetlands and Baro River vistas. Home to unique Nilotic cultures.",
     avgTempDry: "24–38°C",
     climateNote: "Hot and humid. High seasonal rainfall.",
@@ -438,7 +388,7 @@ export const DESTINATION_DETAILS = [
     region: "Amhara",
     price: "$160",
     rating: 4.4,
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1526481280693-3bfa756150f1?q=80&w=1200",
     description: "Major highland city nestled in mountains. Gateway to the northern circuit.",
     avgTempDry: "15–25°C",
     climateNote: "Highland climate. Often misty and cool.",
@@ -454,8 +404,8 @@ export const DESTINATION_DETAILS = [
     region: "Southern Nations",
     price: "$120",
     rating: 4.6,
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=900&q=80",
-    description: "UNESCO site featuring 36 ancient megalithic stelae with unique carvings.",
+    image: "https://images.unsplash.com/photo-1508138221679-760a23a2285b?q=80&w=1200",
+    description: "UNESCO site featuring ancient megalithic stelae with unique carvings.",
     avgTempDry: "18–28°C",
     climateNote: "Mild. A great day trip from Addis Ababa.",
     bestMonths: "Year-round",
@@ -470,7 +420,7 @@ export const DESTINATION_DETAILS = [
     region: "Southern Nations",
     price: "$270",
     rating: 4.8,
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=1200",
     description: "Central hub for the Hamer people. Witness bull-jumping and vibrant markets.",
     avgTempDry: "22–34°C",
     climateNote: "Warm savanna. Best visited in the drier months.",
@@ -486,7 +436,7 @@ export const DESTINATION_DETAILS = [
     region: "Tigray",
     price: "$190",
     rating: 4.7,
-    image: "https://images.unsplash.com/photo-1512100356132-d02fe1c4f74d?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1518005020251-582c782247dc?q=80&w=1200",
     description: "First Muslim settlement in Africa. Home to Al-Nejashi mosque.",
     avgTempDry: "18–28°C",
     climateNote: "Arid highlands. Historically significant year-round.",
@@ -502,7 +452,7 @@ export const DESTINATION_DETAILS = [
     region: "Southern Nations",
     price: "$320",
     rating: 4.6,
-    image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1505833359648-43ae3fd00676?q=80&w=1200",
     description: "Home to the Mursi people and diverse savanna wildlife.",
     avgTempDry: "22–35°C",
     climateNote: "Hot and dusty. Roads can be impassable during heavy rains.",
@@ -518,7 +468,7 @@ export const DESTINATION_DETAILS = [
     region: "Oromia",
     price: "$310",
     rating: 4.9,
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=80",
+    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200",
     description: "Natural high-canopy forest. Home to endemic Bale monkeys.",
     avgTempDry: "12–22°C",
     climateNote: "Cool and moist. Often shrouded in mist.",
@@ -531,7 +481,7 @@ export const DESTINATION_DETAILS = [
   },
 ];
 
-function matchesDestinationQuery(d, q) {
+export function matchesDestinationQuery(d, q) {
   if (d.name.toLowerCase().includes(q)) return true;
   if (d.region.toLowerCase().includes(q)) return true;
   if (`${d.name} ${d.region}`.toLowerCase().includes(q)) return true;
@@ -561,10 +511,6 @@ export function getDestinationByName(name) {
   );
 }
 
-/**
- * Demo-only figures for home analytics (not official statistics).
- * Derived from travelVolumeIndex so charts stay consistent with the catalog.
- */
 export function getDemoEconomics(d) {
   return {
     monthlyVisitors: Math.round(1600 + d.travelVolumeIndex * 210),
