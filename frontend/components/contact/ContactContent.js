@@ -60,7 +60,7 @@ export default function ContactContent() {
   };
 
   return (
-    <main className="bg-[#f8faff] min-h-screen py-24">
+    <main className="bg-[#f8faff] dark:bg-[var(--bg)] min-h-screen py-24">
       <div className="container max-w-7xl">
         <div className="mb-16">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600 mb-4">Personalized Assistance</p>
@@ -201,6 +201,96 @@ export default function ContactContent() {
             </div>
           </div>
         </div>
+
+        {/* Support Team Section */}
+        <section className="mt-24 pt-24 border-t border-slate-100 dark:border-white/5">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 mb-16">
+            <div className="max-w-xl">
+              <h3 className="text-4xl font-black text-[#051128] dark:text-white uppercase tracking-tighter mb-4">Meet Your <span className="text-blue-600 dark:text-purple-400">Personal Support</span> Team</h3>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Our elite concierge specialists are available 24/7 to ensure your Ethiopian journey is flawless. From logistics to cultural immersion, we've got you covered.</p>
+            </div>
+            <div className="flex -space-x-4">
+              {["Ashu", "Jemile", "Bire", "Elsa"].map((name, i) => (
+                <div key={name} className={`relative h-20 w-20 rounded-full border-4 border-white dark:border-[#050b18] overflow-hidden shadow-xl z-${40 - i * 10}`}>
+                   <Image 
+                    src={`https://images.unsplash.com/photo-${1500000000000 + i * 1234567}?auto=format&fit=crop&w=200&h=200&q=80`} 
+                    alt={name} 
+                    fill 
+                    className="object-cover"
+                   />
+                </div>
+              ))}
+              <div className="relative h-20 w-20 rounded-full border-4 border-white dark:border-[#050b18] bg-blue-600 flex items-center justify-center shadow-xl z-0">
+                <span className="text-white text-xs font-black">+12</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: "Ashu", status: "Active Now", icon: <FiCheck className="text-emerald-500" /> },
+              { name: "Jemile", status: "Active Now", icon: <FiCheck className="text-emerald-500" /> },
+              { name: "Bire", status: "In Session", icon: <FiClock className="text-amber-500" /> },
+              { name: "Elsa", status: "Active Now", icon: <FiCheck className="text-emerald-500" /> },
+            ].map((member) => (
+              <div key={member.name} className="bg-white dark:bg-white/5 p-6 rounded-[2rem] border border-slate-100 dark:border-white/10 flex items-center justify-between group hover:shadow-lg transition-all">
+                <div>
+                  <p className="text-sm font-black text-[#051128] dark:text-white uppercase tracking-tighter">{member.name}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1.5 mt-1">{member.icon} {member.status}</p>
+                </div>
+                <button className="h-10 w-10 rounded-xl bg-slate-50 dark:bg-white/10 flex items-center justify-center text-[#051128] dark:text-white group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  <FiSend size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Office Locations */}
+        <section className="mt-32">
+          <div className="text-center mb-20">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-blue-600 mb-4">Our Presence</h2>
+            <h3 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">Global <span className="text-blue-600">Offices</span></h3>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              { city: "Addis Ababa", addr: "Bole Medhanialem Road, Crystal Tower, 4th Floor", tel: "+251 11 661 2345", image: "https://images.unsplash.com/photo-1547036967-23d11aaca7dc?auto=format&fit=crop&w=800&q=80" },
+              { city: "Gondar", addr: "Fasilides Square, Heritage House, Suite 12", tel: "+251 58 211 6789", image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80" },
+            ].map((office) => (
+              <div key={office.city} className="group relative h-[350px] rounded-[3rem] overflow-hidden shadow-2xl">
+                <Image src={office.image} alt={office.city} fill className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#051128] via-[#051128]/40 to-transparent" />
+                <div className="absolute bottom-10 left-10">
+                   <h4 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">{office.city}</h4>
+                   <p className="text-white/60 text-xs font-bold uppercase tracking-widest leading-relaxed mb-4 max-w-[250px]">{office.addr}</p>
+                   <p className="text-blue-400 text-sm font-black">{office.tel}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="mt-32 mb-16">
+           <div className="bg-slate-50 dark:bg-white/5 rounded-[4rem] p-16 lg:p-24 border border-slate-100 dark:border-white/10">
+              <div className="max-w-3xl">
+                 <h3 className="text-4xl font-black text-[#051128] dark:text-white uppercase tracking-tighter mb-12">General <span className="text-blue-600">Inquiries</span></h3>
+                 <div className="space-y-10">
+                    {[
+                      { q: "What is the best time to visit the Simien Mountains?", a: "The dry season between October and March offers the best trekking conditions and clearest views." },
+                      { q: "Are custom itineraries available?", a: "Absolutely. Our concierge team specializes in bespoke journeys tailored to your specific interests and pace." },
+                      { q: "How do I book a private guide?", a: "You can request a private guide through the 'Experiences' page or by contacting your assigned concierge specialist." },
+                    ].map((faq, i) => (
+                      <div key={i} className="space-y-3">
+                         <p className="text-lg font-black text-[#051128] dark:text-white uppercase tracking-tight">{faq.q}</p>
+                         <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{faq.a}</p>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+           </div>
+        </section>
 
         {/* Footer Meta */}
         <footer className="mt-32 pt-16 border-t border-slate-200">

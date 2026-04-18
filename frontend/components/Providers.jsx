@@ -7,7 +7,7 @@ import { LanguageProvider } from "../context/LanguageContext";
 
 export default function Providers({ children }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <LanguageProvider>
         <AuthProvider>
           <TripProvider>{children}</TripProvider>

@@ -54,16 +54,16 @@ function SignupContent() {
           src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=1920&q=80" 
           alt="Ethiopian Highlands"
           fill
-          className="object-cover scale-105"
+          className="object-cover scale-100"
           priority
         />
-        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-slate-900/20 backdrop-blur-[1px]" />
       </div>
 
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 w-full max-w-[540px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[3rem] p-10 lg:p-14 shadow-2xl border border-white/30 dark:border-white/10"
+        className="relative z-10 w-full max-w-[440px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[3rem] p-8 lg:p-10 shadow-2xl border border-white/30 dark:border-white/10"
       >
         <div className="text-center mb-10">
           <p className="text-2xl font-black text-[#051128] uppercase tracking-tighter mb-4">EthioTravel</p>

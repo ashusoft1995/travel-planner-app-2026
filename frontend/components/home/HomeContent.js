@@ -227,10 +227,10 @@ export default function HomeContent() {
     else router.push(`/login?next=${encodeURIComponent(dest)}`);
   };
 
-  const displayedDestinations = showAllDestinations ? destinations : destinations.slice(0, 8);
+  const displayedDestinations = destinations.slice(0, 25);
 
   return (
-    <main className="page-shell">
+    <main className="page-shell bg-white dark:bg-[var(--bg)]">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] overflow-hidden bg-brand-950">
         <div className="absolute inset-0">
@@ -313,10 +313,10 @@ export default function HomeContent() {
             <h3 className="text-5xl font-black text-white uppercase tracking-tight">Iconic <span className="text-white/40">Locations</span></h3>
           </div>
           <button 
-            onClick={() => setShowAllDestinations(!showAllDestinations)}
-            className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors group"
+            onClick={() => router.push("/trips")}
+            className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors group"
           >
-            {showAllDestinations ? "Show Less" : "View All 25+ Destinations"} <FiArrowRight className={`transition-transform ${showAllDestinations ? 'rotate-90' : ''}`} />
+            View All 25+ Destinations <FiArrowRight className="transition-transform group-hover:translate-x-1" />
           </button>
         </div>
 
@@ -327,26 +327,27 @@ export default function HomeContent() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: (idx % 8) * 0.05 }}
-              className="group relative h-[450px] overflow-hidden rounded-[2.5rem] bg-[#12122a] border border-white/10"
+              className="group relative h-[450px] overflow-hidden rounded-[3rem] bg-white border border-slate-100 shadow-lg shadow-blue-900/5"
             >
               <Image 
                 src={dest.image} 
                 alt={dest.name} 
                 fill 
-                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-90" 
+                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" 
+                sizes="(max-width: 768px) 100vw, 25vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent opacity-90" />
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="h-1 w-8 bg-accent-yellow rounded-full" />
-                  <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{dest.region}</span>
+                  <div className="h-1 w-8 bg-blue-600 rounded-full" />
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{dest.region}</span>
                 </div>
-                <h4 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
+                <h4 className="text-3xl font-black text-[#051128] mb-2 uppercase tracking-tighter">{dest.name}</h4>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-xl font-black text-accent-yellow">{dest.price}</p>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-                    <FiStar className="fill-accent-yellow text-accent-yellow" size={12} />
-                    <span className="text-[10px] font-black text-white">{dest.rating}</span>
+                  <p className="text-xl font-black text-blue-600">{dest.price}</p>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 backdrop-blur-md border border-slate-100 shadow-sm">
+                    <FiStar className="fill-blue-600 text-blue-600" size={12} />
+                    <span className="text-[10px] font-black text-[#051128]">{dest.rating}</span>
                   </div>
                 </div>
               </div>
@@ -397,7 +398,7 @@ export default function HomeContent() {
             </div>
 
             {/* Line Chart: Trends */}
-            <div className="p-8 rounded-[3rem] bg-[#f8faff] border border-slate-100 shadow-sm">
+            <div className="p-8 rounded-[3rem] bg-[#f8faff] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm">
               <div className="flex items-center justify-between mb-8 px-2">
                 <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rating Propagation</h4>
                 <div className="h-2 w-2 rounded-full bg-purple-600 animate-pulse" />
@@ -406,8 +407,8 @@ export default function HomeContent() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={destinations.slice(0, 8)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#00000008" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[4, 5]} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'currentColor', opacity: 0.5, fontSize: 10, fontWeight: 700 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'currentColor', opacity: 0.5, fontSize: 10 }} domain={[4, 5]} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       itemStyle={{ color: '#051128' }}
@@ -425,7 +426,7 @@ export default function HomeContent() {
       <section className="container py-24">
         <div className="text-center mb-20">
           <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Transmission Logs</h2>
-          <h3 className="text-5xl font-black text-[#051128] uppercase tracking-tight">Traveler <span className="text-slate-200">Verified</span></h3>
+          <h3 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tight">Traveler <span className="text-slate-200 dark:text-white/20">Verified</span></h3>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -436,14 +437,14 @@ export default function HomeContent() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05 }}
-              className="p-10 rounded-[3rem] bg-white border border-slate-100 relative overflow-hidden group shadow-lg shadow-blue-900/5"
+              className="p-10 rounded-[3rem] bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 relative overflow-hidden group shadow-lg shadow-blue-900/5"
             >
               <div className="absolute top-8 right-10 text-slate-100 group-hover:text-blue-50 transition-colors">
                 <svg width="40" height="30" viewBox="0 0 60 45" fill="currentColor">
                   <path d="M14.4 0C22.4 0 28.8 6.4 28.8 14.4C28.8 22.4 22.4 28.8 14.4 28.8H7.2V36H14.4V45H0V28.8C0 12.9 12.9 0 28.8 0H14.4ZM45.6 0C53.6 0 60 6.4 60 14.4C60 22.4 53.6 28.8 45.6 28.8H38.4V36H45.6V45H31.2V28.8C31.2 12.9 44.1 0 60 0H45.6Z" />
                 </svg>
               </div>
-              <p className="text-lg text-slate-600 font-medium leading-relaxed mb-10 relative z-10 italic">
+              <p className="text-lg text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-10 relative z-10 italic">
                 "{t.quote}"
               </p>
               <div className="flex items-center gap-4">

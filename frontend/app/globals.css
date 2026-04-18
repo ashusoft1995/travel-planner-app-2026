@@ -17,17 +17,17 @@
 }
 
 .dark {
-  --bg: #0d0d1a;
-  --surface: #12122a;
-  --panel: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.1);
+  --bg: #050614;
+  --surface: #0a0b1f;
+  --panel: rgba(16, 17, 35, 0.4);
+  --border: rgba(168, 85, 247, 0.15);
   --text: #ffffff;
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.3);
-  --muted: #a0a0a0;
-  --accent: #8b5cf6;
-  --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.4);
+  --muted: #94a3b8;
+  --accent: #a855f7;
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 *,

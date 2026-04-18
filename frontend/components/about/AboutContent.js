@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { 
   FiAward, FiGlobe, FiHeart, FiUsers, FiLeaf, FiShield, FiDroplet, FiStar, FiChevronRight 
@@ -7,7 +9,7 @@ import Link from "next/link";
 
 export default function AboutContent() {
   return (
-    <main className="bg-white dark:bg-[#050b18] text-slate-900 dark:text-white">
+    <main className="bg-white dark:bg-[var(--bg)] text-slate-900 dark:text-white">
       {/* Hero Section */}
       <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
         <Image 
@@ -127,6 +129,41 @@ export default function AboutContent() {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="py-24 bg-white dark:bg-[var(--bg)]">
+        <div className="container">
+          <div className="text-center mb-20">
+            <h2 className="text-xs font-black uppercase tracking-[0.4em] text-blue-600 mb-4">Our Core Team</h2>
+            <h3 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">The Architects of <span className="text-blue-600">Your Journey</span></h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { name: "Ashu", role: "Chief Experience Architect", photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=400&q=80" },
+              { name: "Jemile", role: "Head of Cultural Heritage", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=400&q=80" },
+              { name: "Bire", role: "Logistics Specialist", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&h=400&q=80" },
+              { name: "Elsa", role: "Guest Relations Director", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&h=400&q=80" },
+            ].map((member, idx) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="group relative"
+              >
+                <div className="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden mb-6">
+                  <Image src={member.photo} alt={member.name} fill className="object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#051128]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <h4 className="text-2xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">{member.name}</h4>
+                <p className="text-xs font-bold uppercase tracking-widest text-blue-600 mt-1">{member.role}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Concierge Section */}
       <section className="py-24">
         <div className="container">
@@ -163,6 +200,66 @@ export default function AboutContent() {
                   </button>
                 </Link>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Core Values */}
+      <section className="py-24 bg-slate-50 dark:bg-white/5">
+        <div className="container">
+          <div className="grid lg:grid-cols-3 gap-12">
+            {[
+              { title: "Authenticity", desc: "We don't do 'tourist traps'. Every experience is vetted for genuine cultural value.", icon: <FiAward /> },
+              { title: "Preservation", desc: "A portion of every booking goes directly to heritage site restoration projects.", icon: <FiShield /> },
+              { title: "Excellence", desc: "From the first click to the final flight, every detail is handled with precision.", icon: <FiStar /> },
+            ].map((value) => (
+              <div key={value.title} className="p-12 rounded-[3rem] bg-white dark:bg-[var(--bg)] border border-slate-100 dark:border-white/5 shadow-xl shadow-blue-900/5">
+                <div className="h-16 w-16 rounded-2xl bg-blue-600/10 dark:bg-purple-500/10 flex items-center justify-center text-3xl text-blue-600 dark:text-purple-400 mb-8">
+                  {value.icon}
+                </div>
+                <h4 className="text-2xl font-black text-[#051128] dark:text-white uppercase tracking-tighter mb-4">{value.title}</h4>
+                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{value.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Global Vision */}
+      <section className="py-32 overflow-hidden">
+        <div className="container">
+          <div className="flex flex-col lg:flex-row items-center gap-24">
+            <div className="lg:w-1/2 space-y-8">
+               <h2 className="text-xs font-black uppercase tracking-[0.4em] text-blue-600">Global Vision</h2>
+               <h3 className="text-6xl font-black text-[#051128] dark:text-white uppercase tracking-tighter leading-[0.9]">Connecting <br /> Ethiopia to <br /> <span className="text-blue-600">The World</span></h3>
+               <p className="text-xl text-slate-500 dark:text-slate-400 font-medium max-w-lg">
+                 Our platform isn't just a booking tool; it's a bridge. We are committed to making Ethiopia the world's premier destination for luxury cultural tourism.
+               </p>
+               <div className="pt-8 grid grid-cols-2 gap-12 border-t border-slate-100 dark:border-white/10">
+                  <div>
+                    <p className="text-5xl font-black text-[#051128] dark:text-white">2.4M</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Annual Reach</p>
+                  </div>
+                  <div>
+                    <p className="text-5xl font-black text-blue-600">100%</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Local Sourcing</p>
+                  </div>
+               </div>
+            </div>
+            <div className="lg:w-1/2 relative">
+               <div className="relative aspect-square rounded-[4rem] overflow-hidden shadow-2xl">
+                  <Image 
+                    src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Global Vision"
+                    fill
+                    className="object-cover"
+                  />
+               </div>
+               <div className="absolute -bottom-10 -left-10 h-64 w-64 bg-blue-600 rounded-[3rem] p-10 flex flex-col justify-end text-white shadow-2xl">
+                  <FiGlobe size={40} className="mb-6" />
+                  <p className="text-sm font-black uppercase tracking-widest">Global Headquarters <br /> Addis Ababa</p>
+               </div>
             </div>
           </div>
         </div>
