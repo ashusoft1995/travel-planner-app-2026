@@ -68,8 +68,8 @@ function SignupContent() {
       {/* Immersive Background (Synced with Login) */}
       <div className="fixed inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1585016495481-9161353f1ba2?q=80&w=2000" 
-          alt="Ancient Aksum"
+          src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2000" 
+          alt="Highland"
           className="w-full h-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#050510]/80 via-transparent to-[#050510]" />
@@ -81,7 +81,7 @@ function SignupContent() {
         className={`relative z-10 w-full ${form.role === "agent" ? "max-w-[480px]" : "max-w-[400px]"} bg-[#121421]/60 backdrop-blur-3xl rounded-[3.5rem] p-10 lg:p-12 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] border border-white/10 transition-all duration-500`}
       >
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Join Azure</h1>
+          <h1 className="text-4xl font-black text-white tracking-tighter uppercase mb-2">Join EthioTravel</h1>
           <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Global Travel Network</p>
         </div>
 
@@ -202,6 +202,17 @@ function SignupContent() {
             {loading ? "Verifying..." : form.role === "agent" ? "Apply as Expert" : "Create Account"} <FiArrowRight size={16} />
           </button>
         </form>
+
+        <div className="mt-6">
+            <div className="relative flex items-center justify-center mb-6">
+              <div className="absolute w-full border-t border-white/5"></div>
+              <span className="relative z-10 px-4 bg-[#050510]/50 rounded-full text-[8px] font-black uppercase tracking-widest text-white/30">Quick Auth</span>
+            </div>
+
+            <button className="w-full bg-white/5 text-white font-black uppercase tracking-widest text-[9px] py-4 rounded-2xl border border-white/10 flex items-center justify-center gap-3 hover:bg-white/10 transition-all">
+               <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" className="w-4 h-4" alt="Google" /> Continue with Google
+            </button>
+        </div>
 
         <div className="mt-10 pt-8 border-t border-white/5 text-center">
             <p className="text-white/40 text-[10px] font-bold">

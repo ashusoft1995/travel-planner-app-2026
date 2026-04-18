@@ -9,7 +9,7 @@ const EXPERIENCES = [
   {
     title: "The Coffee Ceremony",
     desc: "Immerse yourself in the birthplace of Arabica. Witness the rhythmic ritual of roasting, grinding, and brewing in a traditional Ethiopian home.",
-    image: "https://images.unsplash.com/photo-1510797215324-95aa89f29763?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
     icon: <FiCoffee />,
     tag: "Cultural"
   },
@@ -23,7 +23,7 @@ const EXPERIENCES = [
   {
     title: "Timket Festival",
     desc: "Join thousands of pilgrims in Gondar for the Feast of Epiphany, a kaleidoscope of white robes, gold umbrellas, and spiritual song.",
-    image: "https://images.unsplash.com/photo-1596431718871-3375b432e6fc?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1523438097201-5121b33c6a55?auto=format&fit=crop&w=1200&q=80",
     icon: <FiMusic />,
     tag: "Spiritual"
   },
