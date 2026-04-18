@@ -45,7 +45,7 @@ export default function AboutContent() {
               <span className="text-blue-400">EthioTravel</span>
             </h1>
             <p className="mt-8 text-xl text-white/80 font-medium max-w-xl leading-relaxed">
-              Founded by Ashu and a team of passionate cultural architects, we bridge the gap between world-class luxury and ancient heritage.
+              Founded by Ashu, Jemile, Elsa, Elsa, and a team of passionate cultural architects, we bridge the gap between world-class luxury and ancient heritage.
             </p>
           </motion.div>
         </div>
