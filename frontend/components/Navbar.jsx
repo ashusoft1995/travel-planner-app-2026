@@ -11,9 +11,8 @@ import NotificationBell from "./NotificationBell";
 
 const baseLinks = [
   { href: "/", label: "Home" },
-  { href: "/trips", label: "Trips" },
-  { href: "/add-trip", label: "Add trip" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/trips", label: "Destinations" },
+  { href: "/experiences", label: "Experiences" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -32,88 +31,83 @@ export default function Navbar() {
   const links = isAdmin
     ? [
         { href: "/", label: "Home" },
-        { href: "/trips", label: "Trips" },
+        { href: "/trips", label: "Destinations" },
         { href: "/admin/dashboard", label: "Admin Console" },
         { href: "/about", label: "About" },
       ]
     : baseLinks;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-brand-950/90 backdrop-blur-xl dark:bg-brand-950/95">
-      <div className="container flex h-16 items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-white">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-green text-sm font-bold text-white shadow-lg">
-            ET
-          </span>
-          <span className="hidden sm:inline">EthioTravel</span>
+    <header className="sticky top-0 z-50 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl">
+      <div className="container flex h-20 items-center justify-between gap-4">
+        <Link href="/" className="flex items-center gap-2 text-xl font-black text-[#051128] dark:text-white uppercase tracking-tighter">
+          <span className="text-blue-600">Ethio</span>Travel
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-2 md:flex">
           {links.map((l) => {
             const isActive = pathname === l.href;
             return (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                className={`relative px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${
                   isActive
-                    ? "text-accent-yellow"
-                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-slate-400 hover:text-[#051128] dark:hover:text-white"
                 }`}
               >
                 {l.label}
-                {isActive && (
-                  <motion.div
-                    layoutId="navbar-active"
-                    className="absolute -bottom-1 left-1/2 h-1 w-4 -translate-x-1/2 rounded-full bg-accent-yellow shadow-[0_0_8px_rgba(255,215,0,0.6)]"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
               </Link>
             );
           })}
         </nav>
 
-        <div className="flex items-center gap-2">
-          {hydrated && isAdmin && (
-            <Link
-              href="/admin/dashboard"
-              className="hidden items-center gap-1 rounded-full bg-brand-500/20 border border-brand-500/30 px-3 py-2 text-xs font-bold text-brand-400 transition hover:bg-brand-500/30 md:inline-flex"
-            >
-              <FiShield className="text-brand-400" /> Back to Admin
-            </Link>
-          )}
+        <div className="flex items-center gap-4">
           {hydrated && user ? (
-            user.username === "ashu" ? (
-              // Root admin (Ashu) doesn't see Logout here, only the Dashboard link added above
-              null
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  logout();
-                  setOpen(false);
-                }}
-                className="hidden items-center gap-1 rounded-full border border-white/20 bg-white/5 px-3 py-2 text-xs font-semibold text-white transition hover:bg-white/10 md:inline-flex"
-              >
-                <FiLogOut /> Log out
-              </button>
-            )
+            <div className="flex items-center gap-4">
+               {isAdmin && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="hidden items-center gap-2 rounded-xl bg-blue-50 border border-blue-100 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-blue-600 transition hover:bg-blue-100 md:inline-flex"
+                  >
+                    <FiShield /> Admin
+                  </Link>
+               )}
+               <button
+                 type="button"
+                 onClick={() => {
+                   logout();
+                   setOpen(false);
+                 }}
+                 className="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#051128] transition hover:bg-slate-50 md:inline-flex"
+               >
+                 <FiLogOut /> Log out
+               </button>
+            </div>
           ) : (
             hydrated && (
-              <Link
-                href="/login"
-                className="hidden rounded-full bg-accent-yellow px-4 py-2 text-xs font-bold text-brand-950 transition hover:opacity-90 md:inline-block"
-              >
-                Login
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/login"
+                  className="hidden text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition md:inline-block"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="hidden rounded-xl bg-blue-600 px-6 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-blue-600/20 transition hover:bg-blue-500 md:inline-block"
+                >
+                  Get Started
+                </Link>
+              </div>
             )
           )}
           <NotificationBell />
           <ThemeToggle />
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 bg-white/5 text-slate-900 dark:text-white md:hidden"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
           >

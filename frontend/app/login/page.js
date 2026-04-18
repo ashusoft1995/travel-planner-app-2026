@@ -4,9 +4,11 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import { FiLock, FiMail } from "react-icons/fi";
+import { FiLock, FiMail, FiUser, FiArrowRight, FiHeadphones } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import useFastRouting from "../../hooks/useFastRouting";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 function LoginForm() {
   const router = useRouter();
@@ -19,113 +21,137 @@ function LoginForm() {
 
   useEffect(() => {
     if (!hydrated || !user) return;
-    
-    // Use fast routing for immediate redirection
     handleLoginRedirect(user, next);
   }, [hydrated, user, next, handleLoginRedirect]);
 
-  // If already authenticated, bypass rendering entirely to speed up redirect
   if (hydrated && user) {
-    return <div className="min-h-screen bg-brand-950" />;
+    return <div className="min-h-screen bg-[#f8faff]" />;
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const id = form.identifier.trim();
-    if (id.includes("@")) {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(id)) {
-        toast.error("Enter a valid email");
-        return;
-      }
-    } else if (id.length < 2) {
-      toast.error("Enter your email or admin username");
-      return;
-    }
-    if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    if (!id || form.password.length < 6) {
+      toast.error("Please enter valid credentials");
       return;
     }
     setLoading(true);
     try {
       const signedIn = await login(id, form.password);
-      toast.success("Welcome back â youâre signed in.");
-      
-      // Use fast routing for immediate redirection
+      toast.success("Welcome back. You're signed in.");
       handleLoginRedirect(signedIn, next);
     } catch (err) {
-      const m = err?.message;
-      toast.error(
-        m === "Invalid email or password"
-          ? "We couldn’t sign you in. Check your email or password, then try again."
-          : m || "We couldn’t complete sign-in. Please try again."
-      );
+      toast.error(err?.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="page-shell py-16">
-      <div className="container max-w-md">
-        <div className="card-surface p-10">
-          <h1 className="text-center text-2xl font-bold text-[var(--text)]">Sign in</h1>
-          <p className="mt-2 text-center text-sm text-[var(--muted)]">
-            Sign in to use your dashboard, save trips, and sync your itineraries with your
-            EthioTravel account. New here? Create an account—it only takes a moment.
-          </p>
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-            <label className="block text-sm font-semibold">
-              Email or username
-              <div className="mt-2 flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3">
-                <FiMail className="text-[var(--muted)]" />
-                <input
-                  type="text"
-                  className="w-full border-0 bg-transparent py-3 outline-none"
-                  value={form.identifier}
-                  onChange={(e) => setForm((p) => ({ ...p, identifier: e.target.value }))}
-                  autoComplete="username"
-                  placeholder="you@example.com or ashu"
-                  required
-                />
-              </div>
-            </label>
-            <label className="block text-sm font-semibold">
-              Password
-              <div className="mt-2 flex items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3">
-                <FiLock className="text-[var(--muted)]" />
-                <input
-                  type="password"
-                  className="w-full border-0 bg-transparent py-3 outline-none"
-                  value={form.password}
-                  onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                  autoComplete="current-password"
-                  required
-                />
-              </div>
-            </label>
-            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-              <Link
-                href="/forgot-password"
-                className="font-semibold text-brand-600 hover:underline dark:text-accent-yellow"
-              >
-                Forgot password?
-              </Link>
-              <Link
-                href="/signup"
-                className="font-semibold text-brand-600 hover:underline dark:text-accent-yellow"
-              >
-                Create account
-              </Link>
+    <main className="relative min-h-screen w-full flex items-center justify-center p-6 overflow-hidden">
+      {/* Dynamic Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image 
+          src="https://images.unsplash.com/photo-1544735716-7c0b88f3f2a3?auto=format&fit=crop&w=1920&q=80" 
+          alt="Ethiopian Highlands"
+          fill
+          className="object-cover scale-105"
+          priority
+        />
+        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative z-10 w-full max-w-[500px] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[3rem] p-10 lg:p-14 shadow-2xl border border-white/30 dark:border-white/10"
+      >
+        <div className="text-center mb-10">
+          <p className="text-2xl font-black text-[#051128] uppercase tracking-tighter mb-4">EthioTravel</p>
+          <h1 className="text-4xl font-black text-[#051128] tracking-tighter uppercase mb-3">Welcome Back</h1>
+          <p className="text-slate-600 text-sm font-medium">Enter your credentials to access your digital travel planner.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 ml-1">Email Address</label>
+            <div className="relative">
+              <FiMail className="absolute left-6 top-1/2 -translate-y-1/2 text-[#051128]/60 text-lg" />
+              <input 
+                type="text" 
+                placeholder="alexander@luxurytravel.com"
+                value={form.identifier}
+                onChange={(e) => setForm({...form, identifier: e.target.value})}
+                className="w-full bg-white border-none rounded-2xl pl-14 pr-6 py-5 text-slate-900 font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+                required
+              />
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? "Signing in…" : "Sign in"}
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-3 px-1">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Password</label>
+              <Link href="/forgot-password" title="Account Recovery" className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition">Forgot?</Link>
+            </div>
+            <div className="relative">
+              <FiLock className="absolute left-6 top-1/2 -translate-y-1/2 text-[#051128]/60 text-lg" />
+              <input 
+                type="password" 
+                placeholder="••••••••••••"
+                value={form.password}
+                onChange={(e) => setForm({...form, password: e.target.value})}
+                className="w-full bg-white border-none rounded-2xl pl-14 pr-6 py-5 text-slate-900 font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-blue-500 transition-all shadow-sm"
+                required
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs py-5 rounded-2xl transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-3"
+          >
+            {loading ? "Authenticating..." : "Sign In"} <FiArrowRight />
+          </button>
+        </form>
+
+        <div className="mt-8">
+            <div className="relative flex items-center justify-center mb-8">
+              <div className="absolute w-full border-t border-slate-200"></div>
+              <span className="relative z-10 px-4 bg-white/10 rounded-full backdrop-blur-md text-[10px] font-black uppercase tracking-widest text-slate-500">Or continue with</span>
+            </div>
+
+            <button className="w-full bg-[#f0f4ff] text-slate-900 font-black uppercase tracking-widest text-[10px] py-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center gap-3 hover:bg-white transition-all">
+               <Image src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" width={18} height={18} alt="Google" /> Continue with Google
             </button>
-          </form>
-          <p className="mt-6 text-center text-sm text-[var(--muted)]">
-            <Link href="/" className="font-semibold text-brand-600 dark:text-accent-yellow">
-              Back home
-            </Link>
-          </p>
+        </div>
+
+        <p className="mt-10 text-center text-xs font-medium text-slate-500">
+          Don't have an account? <Link href="/signup" className="text-blue-600 font-black uppercase tracking-tighter hover:underline ml-1">Create Account</Link>
+        </p>
+
+        <div className="mt-10 flex justify-center gap-6">
+           <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition">Privacy</Link>
+           <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition">Terms</Link>
+           <Link href="/contact" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition">Support</Link>
+        </div>
+      </motion.div>
+
+      {/* Back to Home Link */}
+      <Link href="/" className="absolute bottom-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition group z-10">
+        <FiArrowRight className="rotate-180 group-hover:-translate-x-1 transition-transform" /> Back to main exploration
+      </Link>
+
+      {/* Support Badge */}
+      <div className="absolute bottom-10 right-10 z-10 hidden lg:block">
+        <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/50 flex items-center gap-4">
+           <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+              <FiHeadphones className="text-blue-600" />
+           </div>
+           <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">Live Concierge</p>
+              <p className="text-[10px] text-slate-500 font-bold">Need help logging in?</p>
+           </div>
         </div>
       </div>
     </main>
@@ -134,13 +160,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
-        </div>
-      }
-    >
+    <Suspense fallback={<div className="min-h-screen bg-[#f8faff] flex items-center justify-center"><div className="h-10 w-10 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" /></div>}>
       <LoginForm />
     </Suspense>
   );

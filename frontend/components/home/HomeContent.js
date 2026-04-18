@@ -21,6 +21,7 @@ import {
   ComposedChart,
   Legend,
   Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -49,6 +50,57 @@ const TESTIMONIALS = [
     role: "Photographer · Germany",
     photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&h=200&q=80",
   },
+  {
+    quote: "The Omo Valley experience was transformational. The guide's knowledge and the seamless logistics made it a once-in-a-lifetime trip.",
+    name: "Elena S.",
+    role: "Anthropologist · Italy",
+    photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&h=200&q=80",
+  },
+  {
+    quote: "Business trips to Addis are usually stressful, but the Entoto views and local coffee tour recommendations turned my weekend into a vacation.",
+    name: "Ahmed K.",
+    role: "Tech Executive · UAE",
+    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&h=200&q=80",
+  },
+  {
+    quote: "Bale Mountains is a hidden gem. Seeing the Ethiopian Wolf in the wild was incredible. The planning tool helped us choose the right gear.",
+    name: "Sarah W.",
+    role: "Nature Lover · Canada",
+    photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&h=200&q=80",
+  },
+  {
+    quote: "Harar is like nowhere else on Earth. The Hyatt feeding tradition is wild but safe with the local guides. Truly an ancient atmosphere.",
+    name: "Kenji T.",
+    role: "World Explorer · Japan",
+    photo: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&h=200&q=80",
+  },
+];
+
+const PROMOTIONS = [
+  {
+    id: 1,
+    title: "Gondar Royal Flash",
+    discount: "20% OFF",
+    desc: "Explore the Camelot of Africa. Limited slots for Timket season bookings.",
+    tag: "Hot Deal",
+    color: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  },
+  {
+    id: 2,
+    title: "Bale Alpine Escape",
+    discount: "Perfect Weather",
+    desc: "Peak visibility at Harenna Forest. Book your trekking guide today.",
+    tag: "Good Weather",
+    color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+  },
+  {
+    id: 3,
+    title: "Lalibela Pilgrimage",
+    discount: "Package Deal",
+    desc: "Full flight + hotel + guide bundles for the rock-hewn church circuit.",
+    tag: "Trending",
+    color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  },
 ];
 
 export default function HomeContent() {
@@ -58,6 +110,7 @@ export default function HomeContent() {
   const [selected, setSelected] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [destinations, setDestinations] = useState([]);
+  const [showAllDestinations, setShowAllDestinations] = useState(false);
   const { ref: statsRef, inView: statsInView } = useInView({ triggerOnce: true });
   const { ref: demoStatsRef, inView: demoStatsInView } = useInView({ triggerOnce: true });
 
@@ -71,10 +124,16 @@ export default function HomeContent() {
       .then(res => res.json())
       .then(res => {
         const data = res.data || [];
-        setDestinations(data);
-        setCounters(prev => ({ ...prev, destinations: data.length }));
+        // Fallback to library data if API fails or returns less than 25
+        const finalData = data.length >= 25 ? data : DESTINATION_DETAILS;
+        setDestinations(finalData);
+        setCounters(prev => ({ ...prev, destinations: finalData.length }));
       })
-      .catch(console.error);
+      .catch(e => {
+        console.error(e);
+        setDestinations(DESTINATION_DETAILS);
+        setCounters(prev => ({ ...prev, destinations: DESTINATION_DETAILS.length }));
+      });
   }, []);
 
   const suggestions = useMemo(() => {
@@ -168,145 +227,132 @@ export default function HomeContent() {
     else router.push(`/login?next=${encodeURIComponent(dest)}`);
   };
 
+  const displayedDestinations = showAllDestinations ? destinations : destinations.slice(0, 8);
+
   return (
     <main className="page-shell">
-      <section className="relative min-h-[88vh] overflow-hidden bg-brand-950">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] overflow-hidden bg-brand-950">
         <div className="absolute inset-0">
-          <Image src={HERO_IMAGE} alt="Hero" fill priority className="object-cover opacity-40" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-950/90 to-brand-900/20" />
+          <Image src={HERO_IMAGE} alt="Hero" fill priority className="object-cover opacity-30" sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-950/90 to-transparent" />
         </div>
-        <div className="container relative z-10 grid min-h-[88vh] items-center gap-12 py-24 lg:grid-cols-2">
-          <div>
-            <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-5xl font-bold text-white lg:text-6xl">
-              Your next adventure starts here
+        <div className="container relative z-10 flex min-h-[90vh] flex-col justify-center gap-12 py-24">
+          <div className="max-w-3xl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 mb-8">
+              <span className="h-2 w-2 rounded-full bg-accent-yellow animate-pulse" />
+              <span className="text-xs font-black uppercase tracking-widest text-white/60">New Exploration Phase Enabled</span>
+            </motion.div>
+            <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="text-6xl font-black text-white lg:text-8xl leading-[0.9] tracking-tighter uppercase">
+              Ethiopia <span className="text-accent-yellow">Awaits</span>
             </motion.h1>
-            <div className="mt-8 flex gap-2 max-w-md">
-              <input 
-                type="text" 
-                value={searchQ} 
-                onChange={e => setSearchQ(e.target.value)} 
-                className="flex-1 rounded-xl bg-white/10 border border-white/20 p-3 text-white" 
-                placeholder="Search destination..."
-              />
-              <button onClick={runSearch} className="rounded-xl bg-accent-yellow px-6 py-3 font-bold text-black">Go</button>
-            </div>
-            <div className="mt-8 flex gap-4">
-               <button onClick={e => handleProtectedAction(e, "/add-trip")} className="rounded-xl bg-brand-500 px-8 py-3 font-bold text-white">Start Planning</button>
-               <Link href="/trips" className="rounded-xl border border-white/30 px-8 py-3 text-white">Browse Trips</Link>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="mt-8 text-xl text-white/50 max-w-xl font-medium">
+              Discover 25+ iconic destinations across the roof of Africa. From rock-hewn ancient cities to lush tropical forests.
+            </motion.p>
+            <div className="mt-12 flex flex-col sm:flex-row gap-4 max-w-2xl">
+              <div className="relative flex-1 group">
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-accent-yellow transition-colors" size={20} />
+                <input 
+                  type="text" 
+                  value={searchQ} 
+                  onChange={e => setSearchQ(e.target.value)} 
+                  className="w-full rounded-2xl bg-white/10 border border-white/20 p-4 pl-12 text-white outline-none focus:border-accent-yellow/50 backdrop-blur-md transition-all uppercase tracking-widest text-xs font-bold" 
+                  placeholder="Where do you want to go?"
+                />
+              </div>
+              <button onClick={runSearch} className="rounded-2xl bg-accent-yellow px-8 py-4 font-black uppercase tracking-widest text-black shadow-xl shadow-accent-yellow/20 hover:scale-105 active:scale-95 transition-all">Search</button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Destination Result */}
-      <AnimatePresence>
-        {selected && (
-          <motion.section 
-            id="search-result"
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="container py-12"
-          >
-            <div className="rounded-3xl bg-white/5 border border-white/10 p-8">
-               <h2 className="text-3xl font-bold text-white">{selected.name}</h2>
-               <p className="mt-4 text-slate-300 max-w-2xl">{selected.description}</p>
-               <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <p className="text-xs text-slate-400">Temp</p>
-                    <p className="text-xl font-bold text-white">{selected.avgTempDry}</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                    <p className="text-xs text-slate-400">Best Time</p>
-                    <p className="text-xl font-bold text-white">{selected.bestMonths}</p>
-                  </div>
-               </div>
-               <button onClick={() => setSelected(null)} className="mt-8 text-sm text-slate-500">Dismiss</button>
-            </div>
-          </motion.section>
-        )}
-      </AnimatePresence>
+      {/* Promotions Section */}
+      <section className="container py-12 -mt-16 relative z-20">
+        <div className="grid md:grid-cols-3 gap-6">
+          {PROMOTIONS.map((promo, idx) => (
+            <motion.div
+              key={promo.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className={`p-8 rounded-[2rem] border ${promo.color} backdrop-blur-2xl shadow-2xl relative overflow-hidden group`}
+            >
+              <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/5 blur-2xl group-hover:scale-150 transition-transform" />
+              <span className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-white/10 mb-4">{promo.tag}</span>
+              <h4 className="text-xl font-black text-white mb-2 uppercase">{promo.title}</h4>
+              <p className="text-4xl font-black text-accent-yellow mb-4">{promo.discount}</p>
+              <p className="text-xs text-white/60 leading-relaxed">{promo.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* Stats Section */}
-      <section className="container py-16" ref={statsRef}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-           <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
-           >
-             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.travelers.toLocaleString()}+</p>
-             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Travelers Served</p>
-           </motion.div>
-           <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ delay: 0.1 }}
-             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
-           >
-             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.destinations}</p>
-             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Global Destinations</p>
-           </motion.div>
-           <motion.div 
-             initial={{ opacity: 0, y: 20 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true }}
-             transition={{ delay: 0.2 }}
-             className="text-center p-8 rounded-3xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10"
-           >
-             <p className="text-5xl font-extrabold text-brand-600 dark:text-accent-yellow">{counters.hotels}</p>
-             <p className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-widest">Premium Hotels</p>
-           </motion.div>
+      <section className="container py-24" ref={statsRef}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+           {[
+             { label: "Travelers Served", val: counters.travelers, suffix: "+", color: "text-purple-400" },
+             { label: "Active Destinations", val: counters.destinations, suffix: "", color: "text-emerald-400" },
+             { label: "Premium Lodging", val: counters.hotels, suffix: "", color: "text-blue-400" }
+           ].map((stat, i) => (
+             <div key={i} className="text-center group">
+               <motion.p className={`text-7xl font-black tracking-tighter ${stat.color} text-glow-lg transition-transform group-hover:scale-110`}>
+                 {stat.val.toLocaleString()}{stat.suffix}
+               </motion.p>
+               <p className="mt-4 text-xs font-black text-white/30 uppercase tracking-[0.3em]">{stat.label}</p>
+             </div>
+           ))}
         </div>
       </section>
 
-      {/* Featured Destinations */}
+      {/* Destinations Grid */}
       <section className="container py-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
-            <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Explore</h2>
-            <h3 className="text-4xl font-bold text-slate-900 dark:text-white">Featured Destinations</h3>
+            <h2 className="text-xs font-black text-accent-yellow uppercase tracking-[0.4em] mb-4">Discovery Archive</h2>
+            <h3 className="text-5xl font-black text-white uppercase tracking-tight">Iconic <span className="text-white/40">Locations</span></h3>
           </div>
-          <Link href="/trips" className="flex items-center gap-2 text-brand-600 dark:text-accent-yellow font-bold group">
-            View all destinations <FiArrowRight className="transition-transform group-hover:translate-x-1" />
-          </Link>
+          <button 
+            onClick={() => setShowAllDestinations(!showAllDestinations)}
+            className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-white/50 hover:text-white transition-colors group"
+          >
+            {showAllDestinations ? "Show Less" : "View All 25+ Destinations"} <FiArrowRight className={`transition-transform ${showAllDestinations ? 'rotate-90' : ''}`} />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {DESTINATION_DETAILS.slice(0, 4).map((dest, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {displayedDestinations.map((dest, idx) => (
             <motion.div
               key={dest.name}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="group relative h-[400px] overflow-hidden rounded-3xl bg-slate-100"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: (idx % 8) * 0.05 }}
+              className="group relative h-[450px] overflow-hidden rounded-[2.5rem] bg-[#12122a] border border-white/10"
             >
               <Image 
                 src={dest.image} 
                 alt={dest.name} 
                 fill 
-                className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-90" 
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <FiMapPin className="text-accent-yellow" />
-                  <span className="text-xs font-bold text-white/80 uppercase tracking-wider">{dest.region}</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-1 w-8 bg-accent-yellow rounded-full" />
+                  <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{dest.region}</span>
                 </div>
-                <h4 className="text-2xl font-bold text-white mb-2">{dest.name}</h4>
-                <div className="flex items-center justify-between">
-                  <p className="text-accent-yellow font-bold">{dest.price}</p>
-                  <div className="flex items-center gap-1">
-                    <FiStar className="fill-accent-yellow text-accent-yellow" />
-                    <span className="text-sm font-bold text-white">{dest.rating}</span>
+                <h4 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-xl font-black text-accent-yellow">{dest.price}</p>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
+                    <FiStar className="fill-accent-yellow text-accent-yellow" size={12} />
+                    <span className="text-[10px] font-black text-white">{dest.rating}</span>
                   </div>
                 </div>
               </div>
               <button 
-                onClick={() => { setSelected(dest); scrollToResult(); }}
-                className="absolute inset-0 z-10 opacity-0"
+                onClick={() => router.push(`/trips?destination=${encodeURIComponent(dest.name)}`)}
+                className="absolute inset-0 z-10 cursor-pointer"
                 aria-label={`View ${dest.name}`}
               />
             </motion.div>
@@ -314,88 +360,99 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* Market Analytics Graph */}
-      <section className="container py-24 bg-slate-50 dark:bg-brand-950/30 rounded-[3rem] my-12" ref={demoStatsRef}>
-        <div className="grid lg:grid-cols-5 gap-12 items-center">
-          <div className="lg:col-span-2">
-            <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Insights</h2>
-            <h3 className="text-4xl font-bold text-slate-900 dark:text-white mb-6">Market Overview</h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-8">
-              Experience data-driven travel planning. Our real-time analytics help you understand travel trends, peak seasons, and budget optimizations for each destination.
+      {/* Market Analytics Section */}
+      <section className="container py-24 bg-white border border-slate-100 rounded-[4rem] my-24 overflow-hidden relative shadow-xl shadow-blue-900/5" ref={demoStatsRef}>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
+        <div className="relative z-10 space-y-16">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Telemetry Integration</h2>
+            <h3 className="text-5xl font-black text-[#051128] uppercase tracking-tight">Market <span className="text-slate-200">Analytics</span></h3>
+            <p className="mt-6 text-slate-500 text-sm font-medium leading-relaxed">
+              Synthesizing real-time traveler flow and economic indicators. We leverage deep telemetry to optimize your itinerary and budget allocation.
             </p>
-            
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center text-brand-600 dark:text-brand-400">
-                  <FiUsers size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{demoCounters.visitors.toLocaleString()}</p>
-                  <p className="text-sm text-slate-500">Monthly Visitors</p>
-                </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 h-[500px]">
+            {/* Bar Chart: Volume */}
+            <div className="p-8 rounded-[3rem] bg-[#f8faff] border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between mb-8 px-2">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Travel Volume Index</h4>
+                <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
               </div>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-accent-yellow/10 flex items-center justify-center text-accent-yellow">
-                  <FiDollarSign size={24} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{demoCounters.spendETB.toLocaleString()} ETB</p>
-                  <p className="text-sm text-slate-500">Average Spend</p>
-                </div>
+              <div className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={destinations.slice(0, 8)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#00000008" vertical={false} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      itemStyle={{ color: '#051128' }}
+                      cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                    />
+                    <Bar dataKey="travelVolumeIndex" fill="#2563eb" radius={[12, 12, 0, 0]} barSize={45} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
-          </div>
-          
-          <div className="lg:col-span-3 h-[400px] w-full bg-white dark:bg-white/5 rounded-3xl p-6 border border-slate-200 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={DESTINATION_DETAILS.slice(0, 6)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} opacity={0.3} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#f8fafc' }}
-                  itemStyle={{ color: '#f8fafc' }}
-                />
-                <Bar yAxisId="left" dataKey="travelVolumeIndex" fill="#a855f7" radius={[6, 6, 0, 0]} barSize={40} name="Travel Volume" />
-                <Line yAxisId="right" type="monotone" dataKey="rating" stroke="#d8b4fe" strokeWidth={3} dot={{ r: 6, fill: '#d8b4fe', strokeWidth: 0 }} name="Rating" />
-              </ComposedChart>
-            </ResponsiveContainer>
+
+            {/* Line Chart: Trends */}
+            <div className="p-8 rounded-[3rem] bg-[#f8faff] border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between mb-8 px-2">
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rating Propagation</h4>
+                <div className="h-2 w-2 rounded-full bg-purple-600 animate-pulse" />
+              </div>
+              <div className="h-[350px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={destinations.slice(0, 8)}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#00000008" vertical={false} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[4, 5]} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      itemStyle={{ color: '#051128' }}
+                    />
+                    <Line type="monotone" dataKey="rating" stroke="#a855f7" strokeWidth={4} dot={{ r: 6, fill: '#a855f7', strokeWidth: 0 }} activeDot={{ r: 8, strokeWidth: 0 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
       <section className="container py-24">
-        <div className="text-center mb-16">
-          <h2 className="text-sm font-bold text-brand-500 uppercase tracking-widest mb-2">Testimonials</h2>
-          <h3 className="text-4xl font-bold text-slate-900 dark:text-white">What Our Travelers Say</h3>
+        <div className="text-center mb-20">
+          <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Transmission Logs</h2>
+          <h3 className="text-5xl font-black text-[#051128] uppercase tracking-tight">Traveler <span className="text-slate-200">Verified</span></h3>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {TESTIMONIALS.map((t, idx) => (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative p-10 rounded-[2.5rem] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/30 dark:shadow-none"
+              transition={{ delay: idx * 0.05 }}
+              className="p-10 rounded-[3rem] bg-white border border-slate-100 relative overflow-hidden group shadow-lg shadow-blue-900/5"
             >
-              <div className="absolute top-8 right-10 text-brand-100 dark:text-white/5">
-                <svg width="60" height="45" viewBox="0 0 60 45" fill="currentColor">
+              <div className="absolute top-8 right-10 text-slate-100 group-hover:text-blue-50 transition-colors">
+                <svg width="40" height="30" viewBox="0 0 60 45" fill="currentColor">
                   <path d="M14.4 0C22.4 0 28.8 6.4 28.8 14.4C28.8 22.4 22.4 28.8 14.4 28.8H7.2V36H14.4V45H0V28.8C0 12.9 12.9 0 28.8 0H14.4ZM45.6 0C53.6 0 60 6.4 60 14.4C60 22.4 53.6 28.8 45.6 28.8H38.4V36H45.6V45H31.2V28.8C31.2 12.9 44.1 0 60 0H45.6Z" />
                 </svg>
               </div>
-              <p className="text-xl text-slate-700 dark:text-slate-300 italic mb-8 relative z-10">
+              <p className="text-lg text-slate-600 font-medium leading-relaxed mb-10 relative z-10 italic">
                 "{t.quote}"
               </p>
               <div className="flex items-center gap-4">
-                <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-brand-500">
+                <div className="relative w-12 h-12 rounded-2xl overflow-hidden ring-2 ring-slate-100 group-hover:ring-blue-600 transition-all">
                   <Image src={t.photo} alt={t.name} fill className="object-cover" />
                 </div>
                 <div>
-                  <h5 className="font-bold text-slate-900 dark:text-white">{t.name}</h5>
-                  <p className="text-sm text-slate-500">{t.role}</p>
+                  <h5 className="font-black text-[#051128] text-sm uppercase tracking-widest">{t.name}</h5>
+                  <p className="text-[10px] text-slate-400 uppercase font-bold">{t.role}</p>
                 </div>
               </div>
             </motion.div>
@@ -404,26 +461,27 @@ export default function HomeContent() {
       </section>
 
       {/* CTA Section */}
-      <section className="container py-24">
-        <div className="relative overflow-hidden rounded-[3.5rem] bg-brand-600 dark:bg-brand-900 p-12 lg:p-24 text-center">
-          <div className="absolute inset-0 opacity-20">
+      <section className="container py-24 mb-24">
+        <div className="relative overflow-hidden rounded-[4rem] bg-[#f8faff] p-16 lg:p-32 text-center border border-slate-100 shadow-xl shadow-blue-900/5">
+          <div className="absolute inset-0 opacity-5 grayscale pointer-events-none">
             <Image src={HERO_IMAGE} alt="CTA BG" fill className="object-cover" />
           </div>
-          <div className="relative z-10 max-w-3xl mx-auto">
-            <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6">Ready to plan your next getaway?</h2>
-            <p className="text-brand-100 text-lg mb-10">
-              Join thousands of travelers who have discovered the wonders of Ethiopia through our personalized planning tools.
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-white/80 to-transparent" />
+          <div className="relative z-10 max-w-4xl mx-auto">
+            <h2 className="text-5xl lg:text-7xl font-black text-[#051128] mb-8 tracking-tighter uppercase leading-[0.9]">Start your <span className="text-blue-600">Journey</span></h2>
+            <p className="text-slate-500 text-xl mb-12 font-medium max-w-2xl mx-auto">
+              Join thousands of travelers who have already discovered the hidden treasures of Ethiopia. Your bespoke experience starts with a single click.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button 
                 onClick={e => handleProtectedAction(e, "/add-trip")} 
-                className="w-full sm:w-auto px-10 py-5 bg-accent-yellow text-black font-extrabold rounded-2xl hover:scale-105 transition-transform"
+                className="w-full sm:w-auto px-12 py-6 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all"
               >
-                Create My Trip
+                Plan Your Trip
               </button>
               <Link 
                 href="/contact" 
-                className="w-full sm:w-auto px-10 py-5 bg-white/10 text-white font-bold rounded-2xl border border-white/20 backdrop-blur-md hover:bg-white/20 transition-all"
+                className="w-full sm:w-auto px-12 py-6 bg-white text-[#051128] font-black uppercase tracking-widest rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all"
               >
                 Talk to an Expert
               </Link>
