@@ -8,31 +8,37 @@
 -- ============================================
 
 -- ============================================
--- 0. USER ID SEQUENCE & TRIGGER (Numeric IDs)
+-- 0. USER ID SYSTEM RESET (Numeric IDs 1200+)
 -- ============================================
 
--- Create a sequence for user IDs starting at 1201
+-- 1. Ensure the sequence exists
 CREATE SEQUENCE IF NOT EXISTS user_id_seq START 1201;
 
--- Create a function to automatically assign the next ID if null
+-- 2. Ensure ID column is TEXT and remove old defaults
+ALTER TABLE users ALTER COLUMN id TYPE TEXT;
+ALTER TABLE users ALTER COLUMN id DROP DEFAULT;
+
+-- 3. Set the new default to the sequence
+ALTER TABLE users ALTER COLUMN id SET DEFAULT nextval('user_id_seq')::TEXT;
+
+-- 4. Create a backup trigger just in case the default is bypassed
 CREATE OR REPLACE FUNCTION set_user_id() 
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.id IS NULL THEN
+  IF NEW.id IS NULL OR NEW.id = '' THEN
     NEW.id := nextval('user_id_seq')::TEXT;
   END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Create the trigger
 DROP TRIGGER IF EXISTS trigger_set_user_id ON users;
 CREATE TRIGGER trigger_set_user_id
 BEFORE INSERT ON users
 FOR EACH ROW
 EXECUTE FUNCTION set_user_id();
 
--- Manually set the Admin ID to 1200
+-- 5. Manually set the Admin ID to 1200
 UPDATE users SET id = '1200' WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
 
 -- ============================================
