@@ -78,7 +78,7 @@ const NAV_ITEMS = [
   },
   {
     href: "/admin/dashboard/agents",
-    label: "Agent Protocol",
+    label: "Agent Management",
     icon: FiShield,
     color: "from-teal-500 to-teal-700",
     bg: "bg-teal-500/10",

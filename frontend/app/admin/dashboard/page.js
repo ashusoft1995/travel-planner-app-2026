@@ -78,8 +78,22 @@ export default function AdminCommandCenter() {
         tripsApi.get("/internal-messages")
       ]);
 
+      const rawUsers = Array.isArray(uRes.data?.data) ? uRes.data.data : [];
+      const sortedUsers = rawUsers.sort((a, b) => {
+        const getRank = (u) => {
+          if (u.id === "1200" || u.username === "ashu") return 0;
+          if (u.role === "admin") return 1;
+          if (u.role === "agent") return 2;
+          return 3;
+        };
+        const rankA = getRank(a);
+        const rankB = getRank(b);
+        if (rankA !== rankB) return rankA - rankB;
+        return parseInt(a.id || 0) - parseInt(b.id || 0);
+      });
+
       setStats({
-        users: Array.isArray(uRes.data?.data) ? uRes.data.data : [],
+        users: sortedUsers,
         trips: Array.isArray(tRes.data?.data) ? tRes.data.data : [],
         requests: Array.isArray(rRes.data?.data) ? rRes.data.data : [],
         messages: Array.isArray(mRes.data?.data) ? mRes.data.data : [],

@@ -5,7 +5,7 @@ import AgentsPanel from "../../../../components/admin/AgentsPanel";
 export default function AdminAgentsPage() {
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Manage Agents</h1>
+      <h1 className="text-2xl font-bold text-white mb-6">Agent Management</h1>
       <AgentsPanel />
     </div>
   );

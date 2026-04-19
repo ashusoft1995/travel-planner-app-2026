@@ -68,9 +68,13 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/stats', async (req, res) => {
   try {
-    const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
-    const { count: destCount } = await supabase.from('destinations').select('*', { count: 'exact', head: true });
-    const { count: tripsCount } = await supabase.from('trips').select('*', { count: 'exact', head: true });
+    const { count: usersCount, error: uErr } = await supabase.from('users').select('*', { count: 'exact', head: true });
+    const { count: destCount, error: dErr } = await supabase.from('destinations').select('*', { count: 'exact', head: true });
+    const { count: tripsCount, error: tErr } = await supabase.from('trips').select('*', { count: 'exact', head: true });
+
+    if (uErr || dErr || tErr) {
+      console.error('Stats fetch error:', { uErr, dErr, tErr });
+    }
 
     res.json({
       success: true,
@@ -81,6 +85,7 @@ app.get('/api/stats', async (req, res) => {
       }
     });
   } catch (err) {
+    console.error('Stats internal error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -543,9 +548,11 @@ app.get('/api/notifications', authenticateToken, async (req, res) => {
   const { audience } = req.query;
   let query = supabase.from('notifications').select('*');
 
-  if (req.user.role === 'admin' && audience === 'admin') {
-    query = query.eq('audience', 'admin');
+  if (req.user.role === 'admin') {
+    // Admins see everything for admins + items addressed specifically to them + global items
+    query = query.or(`audience.eq.admin,user_email.eq.${req.user.email},audience.eq.all`);
   } else {
+    // Normal users see only their items + global items
     query = query.or(`user_email.eq.${req.user.email},audience.eq.all`);
   }
 
