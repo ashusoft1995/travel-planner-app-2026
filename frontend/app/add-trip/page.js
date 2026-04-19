@@ -22,6 +22,7 @@ import RequireAuth from "../../components/RequireAuth";
 import { useTrips } from "../../context/TripContext";
 import { friendlyApiMessage, searchDestinations } from "../../lib/api";
 import DestinationSearchPopup from "../../components/destination/DestinationSearchPopup";
+import { uploadFile } from "../../lib/supabase";
 
 const stepLabels = ["Destination & dates", "Accommodation & Costs", "Activities & Budget", "Review & Payment"];
 
@@ -262,12 +263,18 @@ function AddTripPageContent() {
     setForm(prev => ({ ...prev, budget: Math.round(total) }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setPreviewImage(reader.result);
-    reader.readAsDataURL(file);
+    
+    const toastId = toast.loading("Uploading image...");
+    try {
+      const url = await uploadFile(file);
+      setPreviewImage(url);
+      toast.success("Image uploaded successfully", { id: toastId });
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    }
   };
 
   const validateStep = (s) => {
@@ -496,6 +503,23 @@ function AddTripPageContent() {
                     placeholder="client@example.com"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Trip Cover Photo (Optional)
+                  </label>
+                  <label className="flex flex-col items-center justify-center h-48 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-100 transition-all group overflow-hidden relative">
+                    {previewImage ? (
+                      <img src={previewImage} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <FiPlus className="h-8 w-8 text-gray-400 group-hover:text-blue-500 mb-2" />
+                        <span className="text-sm font-medium text-gray-500 group-hover:text-blue-500">Choose from file</span>
+                      </div>
+                    )}
+                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  </label>
                 </div>
               </div>
             )}

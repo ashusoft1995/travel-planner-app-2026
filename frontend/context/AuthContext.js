@@ -177,9 +177,7 @@ export function AuthProvider({ children }) {
         return authData?.user;
       } catch (e) {
         const msg = e?.response?.data?.message;
-        throw new Error(
-          typeof msg === "string" && msg.includes("Invalid") ? msg : friendlyApiMessage(e)
-        );
+        throw new Error(msg || friendlyApiMessage(e));
       }
     },
     [applySession]

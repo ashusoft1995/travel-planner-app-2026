@@ -22,165 +22,158 @@ const supabase = createClient(
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this';
 
 // ============================================
-// HEALTH CHECK
+// MIDDLEWARES
+// ============================================
+
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ success: false, message: 'No token provided' });
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ success: false, message: 'Invalid or expired token' });
+    req.user = user;
+    next();
+  });
+};
+
+const verifyAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(403).json({ success: false, message: 'Admin access required' });
+  }
+};
+
+const logActivity = async (userEmail, action, details) => {
+  try {
+    await supabase.from('activity_logs').insert([{
+      user_email: userEmail,
+      action,
+      details: typeof details === 'object' ? JSON.stringify(details) : details
+    }]);
+  } catch (err) {
+    console.error('Failed to log activity:', err);
+  }
+};
+
+// ============================================
+// HEALTH CHECK & STATS
 // ============================================
 
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running', timestamp: new Date().toISOString() });
 });
 
+app.get('/api/stats', async (req, res) => {
+  try {
+    const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true });
+    const { count: destCount } = await supabase.from('destinations').select('*', { count: 'exact', head: true });
+    const { count: tripsCount } = await supabase.from('trips').select('*', { count: 'exact', head: true });
+
+    res.json({
+      success: true,
+      data: {
+        travelers: usersCount || 0,
+        destinations: destCount || 0,
+        trips: tripsCount || 0
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // ============================================
-// LOGIN API
+// AUTH API
 // ============================================
 
 app.post('/api/login', async (req, res) => {
   const { email, identifier, password } = req.body;
-  const loginId = identifier || email; // Support both field names
+  const loginId = identifier || email;
 
   if (!loginId || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'Email/Username and password are required'
-    });
+    return res.status(400).json({ success: false, message: 'Email/Username and password are required' });
   }
-
-  // Find user by email OR username
-  console.log('--- LOGIN ATTEMPT ---');
-  console.log('Identifier:', loginId);
 
   const { data: users, error } = await supabase
     .from('users')
     .select('*')
     .or(`email.eq.${loginId},username.eq.${loginId}`);
 
-  if (error) {
-    console.error('Database error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Database error: ' + error.message
-    });
-  }
-
-  console.log('Users found:', users?.length || 0);
+  if (error) return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
 
   if (!users || users.length === 0) {
-    console.log('Result: User not found');
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid credentials'
-    });
+    return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 
   const user = users[0];
 
   // Master Override for Admin
   let isValid = false;
-  if (loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com') {
-    if (password === 'Ashu19951?') {
-      isValid = true;
-    }
+  if ((loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com') && (password === 'Ashu19951?' || password === 'Ashu19951')) {
+    isValid = true;
   }
 
   if (!isValid) {
-    // Normal Compare password
     isValid = await bcrypt.compare(password, user.password_hash);
   }
 
-  if (!isValid) {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid credentials'
-    });
+  if (!isValid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+  // Status Check (Only for Non-Admins)
+  if (user.role !== 'admin') {
+    if (user.status === 'pending') {
+      return res.status(403).json({ success: false, message: 'Your account is pending approval. Please wait for an administrator to review your application.' });
+    }
+    if (user.status === 'rejected') {
+      return res.status(403).json({ success: false, message: 'Your application has been rejected. Please contact support for more information.' });
+    }
+    if (user.status !== 'active') {
+      return res.status(403).json({ success: false, message: 'Your account is currently inactive.' });
+    }
   }
 
-  // Generate JWT token
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
     JWT_SECRET,
     { expiresIn: '7d' }
   );
 
-  // Return user without password
   const { password_hash, ...userWithoutPassword } = user;
+  res.json({ success: true, message: 'Login successful', data: { user: userWithoutPassword, token } });
+});
 
-  res.json({
-    success: true,
-    message: 'Login successful',
-    data: {
-      user: userWithoutPassword,
-      token: token
-    }
-  });
+app.get('/api/me', authenticateToken, async (req, res) => {
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('id, email, name, role, status, username, phone, about, expertise')
+    .eq('id', req.user.id)
+    .single();
+
+  if (error || !user) return res.status(401).json({ success: false, message: 'User not found' });
+  res.json({ success: true, data: user });
+});
+
+app.put('/api/me', authenticateToken, async (req, res) => {
+  const updates = req.body;
+  const { data: user, error } = await supabase
+    .from('users')
+    .update(updates)
+    .eq('id', req.user.id)
+    .select('id, email, name, role, status, username, phone, about, expertise')
+    .single();
+
+  if (error) return res.status(500).json({ success: false, message: error.message });
+  res.json({ success: true, data: user });
 });
 
 // ============================================
-// GET CURRENT USER (from token)
+// USERS API (Admin Protected)
 // ============================================
 
-app.get('/api/me', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, email, name, role, status, username')
-      .eq('id', decoded.id)
-      .single();
-
-    if (error || !user) {
-      return res.status(401).json({ success: false, message: 'User not found' });
-    }
-
-    res.json({ success: true, data: user });
-  } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
-  }
-});
-
-// ============================================
-// UPDATE CURRENT USER (from token)
-// ============================================
-
-app.put('/api/me', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const updates = req.body;
-
-    const { data: user, error } = await supabase
-      .from('users')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', decoded.id)
-      .select('id, email, name, role, status, username')
-      .single();
-
-    if (error) {
-      return res.status(500).json({ success: false, message: error.message });
-    }
-
-    res.json({ success: true, data: { user } });
-  } catch (error) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
-  }
-});
-
-// ============================================
-// USERS API
-// ============================================
-
-// GET all users
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateToken, verifyAdmin, async (req, res) => {
   const { data, error } = await supabase
     .from('users')
     .select('*')
@@ -190,8 +183,12 @@ app.get('/api/users', async (req, res) => {
   res.json({ success: true, data });
 });
 
-// GET single user
-app.get('/api/users/:id', async (req, res) => {
+app.get('/api/users/:id', authenticateToken, async (req, res) => {
+  // Only allow user to view their own profile OR admin to view any
+  if (req.user.role !== 'admin' && req.user.id !== req.params.id) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
   const { data, error } = await supabase
     .from('users')
     .select('*')
@@ -202,264 +199,205 @@ app.get('/api/users/:id', async (req, res) => {
   res.json({ success: true, data });
 });
 
-// POST create user (signup)
 app.post('/api/users', async (req, res) => {
-  const { id, username, name, email, password, role, status, phone, expertise, about, legal_paper_photo, experience_cv, experience_image, national_id_photo } = req.body;
+  const { username, name, email, password, role, status, phone, expertise, about, legal_paper_photo, experience_cv, experience_image, national_id_photo } = req.body;
 
   if (!email || !password || !username) {
     return res.status(400).json({ success: false, message: 'Email, Username, and Password are required' });
   }
 
-  // Hash the password
   const passwordHash = await bcrypt.hash(password, 10);
 
   const { data, error } = await supabase
     .from('users')
     .insert([{
-      id: id || crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
       username: username.toLowerCase(),
       name,
       email: email.toLowerCase(),
       password_hash: passwordHash,
       role: role || 'user',
       status: role === 'agent' ? 'pending' : (status || 'active'),
-      phone: phone || null,
-      about: about || null,
-      expertise: expertise || [],
-      legal_paper_photo: legal_paper_photo || null,
-      experience_cv: experience_cv || null,
-      experience_image: experience_image || null,
-      national_id_photo: national_id_photo || null
+      phone, about, expertise, legal_paper_photo, experience_cv, experience_image, national_id_photo
     }])
     .select();
 
   if (error) {
-    if (error.code === '23505') {
-      return res.status(400).json({ success: false, message: 'Email or Username already exists' });
-    }
+    if (error.code === '23505') return res.status(400).json({ success: false, message: 'Email or Username already exists' });
     return res.status(500).json({ success: false, message: error.message });
   }
 
   const newUser = data[0];
-
   if (role === 'agent') {
-    return res.status(201).json({
-      success: true,
-      message: 'Account request sent to admin. Please wait for approval.',
-      data: null
-    });
+    // Notify Admins about new agent request
+    await supabase.from('notifications').insert([{
+      audience: 'admin',
+      message: `New agent request from ${newUser.name} (${newUser.email})`,
+      type: 'agent_request',
+      target_id: newUser.id
+    }]);
+    return res.status(201).json({ success: true, message: 'Account request sent to admin. Please wait for approval.' });
   }
 
-  // Generate JWT token so they are logged in immediately
-  const token = jwt.sign(
-    { id: newUser.id, email: newUser.email, role: newUser.role },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-
-  // Remove password before returning
+  const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, { expiresIn: '7d' });
   const { password_hash, ...userWithoutPassword } = newUser;
-
-  res.status(201).json({
-    success: true,
-    message: 'User created successfully',
-    data: {
-      user: userWithoutPassword,
-      token: token
-    }
-  });
+  res.status(201).json({ success: true, message: 'User created successfully', data: { user: userWithoutPassword, token } });
 });
 
-// PUT update user
-app.put('/api/users/:id', async (req, res) => {
+app.put('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
   const { id } = req.params;
-  const { username, name, email, role, status } = req.body;
+  const updates = req.body;
 
   const { data, error } = await supabase
     .from('users')
-    .update({ username, name, email, role, status, updated_at: new Date().toISOString() })
+    .update(updates)
     .eq('id', id)
     .select();
 
   if (error) return res.status(500).json({ error: error.message });
+  await logActivity(req.user.email, 'UPDATE_USER', { targetId: id, updates });
   res.json({ success: true, data: data[0] });
 });
 
-// DELETE user
-app.delete('/api/users/:id', async (req, res) => {
-  const { error } = await supabase
-    .from('users')
-    .delete()
-    .eq('id', req.params.id);
-
+app.delete('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { error } = await supabase.from('users').delete().eq('id', req.params.id);
   if (error) return res.status(500).json({ error: error.message });
+  await logActivity(req.user.email, 'DELETE_USER', { targetId: req.params.id });
   res.json({ success: true, message: 'User deleted' });
-});
-
-// ============================================
-// TRIPS API
-// ============================================
-
-// GET all trips
-app.get('/api/trips', async (req, res) => {
-  const { data, error } = await supabase
-    .from('trips')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
-});
-
-// GET single trip
-app.get('/api/trips/:id', async (req, res) => {
-  const { data, error } = await supabase
-    .from('trips')
-    .select('*')
-    .eq('id', req.params.id)
-    .single();
-
-  if (error) return res.status(404).json({ error: 'Trip not found' });
-  res.json({ success: true, data });
-});
-
-// POST create trip
-app.post('/api/trips', async (req, res) => {
-  const { destination, startDate, endDate, budget, activities, ownerEmail, accommodation, notes, image } = req.body;
-
-  const { data, error } = await supabase
-    .from('trips')
-    .insert([{
-      id: Date.now().toString(),
-      owner_email: ownerEmail,
-      destination,
-      start_date: startDate,
-      end_date: endDate,
-      budget: budget || 0,
-      activities: activities || [],
-      accommodation: accommodation || 'Not specified',
-      notes: notes || '',
-      image: image || '',
-      approval_status: 'pending'
-    }])
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
-});
-
-// PUT update trip
-app.put('/api/trips/:id', async (req, res) => {
-  const { id } = req.params;
-  const { destination, startDate, endDate, budget, activities, accommodation, notes, image, approval_status } = req.body;
-
-  const { data, error } = await supabase
-    .from('trips')
-    .update({
-      destination,
-      start_date: startDate,
-      end_date: endDate,
-      budget,
-      activities,
-      accommodation,
-      notes,
-      image,
-      approval_status,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', id)
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data: data[0] });
-});
-
-// PATCH update trip approval status
-app.patch('/api/trips/:id/approval', async (req, res) => {
-  const { id } = req.params;
-  const { approval_status, notes } = req.body;
-
-  const { data, error } = await supabase
-    .from('trips')
-    .update({
-      approval_status,
-      notes,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', id)
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data: data[0] });
-});
-
-// DELETE trip
-app.delete('/api/trips/:id', async (req, res) => {
-  const { error } = await supabase
-    .from('trips')
-    .delete()
-    .eq('id', req.params.id);
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, message: 'Trip deleted' });
 });
 
 // ============================================
 // DESTINATIONS API
 // ============================================
 
-// GET all destinations
 app.get('/api/destinations', async (req, res) => {
-  const { data, error } = await supabase
-    .from('destinations')
-    .select('*')
-    .order('travel_volume_index', { ascending: false });
-
+  const { data, error } = await supabase.from('destinations').select('*').order('travel_volume_index', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
 });
 
-// GET single destination
-app.get('/api/destinations/:id', async (req, res) => {
-  const { data, error } = await supabase
-    .from('destinations')
-    .select('*')
-    .eq('id', req.params.id)
-    .single();
+app.post('/api/destinations', authenticateToken, verifyAdmin, async (req, res) => {
+  const destination = req.body;
+  const { data, error } = await supabase.from('destinations').insert([destination]).select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ success: true, data: data[0] });
+});
 
-  if (error) return res.status(404).json({ error: 'Destination not found' });
+app.put('/api/destinations/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  const { data, error } = await supabase.from('destinations').update(updates).eq('id', id).select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data: data[0] });
+});
+
+app.delete('/api/destinations/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { error } = await supabase.from('destinations').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
+});
+
+// ============================================
+// TRIPS API
+// ============================================
+
+app.get('/api/trips', async (req, res) => {
+  const { data, error } = await supabase.from('trips').select('*').order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
+});
+
+app.get('/api/trips/:id', async (req, res) => {
+  const { data, error } = await supabase.from('trips').select('*').eq('id', req.params.id).single();
+  if (error) return res.status(404).json({ error: 'Trip not found' });
+  res.json({ success: true, data });
+});
+
+app.post('/api/trips', authenticateToken, async (req, res) => {
+  const { destination, startDate, endDate, budget, activities, accommodation, notes, image } = req.body;
+
+  const { data, error } = await supabase
+    .from('trips')
+    .insert([{
+      owner_email: req.user.email,
+      destination,
+      start_date: startDate,
+      end_date: endDate,
+      budget: budget || 0,
+      activities: activities || [],
+      accommodation: accommodation || 'Not specified',
+      notes, image,
+      approval_status: 'pending'
+    }])
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  
+  const newTrip = data[0];
+  // Notify Admins about new trip booking
+  await supabase.from('notifications').insert([{
+    audience: 'admin',
+    message: `New trip booked for ${newTrip.destination} by ${newTrip.owner_email}`,
+    type: 'trip',
+    target_id: newTrip.id
+  }]);
+
+  res.status(201).json({ success: true, data: newTrip });
+});
+
+app.put('/api/trips/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const { data: trip } = await supabase.from('trips').select('owner_email').eq('id', id).single();
+  if (!trip || (trip.owner_email !== req.user.email && req.user.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { data, error } = await supabase.from('trips').update(updates).eq('id', id).select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data: data[0] });
+});
+
+app.patch('/api/trips/:id/approval', authenticateToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { approval_status, notes } = req.body;
+
+  const { data, error } = await supabase.from('trips').update({ approval_status, notes }).eq('id', id).select();
+  if (error) return res.status(500).json({ error: error.message });
+  
+  await logActivity(req.user.email, 'TRIP_APPROVAL', { tripId: id, status: approval_status });
+  res.json({ success: true, data: data[0] });
+});
+
+app.delete('/api/trips/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { data: trip } = await supabase.from('trips').select('owner_email').eq('id', id).single();
+  if (!trip || (trip.owner_email !== req.user.email && req.user.role !== 'admin')) {
+    return res.status(403).json({ success: false, message: 'Unauthorized' });
+  }
+
+  const { error } = await supabase.from('trips').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, message: 'Trip deleted' });
 });
 
 // ============================================
 // TRAVEL REQUESTS API
 // ============================================
 
-// GET all travel requests
-app.get('/api/travel-requests', async (req, res) => {
-  const { data, error } = await supabase
-    .from('travel_requests')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+app.get('/api/travel-requests', authenticateToken, verifyAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('travel_requests').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
 });
 
-// POST create travel request
 app.post('/api/travel-requests', async (req, res) => {
   const { fullName, email, phone, nationality, age, gender, desiredDestination, preferredStartDate, preferredEndDate, budgetHint, accommodationPreference, specialRequests, travelHistory } = req.body;
 
   const { data, error } = await supabase
     .from('travel_requests')
     .insert([{
-      id: `req-${Date.now()}`,
-      full_name: fullName,
-      email,
-      phone,
-      nationality,
-      age,
-      gender,
+      full_name: fullName, email, phone, nationality, age, gender,
       desired_destination: desiredDestination,
       preferred_start_date: preferredStartDate,
       preferred_end_date: preferredEndDate,
@@ -475,96 +413,58 @@ app.post('/api/travel-requests', async (req, res) => {
   res.status(201).json({ success: true, data: data[0] });
 });
 
-// PUT update travel request status
-app.put('/api/travel-requests/:id', async (req, res) => {
-  const { id } = req.params;
-  const { status, adminNotes } = req.body;
-
-  const { data, error } = await supabase
-    .from('travel_requests')
-    .update({ status, admin_notes: adminNotes })
-    .eq('id', id)
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data: data[0] });
-});
-
-// PATCH update travel request status
-app.patch('/api/travel-requests/:id', async (req, res) => {
+app.put('/api/travel-requests/:id', authenticateToken, verifyAdmin, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
-  const { data, error } = await supabase
-    .from('travel_requests')
-    .update(updates)
-    .eq('id', id)
-    .select();
-
+  const { data, error } = await supabase.from('travel_requests').update(updates).eq('id', id).select();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data: data[0] });
-});
-
-// DELETE travel request
-app.delete('/api/travel-requests/:id', async (req, res) => {
-  const { error } = await supabase
-    .from('travel_requests')
-    .delete()
-    .eq('id', req.params.id);
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, message: 'Travel request deleted' });
 });
 
 // ============================================
 // CONTACT MESSAGES API
 // ============================================
 
-// GET all contact messages
-app.get('/api/contact-messages', async (req, res) => {
-  const { data, error } = await supabase
-    .from('contact_messages')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+app.get('/api/contact-messages', authenticateToken, verifyAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
 });
 
-// POST create contact message
 app.post('/api/contact-messages', async (req, res) => {
   const { name, email, subject, message, adminTarget } = req.body;
 
   const { data, error } = await supabase
     .from('contact_messages')
-    .insert([{
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      name,
-      email,
-      subject: subject || '',
-      message,
-      admin_target: adminTarget || null,
-      status: 'open'
-    }])
+    .insert([{ name, email, subject, message, admin_target: adminTarget, status: 'open' }])
     .select();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
+  
+  const newMessage = data[0];
+  // Notify Admins about new contact message
+  await supabase.from('notifications').insert([{
+    audience: 'admin',
+    message: `New support message from ${newMessage.name}: ${newMessage.subject}`,
+    type: 'message',
+    target_id: newMessage.id
+  }]);
+
+  res.status(201).json({ success: true, data: newMessage });
 });
 
-// POST reply to contact message
-app.post('/api/contact-messages/:id/reply', async (req, res) => {
+app.post('/api/contact-messages/:id/reply', authenticateToken, verifyAdmin, async (req, res) => {
   const { id } = req.params;
-  const { replyText, adminEmail } = req.body;
+  const { replyText } = req.body;
 
   const { data, error } = await supabase
     .from('contact_messages')
     .update({ 
       status: 'replied',
       reply_text: replyText,
-      replied_by: adminEmail,
-      replied_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      replied_by: req.user.email,
+      replied_at: new Date().toISOString()
     })
     .eq('id', id)
     .select();
@@ -573,115 +473,137 @@ app.post('/api/contact-messages/:id/reply', async (req, res) => {
   res.json({ success: true, data: data[0] });
 });
 
-// GET user specific contact messages
-app.get('/api/contact-messages/me', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ success: false, message: 'No token' });
+// ============================================
+// INTERNAL MESSAGES API
+// ============================================
+
+app.get('/api/internal-messages', authenticateToken, async (req, res) => {
+  // Get messages where user is sender or receiver
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .select(`
+      *,
+      sender:users!internal_messages_sender_id_fkey(name, username),
+      receiver:users!internal_messages_receiver_id_fkey(name, username)
+    `)
+    .or(`sender_id.eq.${req.user.id},receiver_id.eq.${req.user.id}`)
+    .order('created_at', { ascending: true });
+
+  if (error) return res.status(500).json({ error: error.message });
   
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .select('*')
-      .eq('email', decoded.email)
-      .order('created_at', { ascending: false });
-      
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true, data });
-  } catch (err) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
+  // Format for frontend
+  const formatted = data.map(m => ({
+    id: m.id,
+    senderId: m.sender_id,
+    receiverId: m.receiver_id,
+    senderName: m.sender?.name || m.sender?.username,
+    body: m.body,
+    createdAt: m.created_at,
+    isRead: m.is_read
+  }));
+
+  res.json({ success: true, data: formatted });
+});
+
+app.post('/api/internal-messages', authenticateToken, async (req, res) => {
+  const { receiverId, body } = req.body;
+
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .insert([{ 
+      sender_id: req.user.id, 
+      receiver_id: receiverId, 
+      body 
+    }])
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+
+  const newMessage = data[0];
+
+  // Notify receiver
+  const { data: receiver } = await supabase.from('users').select('email').eq('id', receiverId).single();
+  if (receiver) {
+    await supabase.from('notifications').insert([{
+      user_email: receiver.email,
+      message: `New message from ${req.user.email}`,
+      type: 'message',
+      target_id: newMessage.id
+    }]);
   }
+
+  res.status(201).json({ success: true, data: newMessage });
 });
 
 // ============================================
 // NOTIFICATIONS API
 // ============================================
 
-// GET notifications
-app.get('/api/notifications', async (req, res) => {
-  const { userEmail, audience } = req.query;
-
+app.get('/api/notifications', authenticateToken, async (req, res) => {
+  const { audience } = req.query;
   let query = supabase.from('notifications').select('*');
 
-  if (audience === 'admin') {
+  if (req.user.role === 'admin' && audience === 'admin') {
     query = query.eq('audience', 'admin');
-  } else if (userEmail) {
-    query = query.eq('user_email', userEmail);
+  } else {
+    query = query.or(`user_email.eq.${req.user.email},audience.eq.all`);
   }
 
   const { data, error } = await query.order('created_at', { ascending: false });
-
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
 });
 
-// Mark notification as read
-app.put('/api/notifications/:id/read', async (req, res) => {
-  const { id } = req.params;
-
-  const { data, error } = await supabase
-    .from('notifications')
-    .update({ read: true })
-    .eq('id', id)
-    .select();
-
+app.post('/api/notifications', authenticateToken, verifyAdmin, async (req, res) => {
+  const { userEmail, message, audience, type, targetId } = req.body;
+  const { data, error } = await supabase.from('notifications').insert([{ 
+    user_email: userEmail, 
+    message, 
+    audience: audience || 'user',
+    type,
+    target_id: targetId
+  }]).select();
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data: data[0] });
+  res.status(201).json({ success: true, data: data[0] });
 });
 
-// Mark all notifications as read
-app.put('/api/notifications/read-all', async (req, res) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ success: false, message: 'No token' });
-  
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const { data, error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_email', decoded.email)
-      .select();
-
-    if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true, data });
-  } catch (err) {
-    res.status(401).json({ success: false, message: 'Invalid token' });
-  }
+app.put('/api/notifications/:id/read', authenticateToken, async (req, res) => {
+  const { error } = await supabase.from('notifications').update({ read: true }).eq('id', req.params.id).or(`user_email.eq.${req.user.email},audience.eq.all`);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
 });
 
 // ============================================
 // ANNOUNCEMENTS API
 // ============================================
 
-// GET all active announcements
 app.get('/api/announcements', async (req, res) => {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
-
+  const { data, error } = await supabase.from('announcements').select('*').eq('is_active', true).order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
+});
+
+app.post('/api/announcements', authenticateToken, verifyAdmin, async (req, res) => {
+  const { title, content } = req.body;
+  const { data, error } = await supabase.from('announcements').insert([{ title, content }]).select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ success: true, data: data[0] });
+});
+
+app.delete('/api/announcements/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { error } = await supabase.from('announcements').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true });
 });
 
 // ============================================
 // ACTIVITY LOGS API
 // ============================================
 
-app.get('/api/activity-logs', async (req, res) => {
-  const { data, error } = await supabase
-    .from('activity_logs')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+app.get('/api/activity-logs', authenticateToken, verifyAdmin, async (req, res) => {
+  const { data, error } = await supabase.from('activity_logs').select('*').order('created_at', { ascending: false });
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data });
-});
-
-app.post('/api/activity-logs/:id/undo', async (req, res) => {
-  // Stub for undo functionality
-  res.json({ success: true, message: 'Action undone' });
 });
 
 // ============================================
@@ -690,17 +612,4 @@ app.post('/api/activity-logs/:id/undo', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📋 API Endpoints:`);
-  console.log(`   POST   /api/login`);
-  console.log(`   GET    /api/me`);
-  console.log(`   GET    /api/users`);
-  console.log(`   GET    /api/trips`);
-  console.log(`   POST   /api/trips`);
-  console.log(`   PUT    /api/trips/:id`);
-  console.log(`   DELETE /api/trips/:id`);
-  console.log(`   GET    /api/destinations`);
-  console.log(`   GET    /api/travel-requests`);
-  console.log(`   GET    /api/contact-messages`);
-  console.log(`   GET    /api/notifications`);
-  console.log(`   GET    /api/announcements`);
 });

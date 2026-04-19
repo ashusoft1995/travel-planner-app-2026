@@ -110,6 +110,7 @@ export default function HomeContent() {
   const [selected, setSelected] = useState(null);
   const [announcements, setAnnouncements] = useState([]);
   const [destinations, setDestinations] = useState([]);
+  const [realStats, setRealStats] = useState({ travelers: 25800, destinations: 208, trips: 1240 });
   const [showAllDestinations, setShowAllDestinations] = useState(false);
   const { ref: statsRef, inView: statsInView } = useInView({ triggerOnce: true });
   const { ref: demoStatsRef, inView: demoStatsInView } = useInView({ triggerOnce: true });
@@ -121,6 +122,15 @@ export default function HomeContent() {
   useEffect(() => {
     fetchAnnouncements()
       .then(res => setAnnouncements(res.data?.data || []))
+      .catch(console.error);
+
+    fetch(getApiUrl("/api/stats"))
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          setRealStats(res.data);
+        }
+      })
       .catch(console.error);
 
     fetch(getApiUrl("/api/destinations"))
@@ -183,10 +193,10 @@ export default function HomeContent() {
         }
       }, 18);
     };
-    animate(25800, "travelers");
-    animate(150 + destinations.length * 2, "destinations");
-    animate(1240, "hotels");
-  }, [statsInView, destinations.length]);
+    animate(realStats.travelers, "travelers");
+    animate(realStats.destinations, "destinations");
+    animate(realStats.trips, "hotels");
+  }, [statsInView, realStats]);
 
   useEffect(() => {
     if (!demoStatsInView) return;

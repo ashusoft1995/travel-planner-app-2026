@@ -9,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 import useFastRouting from "../../hooks/useFastRouting";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { uploadFile } from "../../lib/supabase";
 
 function SignupContent() {
   const router = useRouter();
@@ -30,6 +31,20 @@ function SignupContent() {
   if (hydrated && user) {
     return <div className="min-h-screen bg-[#050510]" />;
   }
+
+  const handleFileChange = async (e, field) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const toastId = toast.loading(`Uploading ${field.replace(/_/g, ' ')}...`);
+    try {
+      const url = await uploadFile(file);
+      setForm(prev => ({ ...prev, [field]: url }));
+      toast.success("File uploaded successfully", { id: toastId });
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -174,14 +189,22 @@ function SignupContent() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                 <div className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group">
-                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400">Permit Photo</span>
-                    <span className="text-[8px] text-white/20 mt-1">Upload Required</span>
-                 </div>
-                 <div className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group">
-                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400">ID / Kebele</span>
-                    <span className="text-[8px] text-white/20 mt-1">Both Sides</span>
-                 </div>
+                 <label className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group overflow-hidden relative">
+                    {form.legal_paper_photo ? (
+                      <img src={form.legal_paper_photo} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                    ) : null}
+                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400 relative z-10">Permit Photo</span>
+                    <span className="text-[8px] text-white/20 mt-1 relative z-10">{form.legal_paper_photo ? "Selected" : "Upload Required"}</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, "legal_paper_photo")} />
+                 </label>
+                 <label className="flex flex-col items-center justify-center h-28 bg-white/5 border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all group overflow-hidden relative">
+                    {form.national_id_photo ? (
+                      <img src={form.national_id_photo} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                    ) : null}
+                    <span className="text-[9px] font-black uppercase text-white/40 group-hover:text-blue-400 relative z-10">ID / Kebele</span>
+                    <span className="text-[8px] text-white/20 mt-1 relative z-10">{form.national_id_photo ? "Selected" : "Both Sides"}</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, "national_id_photo")} />
+                 </label>
               </div>
             </motion.div>
           )}

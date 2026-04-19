@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiBell,
@@ -116,6 +116,7 @@ const NAV_ITEMS = [
 
 function AdminNotificationPanel() {
   const { user } = useAuth();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -161,12 +162,23 @@ function AdminNotificationPanel() {
   };
 
   const onReadOne = async (n) => {
-    if (n.read) return;
-    try {
-      await markNotificationRead(n.id);
-      setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
-    } catch (e) {
-      toast.error(friendlyApiMessage(e));
+    if (!n.read) {
+      try {
+        await markNotificationRead(n.id);
+        setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+      } catch (e) {
+        toast.error(friendlyApiMessage(e));
+      }
+    }
+
+    setOpen(false);
+    // Redirection Logic
+    if (n.type === 'trip') {
+      router.push(`/admin/dashboard/trips?id=${n.targetId}`);
+    } else if (n.type === 'agent_request') {
+      router.push('/admin/dashboard/agents');
+    } else if (n.type === 'message') {
+      router.push('/admin/dashboard');
     }
   };
 

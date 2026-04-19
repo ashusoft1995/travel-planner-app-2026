@@ -63,5 +63,25 @@ SET role = 'admin', status = 'active'
 WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
 
 -- ============================================
+-- 7. INTERNAL_MESSAGES TABLE - Create if missing
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS internal_messages (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+  sender_id TEXT REFERENCES users(id),
+  receiver_id TEXT REFERENCES users(id),
+  body TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 8. NOTIFICATIONS TABLE - Add missing columns
+-- ============================================
+
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type TEXT;
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS target_id TEXT;
+
+-- ============================================
 -- Done! All columns added successfully.
 -- ============================================
