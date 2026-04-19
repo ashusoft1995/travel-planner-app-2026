@@ -38,19 +38,28 @@ BEFORE INSERT ON users
 FOR EACH ROW
 EXECUTE FUNCTION set_user_id();
 
--- 5. Manually set the Admin ID to 1200
--- First, if ID 1200 is taken by someone else, move them to a new generated ID
-UPDATE users 
-SET id = nextval('user_id_seq')::TEXT 
-WHERE id = '1200' 
-  AND username != 'ashu' 
-  AND email != 'ashenafiabebe@gmail.com';
+-- 5. Manually set the Admin ID to 1200 surgical fix
+DO $$
+BEGIN
+    -- Move anyone who isn't the primary admin but has ID 1200
+    UPDATE users 
+    SET id = nextval('user_id_seq')::TEXT 
+    WHERE id = '1200' 
+      AND username != 'ashu' 
+      AND email != 'ashenafiabebe@gmail.com';
 
--- Now safely set the Admin's ID to 1200
-UPDATE users 
-SET id = '1200' 
-WHERE (username = 'ashu' OR email = 'ashenafiabebe@gmail.com')
-  AND id != '1200';
+    -- Assign 1200 to the primary admin if they don't have it and it's free
+    IF NOT EXISTS (SELECT 1 FROM users WHERE id = '1200') THEN
+        UPDATE users 
+        SET id = '1200' 
+        WHERE ctid = (
+          SELECT ctid FROM users 
+          WHERE (username = 'ashu' OR email = 'ashenafiabebe@gmail.com')
+          ORDER BY created_at ASC 
+          LIMIT 1
+        );
+    END IF;
+END $$;
 
 -- ============================================
 -- 1. USERS TABLE - Add missing columns
