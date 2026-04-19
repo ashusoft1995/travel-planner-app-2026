@@ -94,24 +94,6 @@ const NAV_ITEMS = [
     text: "text-amber-400",
     active: "bg-gradient-to-r from-amber-400 to-amber-600",
   },
-  {
-    href: "/admin/dashboard/profile",
-    label: "Settings & Profile",
-    icon: FiSettings,
-    color: "from-pink-500 to-pink-700",
-    bg: "bg-pink-500/10",
-    text: "text-pink-400",
-    active: "bg-gradient-to-r from-pink-500 to-pink-700",
-  },
-  {
-    href: "/admin/dashboard/activity",
-    label: "Activity Log",
-    icon: FiClock,
-    color: "from-gray-500 to-gray-700",
-    bg: "bg-white/5",
-    text: "text-white/60",
-    active: "bg-gradient-to-r from-gray-600 to-gray-800",
-  },
 ];
 
 function AdminNotificationPanel() {
@@ -177,8 +159,8 @@ function AdminNotificationPanel() {
       router.push(`/admin/dashboard/trips?id=${n.targetId}`);
     } else if (n.type === 'agent_request') {
       router.push('/admin/dashboard/agents');
-    } else if (n.type === 'message') {
-      router.push('/admin/dashboard');
+    } else if (n.type === 'message' || n.type === 'support_message') {
+      router.push(`/admin/dashboard?view=cmessages&recipient=${n.targetId || ''}`);
     }
   };
 

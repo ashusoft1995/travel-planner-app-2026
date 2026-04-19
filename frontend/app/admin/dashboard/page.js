@@ -13,8 +13,12 @@ import {
   FiClock, 
   FiMail,
   FiEdit3,
-  FiTrash2
+  FiTrash2,
+  FiSearch,
+  FiLock,
+  FiUnlock
 } from "react-icons/fi";
+import { useSearchParams } from "next/navigation";
 import { 
   tripsApi, 
   fetchAdminTravelRequests, 
@@ -48,7 +52,15 @@ const Sparkline = dynamic(
 
 const SUPER_ADMIN = "ashu";
 
-export default function AdminCommandCenter() {
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050510] flex items-center justify-center"><div className="h-10 w-10 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>}>
+      <AdminCommandCenter />
+    </Suspense>
+  );
+}
+
+function AdminCommandCenter() {
   const { user } = useAuth();
   const [stats, setStats] = useState({
     users: [],
@@ -63,6 +75,19 @@ export default function AdminCommandCenter() {
   const [msgInput, setMsgInput] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState(null);
   const [viewMode, setViewMode] = useState("users"); // users, activity, messages, profit
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const view = searchParams.get("view");
+    const recipientId = searchParams.get("recipient");
+    
+    if (view) setViewMode(view);
+    
+    if (recipientId && stats.users.length > 0) {
+      const found = stats.users.find(u => u.id === recipientId || u.username === recipientId);
+      if (found) setSelectedRecipient(found);
+    }
+  }, [searchParams, stats.users]);
 
   const isSuperAdmin = user?.username?.toLowerCase() === SUPER_ADMIN;
 
@@ -98,7 +123,12 @@ export default function AdminCommandCenter() {
         requests: Array.isArray(rRes.data?.data) ? rRes.data.data : [],
         messages: Array.isArray(mRes.data?.data) ? mRes.data.data : [],
         activityLogs: Array.isArray(logRes.data?.data) ? logRes.data.data : [],
-        internalMessages: Array.isArray(intMsgRes.data?.data) ? intMsgRes.data.data : []
+        internalMessages: (Array.isArray(intMsgRes.data?.data) ? intMsgRes.data.data : []).sort((a, b) => {
+          // Priority: Unread first, then newest first
+          if (!a.isRead && b.isRead) return -1;
+          if (a.isRead && !b.isRead) return 1;
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        })
       });
     } catch (e) {
       toast.error("System sync failed: " + friendlyApiMessage(e));

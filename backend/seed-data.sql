@@ -1,21 +1,36 @@
 -- ============================================
+-- 0. ENSURE COLUMNS EXIST (Self-Healing)
+-- ============================================
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS region TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS lat NUMERIC;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS lng NUMERIC;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS "travelVolumeIndex" INTEGER DEFAULT 0;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS hotels JSONB DEFAULT '{}';
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS activities JSONB DEFAULT '{}';
+
+-- ============================================
 -- 1. SEED USERS (Ensure 3 Users exist)
 -- ============================================
 
 -- Ensure Admin ashu (ID 1200) exists
 INSERT INTO users (id, username, name, email, password_hash, role, status)
 VALUES ('1200', 'ashu', 'Ashenafi Abebe', 'ashenafiabebe@gmail.com', 'Ashu19951', 'admin', 'active')
-ON CONFLICT (id) DO UPDATE SET role = 'admin', status = 'active';
+ON CONFLICT (id) DO UPDATE SET 
+  username = EXCLUDED.username,
+  role = 'admin', 
+  status = 'active';
 
 -- Ensure 1 Agent exists
 INSERT INTO users (id, username, name, email, password_hash, role, status)
 VALUES ('1201', 'agent_jane', 'Jane Travel Expert', 'jane@ethiotravel.com', 'password123', 'agent', 'active')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username, role = 'agent';
 
 -- Ensure 1 Traveler exists
 INSERT INTO users (id, username, name, email, password_hash, role, status)
 VALUES ('1202', 'traveler_bob', 'Bob Explorer', 'bob@gmail.com', 'password123', 'user', 'active')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username, role = 'user';
 
 
 -- ============================================

@@ -121,7 +121,20 @@ ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type TEXT;
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS target_id TEXT;
 
 -- ============================================
--- 9. SECURITY - Fix RLS Policies
+-- 9. DESTINATIONS TABLE - Add missing columns
+-- ============================================
+
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS region TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS "imageUrl" TEXT;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS lat NUMERIC;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS lng NUMERIC;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS "travelVolumeIndex" INTEGER DEFAULT 0;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS hotels JSONB DEFAULT '{}';
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS activities JSONB DEFAULT '{}';
+
+-- ============================================
+-- 10. SECURITY - Fix RLS Policies
 -- ============================================
 
 -- Disable RLS to allow the backend server to manage data without policy conflicts

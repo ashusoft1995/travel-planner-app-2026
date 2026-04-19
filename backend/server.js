@@ -451,7 +451,7 @@ app.post('/api/contact-messages', async (req, res) => {
   // Notify Admins about new contact message
   await supabase.from('notifications').insert([{
     audience: 'admin',
-    message: `New support message from ${newMessage.name}: ${newMessage.subject}`,
+    message: `New support message for ${newMessage.admin_target} from ${newMessage.name}: ${newMessage.subject}`,
     type: 'message',
     target_id: newMessage.id
   }]);

@@ -156,10 +156,8 @@ export function AuthProvider({ children }) {
           role,
           ...metadata,
         });
-        const authData = res.data;
-        // Agents get no token — just return success
-        if (role === "agent") return null;
-        flushSync(() => { applySession(authData?.token, authData?.user); });
+        // We no longer automatically apply the session after registration.
+        // The user must log in manually to verify their credentials.
         return authData?.user;
       } catch (e) {
         throw new Error(friendlyApiMessage(e));
