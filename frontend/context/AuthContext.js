@@ -158,7 +158,7 @@ export function AuthProvider({ children }) {
         });
         // We no longer automatically apply the session after registration.
         // The user must log in manually to verify their credentials.
-        return authData?.user;
+        return res.data?.user;
       } catch (e) {
         throw new Error(friendlyApiMessage(e));
       }
