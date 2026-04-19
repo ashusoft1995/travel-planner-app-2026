@@ -4,6 +4,38 @@
 -- ============================================
 
 -- ============================================
+-- 0. USER ID SEQUENCE & CUSTOM FORMAT
+-- ============================================
+
+-- ============================================
+-- 0. USER ID SEQUENCE & TRIGGER (Numeric IDs)
+-- ============================================
+
+-- Create a sequence for user IDs starting at 1201
+CREATE SEQUENCE IF NOT EXISTS user_id_seq START 1201;
+
+-- Create a function to automatically assign the next ID if null
+CREATE OR REPLACE FUNCTION set_user_id() 
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.id IS NULL THEN
+    NEW.id := nextval('user_id_seq')::TEXT;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create the trigger
+DROP TRIGGER IF EXISTS trigger_set_user_id ON users;
+CREATE TRIGGER trigger_set_user_id
+BEFORE INSERT ON users
+FOR EACH ROW
+EXECUTE FUNCTION set_user_id();
+
+-- Manually set the Admin ID to 1200
+UPDATE users SET id = '1200' WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
+
+-- ============================================
 -- 1. USERS TABLE - Add missing columns
 -- ============================================
 
@@ -83,5 +115,35 @@ ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type TEXT;
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS target_id TEXT;
 
 -- ============================================
--- Done! All columns added successfully.
+-- 9. SECURITY - Fix RLS Policies
+-- ============================================
+
+-- Disable RLS to allow the backend server to manage data without policy conflicts
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+ALTER TABLE trips DISABLE ROW LEVEL SECURITY;
+ALTER TABLE destinations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
+ALTER TABLE travel_requests DISABLE ROW LEVEL SECURITY;
+ALTER TABLE activity_logs DISABLE ROW LEVEL SECURITY;
+ALTER TABLE internal_messages DISABLE ROW LEVEL SECURITY;
+
+-- ============================================
+-- 10. STORAGE - Create required buckets
+-- ============================================
+
+-- Create the assets bucket if it doesn't exist
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('ethio-travel-assets', 'ethio-travel-assets', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow public access to the bucket (Drop first to avoid duplication errors)
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+DROP POLICY IF EXISTS "Public Upload" ON storage.objects;
+
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'ethio-travel-assets');
+CREATE POLICY "Public Upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'ethio-travel-assets');
+
+-- ============================================
+-- Done! All fixes applied successfully.
 -- ============================================
