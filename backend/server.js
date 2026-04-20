@@ -605,6 +605,34 @@ app.delete('/api/announcements/:id', authenticateToken, verifyAdmin, async (req,
 });
 
 // ============================================
+// INTERNAL MESSAGES API
+// ============================================
+
+app.get('/api/internal-messages', authenticateToken, verifyAdmin, async (req, res) => {
+  const { data, error } = await supabase
+    .from('internal_messages')
+    .select('*, sender:sender_id(name, email, role), receiver:receiver_id(name, email, role)')
+    .order('created_at', { ascending: false });
+  
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, data });
+});
+
+app.post('/api/internal-messages', authenticateToken, async (req, res) => {
+  const { receiverId, body } = req.body;
+  if (!receiverId || !body) return res.status(400).json({ error: 'Receiver and body are required' });
+
+  const { data, error } = await supabase.from('internal_messages').insert([{
+    sender_id: req.user.id,
+    receiver_id: receiverId,
+    body
+  }]).select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ success: true, data: data[0] });
+});
+
+// ============================================
 // ACTIVITY LOGS API
 // ============================================
 

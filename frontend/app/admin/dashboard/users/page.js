@@ -251,13 +251,15 @@ export default function AdminUsersPage() {
                        {u.created_at ? new Date(u.created_at).toLocaleDateString() : 'Historical'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openModal(u, 'detail')} className="p-2.5 rounded-xl bg-white/5 text-white/40 hover:bg-blue-500/20 hover:text-blue-400 transition" title="View Details">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button onClick={() => openModal(u, 'detail')} className="p-2.5 rounded-xl bg-white/10 text-white/60 hover:bg-blue-500/20 hover:text-blue-400 transition" title="View Details">
                             <FiEye size={16} />
                           </button>
-                          <button onClick={() => openModal(u, 'edit')} className="p-2.5 rounded-xl bg-white/5 text-white/40 hover:bg-purple-500/20 hover:text-purple-400 transition" title="Edit Profile">
-                            <FiEdit2 size={16} />
-                          </button>
+                          {u.role !== 'user' && (
+                            <button onClick={() => openModal(u, 'edit')} className="p-2.5 rounded-xl bg-white/10 text-white/60 hover:bg-purple-500/20 hover:text-purple-400 transition" title="Edit Profile">
+                              <FiEdit2 size={16} />
+                            </button>
+                          )}
                           <button 
                             disabled={isSuper}
                             onClick={() => toggleStatus(u)} 
@@ -269,7 +271,7 @@ export default function AdminUsersPage() {
                           <button 
                              disabled={isSuper}
                              onClick={() => removeUser(u)}
-                             className={`p-2.5 rounded-xl bg-white/5 text-white/40 transition ${isSuper ? 'opacity-20' : 'hover:bg-red-500/20 hover:text-red-500'}`}
+                             className={`p-2.5 rounded-xl bg-white/10 text-white/60 transition ${isSuper ? 'opacity-20' : 'hover:bg-red-500/20 hover:text-red-500'}`}
                              title="Purge Record"
                           >
                             <FiTrash2 size={16} />
@@ -398,9 +400,9 @@ export default function AdminUsersPage() {
                             value={editForm.role}
                             onChange={e => setEditForm({...editForm, role: e.target.value})}
                           >
-                            <option value="user">Traveler</option>
-                            <option value="agent">Agent</option>
-                            <option value="admin">Admin / Manager</option>
+                            <option value="user" className="bg-[#12122a] text-white">Traveler</option>
+                            <option value="agent" className="bg-[#12122a] text-white">Agent</option>
+                            <option value="admin" className="bg-[#12122a] text-white">Admin / Manager</option>
                           </select>
                         </div>
                       </div>
