@@ -17,6 +17,8 @@ import {
   FiSearch,
   FiLock,
   FiUnlock,
+  FiRefreshCcw,
+  FiRotateCcw,
   FiX
 } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
@@ -170,6 +172,44 @@ function AdminCommandCenter() {
     }
   };
 
+  const handleDeleteUser = async (id) => {
+    const originalUsers = [...stats.users];
+    setStats(prev => ({ ...prev, users: prev.users.filter(u => u.id !== id) }));
+    
+    const t = toast.loading("Purging identity...", {
+      duration: 3000,
+    });
+    
+    const timeout = setTimeout(async () => {
+      try {
+        await tripsApi.delete(`/users/${id}`);
+        toast.dismiss(t);
+        toast.success("Identity purged successfully");
+        loadAllData();
+      } catch (e) {
+        setStats(prev => ({ ...prev, users: originalUsers }));
+        toast.dismiss(t);
+        toast.error("Purge failed: " + friendlyApiMessage(e));
+      }
+    }, 3000);
+
+    toast((t) => (
+      <span className="flex items-center gap-3">
+        User deleted. 
+        <button 
+          onClick={() => {
+            clearTimeout(timeout);
+            setStats(prev => ({ ...prev, users: originalUsers }));
+            toast.dismiss(t.id);
+          }}
+          className="flex items-center gap-1 font-bold text-amber-400"
+        >
+          <FiRotateCcw size={12}/> Undo
+        </button>
+      </span>
+    ), { id: t, duration: 3000 });
+  };
+
   const handleSendInternalMessage = async () => {
     if (!selectedRecipient || !msgInput.trim()) return;
     setSendingMsg(true);
@@ -282,7 +322,23 @@ function AdminCommandCenter() {
                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
                      <FiUsers className="text-blue-400" /> User & Staff Registry
                    </h3>
-                   <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{stats.users.length} Total</span>
+                   <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                      <input 
+                        type="text" 
+                        placeholder="Filter registry..."
+                        className="bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-2 text-xs text-white placeholder:text-white/20 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all shadow-xl"
+                      />
+                    </div>
+                    <button 
+                      onClick={() => { setLoading(true); loadAllData(); }}
+                      className="p-3 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-purple-400 hover:bg-white/10 transition group"
+                      title="Refresh Registry"
+                    >
+                      <FiRefreshCcw size={16} className="group-active:rotate-180 transition-transform duration-500" />
+                    </button>
+                  </div>
                  </div>
                  
                  <div className="overflow-x-auto">
@@ -321,29 +377,40 @@ function AdminCommandCenter() {
                               </span>
                             </td>
                             <td className="py-4 text-right">
-                               <div className="flex items-center justify-end gap-2 transition-opacity">
+                               <div className="flex items-center justify-end gap-2">
                                   {u.id !== user.id && (
                                     <button 
                                       onClick={() => handleUpdateUserStatus(u.id, u.status)}
-                                      className={`p-2 rounded-lg text-xs font-bold transition ${u.status === 'blocked' ? 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}
+                                      className={`p-2 rounded-lg text-xs font-bold transition ${u.status === 'blocked' ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'}`}
                                       title={u.status === 'blocked' ? 'Reactivate' : 'Block Access'}
                                     >
                                       {u.status === 'blocked' ? <FiActivity /> : <FiShield />}
                                     </button>
                                   )}
-                                  <button 
-                                    onClick={() => {
-                                      setEditingUser(u);
-                                      setEditForm({ role: u.role, rating: u.rating || 0 });
-                                    }} 
-                                    className="p-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
-                                    title="Edit Protocol"
-                                  >
-                                    <FiEdit3 />
-                                  </button>
-                                  <button onClick={() => setSelectedRecipient(u)} className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20">
+                                  {u.role !== 'user' && (
+                                    <button 
+                                      onClick={() => {
+                                        setEditingUser(u);
+                                        setEditForm({ role: u.role, rating: u.rating || 0 });
+                                      }} 
+                                      className="p-2 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                                      title="Edit Protocol"
+                                    >
+                                      <FiEdit3 />
+                                    </button>
+                                  )}
+                                  <button onClick={() => setSelectedRecipient(u)} className="p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30">
                                     <FiMail />
                                   </button>
+                                  {u.id !== user.id && (
+                                    <button 
+                                      onClick={() => handleDeleteUser(u.id)}
+                                      className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                                      title="Purge Identity"
+                                    >
+                                      <FiTrash2 />
+                                    </button>
+                                  )}
                                </div>
                             </td>
                           </tr>

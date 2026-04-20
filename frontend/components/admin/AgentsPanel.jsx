@@ -17,7 +17,8 @@ import {
   FiClock,
   FiSearch,
   FiLock,
-  FiUnlock
+  FiUnlock,
+  FiRefreshCcw
 } from "react-icons/fi";
 import { tripsApi, friendlyApiMessage } from "../../lib/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -58,11 +59,40 @@ export default function AgentsPanel() {
     }
   };
 
+  const [pendingDelete, setPendingDelete] = useState(null);
+
   const deleteAgent = async (id) => {
-    if (!confirm("Are you sure you want to delete this agent record?")) return;
+    setPendingDelete(id);
+    const toastId = toast((t) => (
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold">Purging record in 3s...</span>
+        <button 
+          onClick={() => {
+            setPendingDelete(null);
+            toast.dismiss(t.id);
+          }}
+          className="bg-white/10 px-3 py-1 rounded-lg text-[10px] font-black uppercase hover:bg-white/20 transition"
+        >
+          Undo
+        </button>
+      </div>
+    ), { duration: 3000, style: { background: '#1e1b4b', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' } });
+
+    setTimeout(async () => {
+      setPendingDelete(currentId => {
+        if (currentId === id) {
+          executeDelete(id);
+          return null;
+        }
+        return currentId;
+      });
+    }, 3000);
+  };
+
+  const executeDelete = async (id) => {
     try {
       await tripsApi.delete(`/users/${id}`);
-      toast.success("Agent record purged.");
+      toast.success("Identity purged from registry.");
       fetchUsers();
     } catch (err) {
       toast.error(friendlyApiMessage(err));
@@ -100,15 +130,24 @@ export default function AgentsPanel() {
   return (
     <div className="space-y-12">
       {/* ── SEARCH BAR ── */}
-      <div className="relative max-w-md">
-        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-        <input 
-          type="text"
-          placeholder="Filter by Name, ID, or @username..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-3.5 text-xs text-white placeholder:text-white/20 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all shadow-xl"
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+          <input 
+            type="text"
+            placeholder="Filter by Name, ID, or @username..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-3.5 text-xs text-white placeholder:text-white/20 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all shadow-xl"
+          />
+        </div>
+        <button 
+          onClick={() => { setLoading(true); fetchUsers(); }}
+          className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-white/40 hover:text-purple-400 hover:bg-white/10 transition group"
+          title="Refresh Data"
+        >
+          <FiRefreshCcw size={18} className="group-active:rotate-180 transition-transform duration-500" />
+        </button>
       </div>
 
       {/* ── SECTION 1: AGENT REQUESTED ── */}

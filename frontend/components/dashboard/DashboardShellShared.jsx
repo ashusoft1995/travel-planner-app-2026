@@ -103,8 +103,9 @@ export function UnifiedProfileDropdown() {
     setSaving(true);
     try {
       await updateAccount(editForm);
-      toast.success("Profile updated");
+      toast.success("Successfully Updated");
       setIsEditing(false);
+      setOpen(false); // Close the dropdown as well
     } catch (err) {
       toast.error(err.message);
     } finally {
