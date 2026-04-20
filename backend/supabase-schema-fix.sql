@@ -72,6 +72,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS legal_paper_photo TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS experience_cv TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS experience_image TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS national_id_photo TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 0;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- ============================================

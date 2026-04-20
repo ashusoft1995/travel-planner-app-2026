@@ -317,7 +317,7 @@ export default function AgentsPanel() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-black text-white">{selectedAgent.name}</h3>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">ID: {selectedUser?.id || selectedAgent.id}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">ID: {selectedAgent.id}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">

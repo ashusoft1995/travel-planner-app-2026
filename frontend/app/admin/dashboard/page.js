@@ -16,7 +16,8 @@ import {
   FiTrash2,
   FiSearch,
   FiLock,
-  FiUnlock
+  FiUnlock,
+  FiX
 } from "react-icons/fi";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -74,6 +75,8 @@ function AdminCommandCenter() {
   const [sendingMsg, setSendingMsg] = useState(false);
   const [msgInput, setMsgInput] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({ role: "", rating: 0 });
   const [viewMode, setViewMode] = useState("users"); // users, activity, messages, profit
   const searchParams = useSearchParams();
 
@@ -114,7 +117,7 @@ function AdminCommandCenter() {
         const rankA = getRank(a);
         const rankB = getRank(b);
         if (rankA !== rankB) return rankA - rankB;
-        return parseInt(a.id || 0) - parseInt(b.id || 0);
+        return (a.id || "").toString().localeCompare((b.id || "").toString(), undefined, { numeric: true });
       });
 
       setStats({
@@ -149,6 +152,21 @@ function AdminCommandCenter() {
       loadAllData();
     } catch (e) {
       toast.error(friendlyApiMessage(e));
+    }
+  };
+
+  const handleUpdateUserRole = async () => {
+    if (!editingUser) return;
+    try {
+      await tripsApi.put(`/users/${editingUser.id}`, { 
+        role: editForm.role,
+        rating: parseFloat(editForm.rating) || 0 
+      });
+      toast.success("Security clearance and protocols updated");
+      setEditingUser(null);
+      loadAllData();
+    } catch (err) {
+      toast.error(friendlyApiMessage(err));
     }
   };
 
@@ -303,7 +321,7 @@ function AdminCommandCenter() {
                               </span>
                             </td>
                             <td className="py-4 text-right">
-                               <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                               <div className="flex items-center justify-end gap-2 transition-opacity">
                                   {u.id !== user.id && (
                                     <button 
                                       onClick={() => handleUpdateUserStatus(u.id, u.status)}
@@ -313,6 +331,16 @@ function AdminCommandCenter() {
                                       {u.status === 'blocked' ? <FiActivity /> : <FiShield />}
                                     </button>
                                   )}
+                                  <button 
+                                    onClick={() => {
+                                      setEditingUser(u);
+                                      setEditForm({ role: u.role, rating: u.rating || 0 });
+                                    }} 
+                                    className="p-2 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                                    title="Edit Protocol"
+                                  >
+                                    <FiEdit3 />
+                                  </button>
                                   <button onClick={() => setSelectedRecipient(u)} className="p-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20">
                                     <FiMail />
                                   </button>
@@ -400,7 +428,7 @@ function AdminCommandCenter() {
                     <div className="mt-6 pt-6 border-t border-white/5">
                         <div className="flex items-center justify-between mb-3 px-1">
                            <p className="text-[10px] font-black uppercase tracking-widest text-purple-400">
-                             Recipient: <span className="text-white">{selectedRecipient.name}</span>
+                             ID: {selectedRecipient.id} | Recipient: <span className="text-white">{selectedRecipient.name}</span>
                            </p>
                            <button onClick={() => setSelectedRecipient(null)} className="text-[10px] font-black uppercase text-white/30 hover:text-red-400 transition">Cancel</button>
                         </div>
@@ -561,6 +589,87 @@ function AdminCommandCenter() {
            </div>
         </div>
       </div>
+
+      {/* ── USER EDIT MODAL ── */}
+      <AnimatePresence>
+        {editingUser && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => setEditingUser(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#0d0d1a] p-8 shadow-3xl"
+            >
+              <div className="mb-6 flex items-center justify-between">
+                 <h3 className="text-xl font-black text-white">Security Override</h3>
+                 <button onClick={() => setEditingUser(null)} className="text-white/40 hover:text-white"><FiX /></button>
+              </div>
+
+              <div className="space-y-6">
+                 {/* Read-only profile snapshot */}
+                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30">Profile Snapshot (Protected)</p>
+                    <p className="text-sm font-bold text-white">{editingUser.name}</p>
+                    <p className="text-xs text-white/40">{editingUser.email}</p>
+                    <p className="text-[10px] font-mono text-purple-400">@{editingUser.username}</p>
+                 </div>
+
+                 {/* Editable Role */}
+                 <div>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Protocol Role</label>
+                    <select 
+                      value={editForm.role}
+                      onChange={e => setEditForm({...editForm, role: e.target.value})}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-purple-500 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="user" className="bg-[#0d0d1a] text-white font-bold">Traveler</option>
+                      <option value="agent" className="bg-[#0d0d1a] text-white font-bold">Expert Agent</option>
+                      <option value="admin" className="bg-[#0d0d1a] text-white font-bold">System Admin</option>
+                    </select>
+                 </div>
+
+                 {/* Editable Rating (Agents only) */}
+                 {editForm.role === 'agent' && (
+                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-white/40 mb-2">Expertise Rating (0-5)</label>
+                      <input 
+                        type="number" 
+                        min="0" 
+                        max="5" 
+                        step="0.1"
+                        value={editForm.rating}
+                        onChange={e => setEditForm({...editForm, rating: e.target.value})}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-purple-500 transition-all"
+                      />
+                   </motion.div>
+                 )}
+
+                 <div className="pt-4 flex gap-3">
+                   <button 
+                     onClick={handleUpdateUserRole}
+                     className="flex-1 py-4 bg-purple-600 hover:bg-purple-500 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-purple-600/20 transition-all active:scale-95"
+                   >
+                     Authorize Changes
+                   </button>
+                   <button 
+                     onClick={() => setEditingUser(null)}
+                     className="flex-1 py-4 bg-white/5 hover:bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white/40 transition-all"
+                   >
+                     Abort
+                   </button>
+                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
