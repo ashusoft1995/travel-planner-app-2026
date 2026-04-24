@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { 
   FiCamera, 
@@ -22,120 +22,68 @@ import {
   FiTrash2,
   FiAward,
   FiSettings,
-  FiActivity
+  FiActivity,
+  FiX,
+  FiCheckCircle,
+  FiAlertCircle
 } from "react-icons/fi";
-import { loadUserProfile, saveUserProfile } from "../../lib/userProfileStorage";
 import { useAuth } from "../../context/AuthContext";
+import { tripsApi, friendlyApiMessage } from "../../lib/api";
 
 const SUPER_ADMIN = "ashu";
 
 export default function AdminProfilePanel({ user, onSaved }) {
   const { updateAccount, token } = useAuth();
-  const [form, setForm] = useState(() => loadUserProfile(user?.email));
+  const [form, setForm] = useState({
+    fullName: user?.name || "",
+    phone: user?.phone || "",
+    bio: user?.about || "",
+    location: "",
+    expertise: user?.expertise || []
+  });
+  
   const [accForm, setAccForm] = useState({
     username: user?.username || "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
-  const [users, setUsers] = useState([]);
-  const [agentRequests, setAgentRequests] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [loadingRequests, setLoadingRequests] = useState(false);
 
   const isSuperAdmin = user?.username === SUPER_ADMIN;
 
-  useEffect(() => {
-    if (!user?.email) return;
-    const p = loadUserProfile(user.email);
-    setForm({
-      ...p,
-      fullName: p.fullName || user.name || "",
-    });
-    setAccForm((prev) => ({ ...prev, username: user.username || "" }));
-  }, [user?.email, user?.name, user?.username]);
-
-  useEffect(() => {
-    if (isSuperAdmin) {
-      fetchUsers();
-      fetchAgentRequests();
-    }
-  }, [isSuperAdmin, token]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    if (!isSuperAdmin) return;
     setLoadingUsers(true);
     try {
-      const response = await fetch("/api/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
-      }
+      const { data } = await tripsApi.get("/users");
+      setAllUsers(data?.data || []);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
-      toast.error("Failed to fetch users");
+      toast.error(friendlyApiMessage(error));
     } finally {
       setLoadingUsers(false);
     }
-  };
+  }, [isSuperAdmin]);
 
-  const fetchAgentRequests = async () => {
-    setLoadingRequests(true);
-    try {
-      const response = await fetch("/api/agent-requests", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAgentRequests(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch agent requests:", error);
-      toast.error("Failed to fetch agent requests");
-    } finally {
-      setLoadingRequests(false);
-    }
-  };
-
-  const handlePhoto = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 1.5 * 1024 * 1024) {
-      toast.error("Profile photo should be under 1.5 MB");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () =>
-      setForm((p) => ({ ...p, profilePhoto: reader.result || "" }));
-    reader.readAsDataURL(file);
-  };
+  useEffect(() => {
+    if (isSuperAdmin) fetchUsers();
+  }, [isSuperAdmin, fetchUsers]);
 
   const save = async (e) => {
     e.preventDefault();
-    if (!user?.email) return;
-
-    if (!form.fullName.trim()) {
-      toast.error("Full name is required");
-      return;
-    }
-
     setSaving(true);
-    const loadingToast = toast.loading("Updating records...");
+    const loadingToast = toast.loading("Synchronizing identity data...");
 
     try {
-      // 1. Save biographical info to local storage
-      saveUserProfile(user.email, form);
-
-      // 2. Clear credentials from API if requested
       const payload = { 
-        name: form.fullName.trim() 
+        name: form.fullName.trim(),
+        phone: form.phone,
+        about: form.bio,
+        expertise: form.expertise
       };
 
       const isUsernameChanged = accForm.username.trim().toLowerCase() !== (user.username || "").toLowerCase();
@@ -143,7 +91,7 @@ export default function AdminProfilePanel({ user, onSaved }) {
 
       if (isUsernameChanged || isPasswordChanged) {
         if (!accForm.currentPassword) {
-          toast.error("Current password is required to change credentials", { id: loadingToast });
+          toast.error("Current password required for credential override", { id: loadingToast });
           setSaving(false);
           return;
         }
@@ -151,12 +99,7 @@ export default function AdminProfilePanel({ user, onSaved }) {
         if (isUsernameChanged) payload.username = accForm.username.trim();
         if (isPasswordChanged) {
           if (accForm.newPassword !== accForm.confirmPassword) {
-            toast.error("New passwords do not match", { id: loadingToast });
-            setSaving(false);
-            return;
-          }
-          if (accForm.newPassword.length < 6) {
-            toast.error("New password must be at least 6 characters", { id: loadingToast });
+            toast.error("Passwords mismatch", { id: loadingToast });
             setSaving(false);
             return;
           }
@@ -164,360 +107,197 @@ export default function AdminProfilePanel({ user, onSaved }) {
         }
       }
 
-      // 3. Update account via API
       await updateAccount(payload);
-
       toast.success("Identity Vault synchronized", { id: loadingToast });
-      
-      // Clear password fields on success
       setAccForm(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmPassword: "" }));
-      onSaved();
+      if (onSaved) onSaved();
     } catch (error) {
-      toast.error("Update failed: " + error.message, { id: loadingToast });
+      toast.error(friendlyApiMessage(error), { id: loadingToast });
     } finally {
       setSaving(false);
     }
   };
 
-  const handleUserAction = async (userId, action) => {
+  const updateUserStatus = async (targetId, status) => {
+    const loadingToast = toast.loading(`Modifying user ${targetId}...`);
     try {
-      const response = await fetch(`/api/users/${userId}/status`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          status: action === "block" ? "blocked" : "active"
-        }),
-      });
-
-      if (response.ok) {
-        toast.success(`User ${action}ed successfully`);
-        fetchUsers();
-      } else {
-        toast.error(`Failed to ${action} user`);
-      }
+      await tripsApi.put(`/users/${targetId}`, { status });
+      toast.success(`User status updated to ${status}`, { id: loadingToast });
+      fetchUsers();
     } catch (error) {
-      toast.error(`Failed to ${action} user`);
+      toast.error(friendlyApiMessage(error), { id: loadingToast });
     }
   };
 
-  const handleAgentRequest = async (requestId, action) => {
+  const deleteUser = async (targetId) => {
+    if (!confirm("Permanently purge this record from the registry?")) return;
+    const loadingToast = toast.loading("Purging record...");
     try {
-      const response = await fetch(`/api/agent-requests/${requestId}/${action}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          note: action === "approve" ? "Approved by super admin" : "Rejected by super admin"
-        }),
-      });
-
-      if (response.ok) {
-        toast.success(`Agent request ${action}d successfully`);
-        fetchAgentRequests();
-        fetchUsers();
-      } else {
-        toast.error(`Failed to ${action} agent request`);
-      }
+      await tripsApi.delete(`/users/${targetId}`);
+      toast.success("Record purged successfully", { id: loadingToast });
+      fetchUsers();
     } catch (error) {
-      toast.error(`Failed to ${action} agent request`);
+      toast.error(friendlyApiMessage(error), { id: loadingToast });
     }
   };
 
-  const resetUserPassword = async (userId) => {
-    const newPassword = prompt("Enter new password for this user:");
-    if (!newPassword) return;
-
-    try {
-      const response = await fetch(`/api/users/${userId}/reset-password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ newPassword }),
-      });
-
-      if (response.ok) {
-        toast.success("Password reset successfully");
-      } else {
-        toast.error("Failed to reset password");
-      }
-    } catch (error) {
-      toast.error("Failed to reset password");
-    }
-  };
-
-  const deleteUser = async (userId) => {
-    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        toast.success("User deleted successfully");
-        fetchUsers();
-      } else {
-        toast.error("Failed to delete user");
-      }
-    } catch (error) {
-      toast.error("Failed to delete user");
-    }
-  };
+  const agentRequests = allUsers.filter(u => u.role === 'agent' && u.status === 'pending');
 
   const tabs = [
-    { id: "profile", label: "Profile", icon: FiUser },
+    { id: "profile", label: "Identity", icon: FiUser },
     { id: "security", label: "Security", icon: FiShield },
   ];
 
   if (isSuperAdmin) {
     tabs.push(
-      { id: "users", label: "Manage Users", icon: FiUsers },
-      { id: "agents", label: "Agent Requests", icon: FiUserPlus }
+      { id: "users", label: "Registry", icon: FiUsers },
+      { id: "agents", label: "Agent Queue", icon: FiUserPlus }
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="flex space-x-8">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Icon className="mr-2 h-5 w-5" />
-                {tab.label}
-                {tab.id === "users" && isSuperAdmin && (
-                  <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">
-                    {users.length}
-                  </span>
-                )}
-                {tab.id === "agents" && isSuperAdmin && (
-                  <span className="ml-2 px-2 py-1 text-xs bg-yellow-100 text-yellow-600 rounded-full">
-                    {agentRequests.filter(r => r.status === 'pending').length}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
+    <div className="space-y-8">
+      {/* ── HEADER ── */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-2xl font-black text-white shadow-xl shadow-purple-600/20 border border-white/20">
+            {user?.name?.charAt(0)}
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight">{user?.name}</h2>
+            <p className="text-[10px] text-purple-400 font-black uppercase tracking-[0.2em] flex items-center gap-2 mt-1">
+              {isSuperAdmin ? <FiAward className="text-amber-400" /> : <FiShield />}
+              {isSuperAdmin ? "Super Admin" : "System Administrator"} • Protocol Mode
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Tab Content */}
+      {/* ── TABS ── */}
+      <div className="flex flex-wrap gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10 w-fit">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+              activeTab === tab.id 
+              ? "bg-purple-600 text-white shadow-lg shadow-purple-600/30" 
+              : "text-white/40 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <tab.icon size={14} />
+            {tab.label}
+            {tab.id === 'agents' && agentRequests.length > 0 && (
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse ml-1" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* ── CONTENT ── */}
       <AnimatePresence mode="wait">
         {activeTab === "profile" && (
           <motion.div
-            key="profile"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            key="profile" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="grid lg:grid-cols-2 gap-8"
           >
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
-                {isSuperAdmin && (
-                  <span className="ml-3 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium flex items-center">
-                    <FiAward className="mr-1 h-3 w-3" />
-                    Super Admin
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-6 mb-6">
-                <div className="relative">
-                  <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                    {form.profilePhoto ? (
-                      <img
-                        src={form.profilePhoto}
-                        alt="Profile"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <FiUser className="h-12 w-12 text-gray-400" />
-                    )}
-                  </div>
-                  <label className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700">
-                    <FiCamera className="h-4 w-4" />
-                    <input type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
-                  </label>
-                </div>
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">{form.fullName}</h3>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                  <p className="text-sm text-gray-500 capitalize">{user.role}</p>
-                </div>
-              </div>
-
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#12122a] p-8 shadow-2xl">
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30 mb-6 flex items-center gap-2">
+                <FiInfo className="text-purple-400" /> Biographical Records
+              </h3>
               <form onSubmit={save} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiUser className="inline mr-1 h-4 w-4" />
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      value={form.fullName}
-                      onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiSmartphone className="inline mr-1 h-4 w-4" />
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      value={form.phone || ""}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiGlobe className="inline mr-1 h-4 w-4" />
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      value={form.location || ""}
-                      onChange={(e) => setForm({ ...form, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <FiCreditCard className="inline mr-1 h-4 w-4" />
-                      Bio
-                    </label>
-                    <textarea
-                      value={form.bio || ""}
-                      onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    <FiSave className="mr-2 h-4 w-4" />
-                    {saving ? "Saving..." : "Save Profile"}
-                  </button>
-                </div>
+                 <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Identity Full Name</label>
+                      <input 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none" 
+                        value={form.fullName} onChange={e => setForm({...form, fullName: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Telecom Node (Phone)</label>
+                      <input 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none" 
+                        value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Biographical Brief</label>
+                      <textarea 
+                        rows={4}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none resize-none" 
+                        value={form.bio} onChange={e => setForm({...form, bio: e.target.value})} 
+                      />
+                    </div>
+                 </div>
+                 <button disabled={saving} className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-xl shadow-purple-600/20 active:scale-95">
+                    {saving ? "Synchronizing..." : "Apply Identity Changes"}
+                 </button>
               </form>
+            </div>
+
+            <div className="space-y-6 rounded-3xl border border-white/10 bg-[#12122a] p-8 shadow-2xl flex flex-col justify-center items-center text-center">
+               <div className="h-32 w-32 rounded-[2rem] bg-gradient-to-br from-white/5 to-white/[0.01] border border-white/10 flex items-center justify-center text-4xl font-black text-white/20 mb-6">
+                 {user?.name?.charAt(0)}
+               </div>
+               <h4 className="text-lg font-black text-white uppercase tracking-tight">Satellite Uplink</h4>
+               <p className="text-xs text-white/30 mt-2 max-w-[200px] leading-relaxed">Identity photo synchronization is managed via Global Gravatar Protocol.</p>
+               <div className="mt-8 p-4 rounded-2xl bg-white/5 border border-white/5 w-full text-left">
+                  <p className="text-[9px] font-black text-purple-400 uppercase tracking-widest mb-2">Network Metadata</p>
+                  <p className="text-[10px] text-white/50 font-medium">Access Code: <span className="text-white">PROT-{user?.id}</span></p>
+                  <p className="text-[10px] text-white/50 font-medium">Last Sync: <span className="text-white">{new Date().toLocaleString()}</span></p>
+               </div>
             </div>
           </motion.div>
         )}
 
         {activeTab === "security" && (
           <motion.div
-            key="security"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            key="security" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="max-w-2xl mx-auto"
           >
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Security Settings</h2>
-
+            <div className="rounded-3xl border border-white/10 bg-[#12122a] p-8 shadow-2xl">
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30 mb-8 flex items-center gap-2">
+                <FiLock className="text-purple-400" /> Credential Management
+              </h3>
               <form onSubmit={save} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <FiAtSign className="inline mr-1 h-4 w-4" />
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    value={accForm.username}
-                    onChange={(e) => setAccForm({ ...accForm, username: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div className="border-t pt-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <FiLock className="inline mr-1 h-4 w-4" />
-                        Current Password
-                      </label>
-                      <input
-                        type="password"
-                        value={accForm.currentPassword}
-                        onChange={(e) => setAccForm({ ...accForm, currentPassword: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                 <div className="grid md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Username (@)</label>
+                      <input 
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none" 
+                        value={accForm.username} onChange={e => setAccForm({...accForm, username: e.target.value})} 
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <FiKey className="inline mr-1 h-4 w-4" />
-                        New Password
-                      </label>
-                      <input
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">New Password</label>
+                      <input 
                         type="password"
-                        value={accForm.newPassword}
-                        onChange={(e) => setAccForm({ ...accForm, newPassword: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none" 
+                        value={accForm.newPassword} onChange={e => setAccForm({...accForm, newPassword: e.target.value})} 
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <FiKey className="inline mr-1 h-4 w-4" />
-                        Confirm New Password
-                      </label>
-                      <input
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Confirm Password</label>
+                      <input 
                         type="password"
-                        value={accForm.confirmPassword}
-                        onChange={(e) => setAccForm({ ...accForm, confirmPassword: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none" 
+                        value={accForm.confirmPassword} onChange={e => setAccForm({...accForm, confirmPassword: e.target.value})} 
                       />
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    <FiSave className="mr-2 h-4 w-4" />
-                    {saving ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
+                    <div className="md:col-span-2 pt-4 border-t border-white/5">
+                      <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Current Authorization Key</label>
+                      <input 
+                        type="password"
+                        placeholder="Required for any credential overrides"
+                        className="w-full bg-purple-500/5 border border-purple-500/20 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none placeholder:text-purple-400/20" 
+                        value={accForm.currentPassword} onChange={e => setAccForm({...accForm, currentPassword: e.target.value})} 
+                      />
+                    </div>
+                 </div>
+                 <button disabled={saving} className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-xl shadow-purple-600/20 active:scale-95">
+                    Update Security Protocols
+                 </button>
               </form>
             </div>
           </motion.div>
@@ -525,180 +305,131 @@ export default function AdminProfilePanel({ user, onSaved }) {
 
         {activeTab === "users" && isSuperAdmin && (
           <motion.div
-            key="users"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            key="users" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Manage Users</h2>
+             <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30 flex items-center gap-2">
+                  <FiUsers className="text-purple-400" /> Global Node Registry
+                </h3>
+                <button onClick={fetchUsers} className="text-[10px] font-black uppercase text-purple-400 hover:text-white transition flex items-center gap-2">
+                  <FiRefreshCw className={loadingUsers ? "animate-spin" : ""} /> Sync
+                </button>
+             </div>
 
-              {loadingUsers ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-              ) : (
+             <div className="rounded-3xl border border-white/10 bg-[#12122a] overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-white/5 text-[10px] font-black uppercase tracking-widest text-white/30 border-b border-white/5">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Role
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
+                        <th className="px-6 py-4">Entity</th>
+                        <th className="px-6 py-4">Protocol</th>
+                        <th className="px-6 py-4">Status</th>
+                        <th className="px-6 py-4 text-right">Overrides</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {users.map((userItem) => (
-                        <tr key={userItem.id}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span className="text-sm font-medium text-gray-600">
-                                  {userItem.name.charAt(0).toUpperCase()}
-                                </span>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{userItem.name}</div>
-                                <div className="text-sm text-gray-500">{userItem.email}</div>
-                              </div>
+                    <tbody className="divide-y divide-white/5">
+                      {allUsers.map((u) => (
+                        <tr key={u.id} className="hover:bg-white/[0.02] transition">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                               <div className="h-8 w-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-white/40">
+                                 {u.name?.charAt(0)}
+                               </div>
+                               <div>
+                                  <p className="font-bold text-white uppercase tracking-tight">{u.name}</p>
+                                  <p className="text-[10px] text-white/20 uppercase font-black">@{u.username}</p>
+                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              userItem.role === 'admin' ? 'bg-purple-100 text-purple-800' :
-                              userItem.role === 'agent' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                              u.role === 'admin' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                              u.role === 'agent' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                              'bg-white/5 text-white/30 border-white/10'
                             }`}>
-                              {userItem.role}
+                              {u.role}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              userItem.status === 'active' ? 'bg-green-100 text-green-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
-                              {userItem.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex space-x-2">
-                              {userItem.status === 'active' ? (
-                                <button
-                                  onClick={() => handleUserAction(userItem.id, 'block')}
-                                  className="text-red-600 hover:text-red-900"
-                                  title="Block User"
-                                >
-                                  <FiUserMinus className="h-4 w-4" />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleUserAction(userItem.id, 'unblock')}
-                                  className="text-green-600 hover:text-green-900"
-                                  title="Unblock User"
-                                >
-                                  <FiUserPlus className="h-4 w-4" />
-                                </button>
-                              )}
-                              <button
-                                onClick={() => resetUserPassword(userItem.id)}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="Reset Password"
-                              >
-                                <FiRefreshCw className="h-4 w-4" />
-                              </button>
-                              {userItem.id !== user.id && (
-                                <button
-                                  onClick={() => deleteUser(userItem.id)}
-                                  className="text-red-600 hover:text-red-900"
-                                  title="Delete User"
-                                >
-                                  <FiTrash2 className="h-4 w-4" />
-                                </button>
-                              )}
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1.5">
+                               <div className={`h-1.5 w-1.5 rounded-full ${u.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+                               <span className={`text-[10px] font-black uppercase tracking-widest ${u.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>
+                                 {u.status}
+                               </span>
                             </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                             <div className="flex items-center justify-end gap-2">
+                                {u.status === 'active' ? (
+                                  <button onClick={() => updateUserStatus(u.id, 'blocked')} className="p-2 rounded-lg bg-white/5 text-white/30 hover:bg-red-500/20 hover:text-red-400 transition" title="Suspend Access">
+                                    <FiUserMinus size={14} />
+                                  </button>
+                                ) : (
+                                  <button onClick={() => updateUserStatus(u.id, 'active')} className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition" title="Restore Access">
+                                    <FiUserPlus size={14} />
+                                  </button>
+                                )}
+                                {u.id !== user.id && (
+                                  <button onClick={() => deleteUser(u.id)} className="p-2 rounded-lg bg-white/5 text-white/30 hover:bg-red-600 hover:text-white transition" title="Purge Record">
+                                    <FiTrash2 size={14} />
+                                  </button>
+                                )}
+                             </div>
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
-              )}
-            </div>
+             </div>
           </motion.div>
         )}
 
         {activeTab === "agents" && isSuperAdmin && (
           <motion.div
-            key="agents"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            key="agents" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Agent Requests</h2>
-
-              {loadingRequests ? (
-                <div className="flex items-center justify-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-white/30 mb-4 flex items-center gap-2">
+                <FiUserPlus className="text-purple-400" /> Pending Expert Authorization
+             </h3>
+             
+             {agentRequests.length === 0 ? (
+                <div className="py-20 text-center rounded-[2rem] border border-dashed border-white/10 bg-white/[0.02]">
+                   <FiCheckCircle size={32} className="mx-auto text-emerald-400/20 mb-4" />
+                   <p className="text-[10px] font-black uppercase tracking-widest text-white/20">All expert requests processed</p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {agentRequests.map((request) => (
-                    <div key={request.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center mb-2">
-                            <h3 className="text-lg font-medium text-gray-900">{request.userName}</h3>
-                            <span className={`ml-3 px-2 py-1 text-xs rounded-full ${
-                              request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              request.status === 'approved' ? 'bg-green-100 text-green-800' :
-                              'bg-red-100 text-red-800'
-                            }`}>
-                              {request.status}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600 mb-2">{request.userEmail}</p>
-                          <p className="text-sm text-gray-700 mb-2">{request.bio}</p>
-                          <div className="text-sm text-gray-600">
-                            <p><strong>Phone:</strong> {request.phone}</p>
-                            <p><strong>Experience:</strong> {request.experience}</p>
-                            <p><strong>Qualifications:</strong> {request.qualifications}</p>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Requested: {new Date(request.requestedAt).toLocaleDateString()}
-                          </p>
+             ) : (
+                <div className="grid gap-6">
+                   {agentRequests.map((req) => (
+                     <div key={req.id} className="rounded-3xl border border-white/10 bg-[#12122a] p-6 shadow-2xl flex flex-col md:flex-row gap-6 items-start">
+                        <div className="h-16 w-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl font-black text-white/20 shrink-0">
+                          {req.name?.charAt(0)}
                         </div>
-                        {request.status === 'pending' && (
-                          <div className="flex space-x-2 ml-4">
-                            <button
-                              onClick={() => handleAgentRequest(request.id, 'approve')}
-                              className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleAgentRequest(request.id, 'reject')}
-                              className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
-                            >
-                              Reject
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                        <div className="flex-1 space-y-4">
+                           <div>
+                              <h4 className="text-lg font-black text-white uppercase tracking-tight">{req.name}</h4>
+                              <p className="text-[10px] text-purple-400 font-bold uppercase tracking-widest">@{req.username} • {req.email}</p>
+                           </div>
+                           <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2">
+                              <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Application Data</p>
+                              <p className="text-xs text-white/60 leading-relaxed italic">"{req.about || "No biographical data provided."}"</p>
+                              <div className="flex flex-wrap gap-2 pt-2">
+                                 {(req.expertise || []).map((exp, i) => (
+                                   <span key={i} className="px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-400 text-[9px] font-bold uppercase tracking-widest border border-blue-500/20">{exp}</span>
+                                 ))}
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-4">
+                              <button onClick={() => updateUserStatus(req.id, 'active')} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-lg shadow-emerald-600/20">Authorize</button>
+                              <button onClick={() => updateUserStatus(req.id, 'rejected')} className="px-6 py-2.5 bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition border border-white/10">Deny Access</button>
+                           </div>
+                        </div>
+                     </div>
+                   ))}
                 </div>
-              )}
-            </div>
+             )}
           </motion.div>
         )}
       </AnimatePresence>

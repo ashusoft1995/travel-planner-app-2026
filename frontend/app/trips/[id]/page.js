@@ -302,7 +302,7 @@ function ItineraryTab({ trip, onUpdate }) {
       <div className="grid md:grid-cols-3 gap-6">
         <div className="card-surface p-6 col-span-1 flex flex-col justify-center">
           <p className="text-sm font-bold text-[var(--muted)] mb-1 uppercase tracking-wide">Total Budget</p>
-          <p className="text-3xl font-bold">${totalBudget.toLocaleString()}</p>
+          <p className="text-3xl font-bold">{totalBudget.toLocaleString()} ETB</p>
           
           <div className="mt-6">
             <div className="flex justify-between text-sm mb-2">
@@ -316,7 +316,7 @@ function ItineraryTab({ trip, onUpdate }) {
               />
             </div>
             <p className={`text-xs mt-2 font-bold ${overBudget ? 'text-red-500' : 'text-emerald-500'}`}>
-              {overBudget ? 'Over budget by' : 'Remaining'}: ${Math.abs(budgetRemaining).toLocaleString()}
+              {overBudget ? 'Over budget by' : 'Remaining'}: {Math.abs(budgetRemaining).toLocaleString()} ETB
             </p>
           </div>
         </div>
@@ -330,7 +330,7 @@ function ItineraryTab({ trip, onUpdate }) {
                     <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                   ))}
                 </Pie>
-                <RechartsTooltip formatter={(val) => `$${val}`} />
+                <RechartsTooltip formatter={(val) => `${val} ETB`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -367,7 +367,7 @@ function ItineraryTab({ trip, onUpdate }) {
                     <span className="text-xs uppercase font-bold text-brand-600 bg-brand-500/10 px-2 py-0.5 rounded-full">{e.category}</span>
                   </div>
                 </div>
-                <p className="font-bold text-lg">${Number(e.amount).toLocaleString()}</p>
+                <p className="font-bold text-lg">{Number(e.amount).toLocaleString()} ETB</p>
               </li>
             ))}
           </ul>

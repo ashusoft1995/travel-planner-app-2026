@@ -86,7 +86,7 @@ function TripsContent() {
                 <div className="relative h-[500px] lg:h-auto overflow-hidden bg-slate-100 dark:bg-slate-950">
                    {viewMode === "photo" ? (
                       <>
-                        <Image src={selectedDest.image} alt={selectedDest.name} fill className="object-cover" />
+                        <Image src={selectedDest.image || selectedDest.imageUrl} alt={selectedDest.name} fill className="object-cover" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       </>
                    ) : (

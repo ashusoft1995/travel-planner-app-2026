@@ -376,7 +376,7 @@ export default function HomeContent() {
               className="group relative h-[450px] overflow-hidden rounded-[3rem] bg-white border border-slate-100 shadow-lg shadow-blue-900/5"
             >
               <Image 
-                src={dest.image} 
+                src={dest.image || dest.imageUrl} 
                 alt={dest.name} 
                 fill 
                 className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100" 
@@ -474,8 +474,8 @@ export default function HomeContent() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={destinations.slice(0, 8)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#00000008" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'currentColor', opacity: 0.5, fontSize: 10, fontWeight: 700 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: 'currentColor', opacity: 0.5, fontSize: 10 }} domain={[4, 5]} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[4, 5]} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       itemStyle={{ color: '#051128' }}

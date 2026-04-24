@@ -4,7 +4,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Lalibela",
     region: "Amhara",
-    price: "$299",
+    price: "299 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1596423735880-5f2a689b903e?auto=format&fit=crop&w=1200&q=80",
     description: "UNESCO rock-hewn churches and Ethiopian Orthodox heritage. Compact town, walkable sites, strong cultural tourism infrastructure.",
@@ -20,7 +20,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Gondar",
     region: "Amhara",
-    price: "$219",
+    price: "219 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
     description: "The ‘Camelot of Africa’: Royal Enclosure castles, Debre Berhan Selassie church, and easy access to Simien Mountains staging.",
@@ -36,7 +36,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Aksum",
     region: "Tigray",
-    price: "$249",
+    price: "249 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6?auto=format&fit=crop&w=1200&q=80",
     description: "Ancient stelae field, church traditions, and deep historical significance on the northern circuit.",
@@ -52,7 +52,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Simien Mountains",
     region: "Amhara",
-    price: "$389",
+    price: "389 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
     description: "Dramatic escarpments, endemic wildlife (Gelada, Walia ibex), and multi-day trekking in Simien Mountains National Park.",
@@ -68,7 +68,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Danakil Depression",
     region: "Afar",
-    price: "$459",
+    price: "459 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1200",
     description: "Extreme landscapes: salt flats, active geology, and guided expeditions. Best as an organized tour.",
@@ -84,7 +84,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Lake Tana",
     region: "Amhara",
-    price: "$199",
+    price: "199 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=1200",
     description: "Island monasteries, birdlife, and boat culture near Bahir Dar — a relaxed complement to the northern route.",
@@ -100,7 +100,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Hawassa",
     region: "Sidama",
-    price: "$179",
+    price: "179 ETB",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1200",
     description: "Lakeside city with coffee country access, birding, and a calmer pace for Rift Valley stops.",
@@ -116,7 +116,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Bale Mountains",
     region: "Oromia",
-    price: "$349",
+    price: "349 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200",
     description: "Afro-alpine moorland, Ethiopian wolf habitat, and quieter trekking compared to the northern circuit.",
@@ -133,7 +133,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Bishoftu",
     region: "Oromia",
-    price: "$159",
+    price: "159 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
     description: "Crater lakes and lakeside lodges a short drive from Addis — ideal weekend escapes and birding.",
@@ -150,7 +150,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Lake Langano",
     region: "Oromia",
-    price: "$169",
+    price: "169 ETB",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
     description: "Brown-sand Rift Valley lake with resorts, swimming, and watersports — a classic Rift Valley stop.",
@@ -167,7 +167,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Wenchi Crater Lake",
     region: "Oromia",
-    price: "$189",
+    price: "189 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
     description: "Dramatic crater lake reached by hike or horse; island monastery and community eco-tourism.",
@@ -184,7 +184,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Arba Minch",
     region: "Southern Nations",
-    price: "$209",
+    price: "209 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
     description: "Gateway to Nechisar National Park — boat trips, hippos, and the famous ‘crocodile market’.",
@@ -201,7 +201,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Blue Nile Falls",
     region: "Amhara",
-    price: "$139",
+    price: "139 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
     description: "Tis Issat — one of Ethiopia’s great water spectacles near Bahir Dar; pair with Lake Tana.",
@@ -218,7 +218,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Awash National Park",
     region: "Afar / Oromia",
-    price: "$199",
+    price: "199 ETB",
     rating: 4.4,
     image: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?auto=format&fit=crop&w=1200&q=80",
     description: "Savanna wildlife, volcanic landscapes, and the Awash River gorge with waterfalls.",
@@ -235,7 +235,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Addis Ababa",
     region: "Addis Ababa",
-    price: "$150",
+    price: "150 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=80",
     description: "The diplomatic capital of Africa. Museums, vibrant markets, and high-altitude forest views.",
@@ -252,7 +252,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Harar",
     region: "Harari",
-    price: "$210",
+    price: "210 ETB",
     rating: 4.9,
     image: "https://images.pexels.com/photos/105809/pexels-photo-105809.jpeg?auto=compress&cs=tinysrgb&w=1200",
     description: "The walled city of Jugol, spiritual heritage, and the unique Hyena feeding tradition.",
@@ -269,7 +269,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Jimma",
     region: "Oromia",
-    price: "$180",
+    price: "180 ETB",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
     description: "The heart of coffee culture. Aba Jifar palace and lush tropical forests of Arabica birth.",
@@ -286,7 +286,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Adama",
     region: "Oromia",
-    price: "$140",
+    price: "140 ETB",
     rating: 4.4,
     image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=1200&q=80",
     description: "A bustling transportation hub. Famous for warm weather and proximity to the Rift Valley.",
@@ -303,7 +303,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Geralta Mountains",
     region: "Tigray",
-    price: "$280",
+    price: "280 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=1200&q=80",
     description: "Dramatic sandstone cliffs housing some of the world's most inaccessible rock-hewn churches.",
@@ -320,7 +320,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Jinka",
     region: "Southern Nations",
-    price: "$260",
+    price: "260 ETB",
     rating: 4.7,
     image: "https://images.pexels.com/photos/4243048/pexels-photo-4243048.jpeg?auto=compress&cs=tinysrgb&w=1200",
     description: "Gateway to the Omo Valley and home to the South Omo Research Center.",
@@ -337,7 +337,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Dire Dawa",
     region: "Dire Dawa",
-    price: "$170",
+    price: "170 ETB",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1593642532744-d377ab507dc8?auto=format&fit=crop&w=1200&q=80",
     description: "French-colonial architecture and traditional culture with vibrant spice markets.",
@@ -354,7 +354,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Semera",
     region: "Afar",
-    price: "$300",
+    price: "300 ETB",
     rating: 4.3,
     image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
     description: "The capital of Afar. Staging point for Danakil and home to the Lucy museum.",
@@ -370,7 +370,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Gambela",
     region: "Gambela",
-    price: "$220",
+    price: "220 ETB",
     rating: 4.2,
     image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1200&q=80",
     description: "Vast wetlands and Baro River vistas. Home to unique Nilotic cultures.",
@@ -386,7 +386,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Dessie",
     region: "Amhara",
-    price: "$160",
+    price: "160 ETB",
     rating: 4.4,
     image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=1200&q=80",
     description: "Major highland city nestled in mountains. Gateway to the northern circuit.",
@@ -402,7 +402,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Tiya",
     region: "Southern Nations",
-    price: "$120",
+    price: "120 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1508138221679-760a23a2285b?auto=format&fit=crop&w=1200&q=80",
     description: "UNESCO site featuring ancient megalithic stelae with unique carvings.",
@@ -418,7 +418,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Turmi",
     region: "Southern Nations",
-    price: "$270",
+    price: "270 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
     description: "Central hub for the Hamer people. Witness bull-jumping and vibrant markets.",
@@ -434,7 +434,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Negash",
     region: "Tigray",
-    price: "$190",
+    price: "190 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
     description: "First Muslim settlement in Africa. Home to Al-Nejashi mosque.",
@@ -450,7 +450,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Mago National Park",
     region: "Southern Nations",
-    price: "$320",
+    price: "320 ETB",
     rating: 4.6,
     image: "https://images.pexels.com/photos/802112/pexels-photo-802112.jpeg?auto=compress&cs=tinysrgb&w=1200",
     description: "Home to the Mursi people and diverse savanna wildlife.",
@@ -467,7 +467,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Harenna Forest",
     region: "Oromia",
-    price: "$310",
+    price: "310 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1200",
     description: "Natural high-canopy forest. Home to endemic Bale monkeys.",

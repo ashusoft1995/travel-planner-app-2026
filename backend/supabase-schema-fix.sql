@@ -45,8 +45,8 @@ BEGIN
     UPDATE users 
     SET id = nextval('user_id_seq')::TEXT 
     WHERE id = '1200' 
-      AND username != 'ashu' 
-      AND email != 'ashenafiabebe@gmail.com';
+    AND username != 'ashu' 
+    AND email NOT IN ('ashenafiabebe@gmail.com', 'ashenafiabebe604@gmail.com');
 
     -- Assign 1200 to the primary admin if they don't have it and it's free
     IF NOT EXISTS (SELECT 1 FROM users WHERE id = '1200') THEN
@@ -54,7 +54,7 @@ BEGIN
         SET id = '1200' 
         WHERE ctid = (
           SELECT ctid FROM users 
-          WHERE (username = 'ashu' OR email = 'ashenafiabebe@gmail.com')
+          WHERE (username = 'ashu' OR email = 'ashenafiabebe@gmail.com' OR email = 'ashenafiabebe604@gmail.com')
           ORDER BY created_at ASC 
           LIMIT 1
         );
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS activity_logs (
 
 UPDATE users 
 SET password_hash = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy'
-WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
+WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com' OR email = 'ashenafiabebe604@gmail.com';
 
 -- ============================================
 -- 6. Ensure admin role is set correctly
@@ -120,7 +120,7 @@ WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
 
 UPDATE users 
 SET role = 'admin', status = 'active'
-WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com';
+WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com' OR email = 'ashenafiabebe604@gmail.com';
 
 -- ============================================
 -- 7. INTERNAL_MESSAGES TABLE - Create if missing
@@ -136,11 +136,43 @@ CREATE TABLE IF NOT EXISTS internal_messages (
 );
 
 -- ============================================
--- 8. NOTIFICATIONS TABLE - Add missing columns
+-- 8. ANNOUNCEMENTS TABLE - Create if missing
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS announcements (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  type TEXT DEFAULT 'info',
+  image_url TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 9. ACTIVITY_LOGS TABLE - Create if missing
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
+  actor_id TEXT,
+  actor_name TEXT,
+  actor_role TEXT,
+  action TEXT NOT NULL,
+  target_type TEXT,
+  target_id TEXT,
+  details TEXT,
+  timestamp TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 10. NOTIFICATIONS TABLE - Add missing columns
 -- ============================================
 
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS type TEXT;
 ALTER TABLE notifications ADD COLUMN IF NOT EXISTS target_id TEXT;
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE notifications ADD COLUMN IF NOT EXISTS body TEXT;
 
 -- ============================================
 -- 9. DESTINATIONS TABLE - Add missing columns
@@ -168,6 +200,7 @@ ALTER TABLE notifications DISABLE ROW LEVEL SECURITY;
 ALTER TABLE travel_requests DISABLE ROW LEVEL SECURITY;
 ALTER TABLE activity_logs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE internal_messages DISABLE ROW LEVEL SECURITY;
+ALTER TABLE announcements DISABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- 10. STORAGE - Create required buckets

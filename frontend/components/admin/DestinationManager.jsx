@@ -1,14 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiPlus, FiEdit2, FiTrash2, FiMapPin, FiImage, FiSave, FiX, FiStar, FiDollarSign } from "react-icons/fi";
+import { 
+  FiPlus, 
+  FiEdit2, 
+  FiTrash2, 
+  FiMapPin, 
+  FiImage, 
+  FiSave, 
+  FiX, 
+  FiStar, 
+  FiDollarSign,
+  FiActivity,
+  FiSearch,
+  FiRefreshCw
+} from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
+import { tripsApi, friendlyApiMessage, getApiUrl } from "../../lib/api";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function DestinationManager() {
   const { user, token } = useAuth();
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingDestination, setEditingDestination] = useState(null);
   const [formData, setFormData] = useState({
@@ -19,7 +35,8 @@ export default function DestinationManager() {
     highlights: [],
     imageUrl: "",
     hotels: {},
-    activities: {}
+    activities: {},
+    travel_volume_index: 0
   });
 
   useEffect(() => {
@@ -27,17 +44,12 @@ export default function DestinationManager() {
   }, []);
 
   const fetchDestinations = async () => {
+    setLoading(true);
     try {
-      const response = await fetch("/api/destinations", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.ok) {
-        const resJson = await response.json();
-        setDestinations(resJson.data || []);
-      }
+      const response = await tripsApi.get("/destinations");
+      setDestinations(response.data?.data || []);
     } catch (error) {
-      toast.error("Failed to fetch destinations");
+      toast.error(friendlyApiMessage(error));
     } finally {
       setLoading(false);
     }
@@ -45,50 +57,41 @@ export default function DestinationManager() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const loadingToast = toast.loading(editingDestination ? "Updating node..." : "Initializing new destination...");
     
     try {
-      const url = editingDestination 
-        ? `/api/destinations/${editingDestination.id}`
-        : "/api/destinations";
+      const payload = { ...formData };
+      let response;
       
-      const method = editingDestination ? "PUT" : "POST";
+      if (editingDestination) {
+        response = await tripsApi.put(`/destinations/${editingDestination.id}`, payload);
+      } else {
+        response = await tripsApi.post("/destinations", payload);
+      }
       
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
-      
-      if (response.ok) {
-        toast.success(`Destination ${editingDestination ? "updated" : "added"} successfully`);
+      if (response.data?.success) {
+        toast.success(`Destination ${editingDestination ? "synchronized" : "deployed"} successfully`, { id: loadingToast });
         setShowForm(false);
         setEditingDestination(null);
         resetForm();
         fetchDestinations();
       }
     } catch (error) {
-      toast.error(`Failed to ${editingDestination ? "update" : "add"} destination`);
+      toast.error(friendlyApiMessage(error), { id: loadingToast });
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this destination?")) return;
+    if (!confirm("Are you sure you want to purge this destination from the global registry?")) return;
     
     try {
-      const response = await fetch(`/api/destinations/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (response.ok) {
-        toast.success("Destination deleted successfully");
+      const response = await tripsApi.delete(`/destinations/${id}`);
+      if (response.data?.success) {
+        toast.success("Destination purged from registry");
         fetchDestinations();
       }
     } catch (error) {
-      toast.error("Failed to delete destination");
+      toast.error(friendlyApiMessage(error));
     }
   };
 
@@ -101,14 +104,21 @@ export default function DestinationManager() {
       highlights: [],
       imageUrl: "",
       hotels: {},
-      activities: {}
+      activities: {},
+      travel_volume_index: 0
     });
   };
 
   const handleEdit = (destination) => {
     setEditingDestination(destination);
-    setFormData(destination);
-    setShowForm(true);
+    setFormData({
+      ...destination,
+      highlights: destination.highlights || [],
+      hotels: destination.hotels || {},
+      activities: destination.activities || {},
+      travel_volume_index: destination.travel_volume_index || 0
+    });
+    setShowAdd(true); // Re-using showForm but let's call it showAdd consistently
   };
 
   const addHighlight = () => {
@@ -132,427 +142,278 @@ export default function DestinationManager() {
     }));
   };
 
-  const addHotel = () => {
-    const name = prompt("Hotel name:");
-    if (!name) return;
-    
-    setFormData(prev => ({
-      ...prev,
-      hotels: {
-        ...prev.hotels,
-        [name]: { pricePerNight: 0, rating: 3 }
-      }
-    }));
-  };
+  const filtered = destinations.filter(d => 
+    d.name?.toLowerCase().includes(search.toLowerCase()) ||
+    d.country?.toLowerCase().includes(search.toLowerCase())
+  );
 
-  const updateHotel = (name, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      hotels: {
-        ...prev.hotels,
-        [name]: {
-          ...prev.hotels[name],
-          [field]: field === "pricePerNight" ? Number(value) : Number(value)
-        }
-      }
-    }));
-  };
-
-  const removeHotel = (name) => {
-    setFormData(prev => {
-      const newHotels = { ...prev.hotels };
-      delete newHotels[name];
-      return { ...prev, hotels: newHotels };
-    });
-  };
-
-  const addActivity = () => {
-    const name = prompt("Activity name:");
-    if (!name) return;
-    
-    setFormData(prev => ({
-      ...prev,
-      activities: {
-        ...prev.activities,
-        [name]: { price: 0, duration: "2 hours" }
-      }
-    }));
-  };
-
-  const updateActivity = (name, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      activities: {
-        ...prev.activities,
-        [name]: {
-          ...prev.activities[name],
-          [field]: field === "price" ? Number(value) : value
-        }
-      }
-    }));
-  };
-
-  const removeActivity = (name) => {
-    setFormData(prev => {
-      const newActivities = { ...prev.activities };
-      delete newActivities[name];
-      return { ...prev, activities: newActivities };
-    });
-  };
-
-  if (loading) {
+  if (loading && destinations.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-purple-500 border-t-transparent shadow-lg" />
+        <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">Scanning Global Nodes...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Destination Management</h2>
-        <button
-          onClick={() => {
-            setShowForm(true);
-            setEditingDestination(null);
-            resetForm();
-          }}
-          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          <FiPlus className="mr-2 h-5 w-5" />
-          Add Destination
-        </button>
+    <div className="space-y-8">
+      {/* ── HEADER ── */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h2 className="text-sm font-black uppercase tracking-[0.3em] text-white flex items-center gap-2">
+            <FiMapPin className="text-purple-500" />
+            Destination <span className="text-purple-400">Registry</span>
+          </h2>
+          <p className="text-[10px] text-white/40 uppercase font-bold tracking-widest mt-1">Global Node Management System</p>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+             <input 
+               type="text" 
+               placeholder="Search nodes..." 
+               value={search}
+               onChange={e => setSearch(e.target.value)}
+               className="w-full bg-white/5 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder:text-white/20 outline-none focus:border-purple-500/50 transition-all"
+             />
+          </div>
+          <button
+            onClick={() => {
+              setEditingDestination(null);
+              resetForm();
+              setShowForm(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-purple-600/20 hover:scale-105 transition active:scale-95 whitespace-nowrap"
+          >
+            <FiPlus /> Initialize Node
+          </button>
+        </div>
       </div>
 
-      {/* Destinations List */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {destinations.map((destination) => (
-          <div key={destination.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="aspect-video bg-gray-200 relative">
-              {destination.imageUrl ? (
+      {/* ── GRID ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filtered.map((dest) => (
+          <motion.div 
+            layout
+            key={dest.id} 
+            className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#12122a] shadow-xl transition hover:border-purple-500/30"
+          >
+            <div className="aspect-video relative overflow-hidden bg-white/5">
+              {dest.imageUrl ? (
                 <img
-                  src={destination.imageUrl}
-                  alt={destination.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.className = 'aspect-video bg-gray-200 relative flex items-center justify-center';
-                    e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center"><svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>';
-                  }}
+                  src={dest.imageUrl}
+                  alt={dest.name}
+                  className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <FiMapPin className="h-12 w-12 text-gray-400" />
+                  <FiImage size={32} className="text-white/10" />
                 </div>
               )}
-              <div className="absolute top-2 right-2 flex space-x-2">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#12122a] via-transparent to-transparent opacity-60" />
+              
+              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
                 <button
-                  onClick={() => handleEdit(destination)}
-                  className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50"
+                  onClick={() => handleEdit(dest)}
+                  className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-purple-600 transition shadow-xl"
+                  title="Modify Node"
                 >
-                  <FiEdit2 className="h-4 w-4 text-gray-600" />
+                  <FiEdit2 size={14} />
                 </button>
                 <button
-                  onClick={() => handleDelete(destination.id)}
-                  className="p-2 bg-white rounded-full shadow-md hover:bg-red-50"
+                  onClick={() => handleDelete(dest.id)}
+                  className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-red-600 transition shadow-xl"
+                  title="Purge Node"
                 >
-                  <FiTrash2 className="h-4 w-4 text-red-600" />
+                  <FiTrash2 size={14} />
                 </button>
+              </div>
+
+              <div className="absolute bottom-4 left-4">
+                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-2 py-1 rounded-lg backdrop-blur-sm border border-purple-500/20">
+                    ID: {dest.id}
+                 </span>
               </div>
             </div>
             
-            <div className="p-4">
-              <h3 className="font-semibold text-gray-900">{destination.name}</h3>
-              <p className="text-sm text-gray-500">{destination.region}, {destination.country}</p>
-              
-              {destination.description && (
-                <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                  {destination.description}
-                </p>
-              )}
-              
-              {destination.highlights && destination.highlights.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {destination.highlights.slice(0, 3).map((highlight, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
-                    >
-                      {highlight}
-                    </span>
-                  ))}
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-lg font-black text-white uppercase tracking-tight">{dest.name}</h3>
+                <div className="flex items-center gap-1 text-amber-400">
+                   <FiStar size={12} fill="currentColor" />
+                   <span className="text-[10px] font-black">{dest.travel_volume_index || 0}</span>
                 </div>
-              )}
+              </div>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3 flex items-center gap-1">
+                <FiMapPin size={10} /> {dest.region || "Central"}, {dest.country}
+              </p>
               
-              <div className="mt-3 text-xs text-gray-500">
-                {Object.keys(destination.hotels || {}).length} hotels, {Object.keys(destination.activities || {}).length} activities
+              <p className="text-xs text-white/50 line-clamp-2 leading-relaxed mb-4 italic">
+                "{dest.description || "No transmission data available for this node."}"
+              </p>
+              
+              <div className="flex flex-wrap gap-1.5">
+                {(dest.highlights || []).slice(0, 3).map((h, i) => (
+                  <span key={i} className="px-2 py-1 bg-white/5 text-white/40 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-white/5">
+                    {h}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4 text-[9px] font-black uppercase tracking-widest text-white/20">
+                <span className="flex items-center gap-1"><FiActivity size={12} /> {Object.keys(dest.hotels || {}).length} Infrastructure</span>
+                <span className="flex items-center gap-1"><FiDollarSign size={12} /> {Object.keys(dest.activities || {}).length} Services</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* Add/Edit Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
-                  {editingDestination ? "Edit Destination" : "Add New Destination"}
+      {/* ── ADD/EDIT MODAL ── */}
+      <AnimatePresence>
+        {showForm && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-[#0d0d1a] rounded-[2.5rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-white/10 shadow-3xl relative p-8 custom-scrollbar"
+            >
+              <button 
+                onClick={() => { setShowForm(false); setEditingDestination(null); resetForm(); }}
+                className="absolute top-8 right-8 text-white/30 hover:text-white transition"
+              >
+                <FiX size={24} />
+              </button>
+
+              <div className="mb-8">
+                <h3 className="text-3xl font-black text-white uppercase tracking-tight">
+                  {editingDestination ? "Modify Node" : "Initialize Node"}
                 </h3>
-                <button
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingDestination(null);
-                    resetForm();
-                  }}
-                  className="p-2 text-gray-400 hover:text-gray-600"
-                >
-                  <FiX className="h-5 w-5" />
-                </button>
+                <p className="text-xs text-white/40 font-bold uppercase tracking-[0.2em] mt-1">Data Entry Protocol</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Basic Information */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Destination Name *
-                    </label>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Node Name</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
                       required
                     />
                   </div>
-                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Country *
-                    </label>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Sovereign State</label>
                     <input
                       type="text"
                       value={formData.country}
                       onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
                       required
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Region
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.region}
-                    onChange={(e) => setFormData(prev => ({ ...prev, region: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Geographic Region</label>
+                    <input
+                      type="text"
+                      value={formData.region}
+                      onChange={(e) => setFormData(prev => ({ ...prev, region: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Popularity Index (0-100)</label>
+                    <input
+                      type="number"
+                      value={formData.travel_volume_index}
+                      onChange={(e) => setFormData(prev => ({ ...prev, travel_volume_index: Number(e.target.value) }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
-                  </label>
+                  <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Transmission Body (Description)</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
-                  </label>
+                  <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Satellite Visualization (Image URL)</label>
                   <input
                     type="url"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
+                    placeholder="https://images.unsplash.com/..."
                   />
                 </div>
 
                 {/* Highlights */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Highlights
-                    </label>
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest">Node Highlights</label>
                     <button
                       type="button"
                       onClick={addHighlight}
-                      className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200"
+                      className="text-[10px] font-black uppercase text-purple-400 hover:text-purple-300 transition flex items-center gap-1"
                     >
-                      <FiPlus className="inline mr-1 h-3 w-3" />
-                      Add Highlight
+                      <FiPlus size={12} /> Add Point
                     </button>
                   </div>
-                  {formData.highlights.map((highlight, index) => (
-                    <div key={index} className="flex items-center space-x-2 mb-2">
-                      <input
-                        type="text"
-                        value={highlight}
-                        onChange={(e) => updateHighlight(index, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter highlight"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeHighlight(index)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-md"
-                      >
-                        <FiX className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Hotels */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Hotels
-                    </label>
-                    <button
-                      type="button"
-                      onClick={addHotel}
-                      className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200"
-                    >
-                      <FiPlus className="inline mr-1 h-3 w-3" />
-                      Add Hotel
-                    </button>
-                  </div>
-                  {Object.entries(formData.hotels).map(([name, hotel]) => (
-                    <div key={name} className="border border-gray-200 rounded-md p-3 mb-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900">{name}</h4>
+                  <div className="space-y-2">
+                    {formData.highlights.map((highlight, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={highlight}
+                          onChange={(e) => updateHighlight(index, e.target.value)}
+                          className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white outline-none focus:border-purple-500/50"
+                          placeholder="Transmission point..."
+                        />
                         <button
                           type="button"
-                          onClick={() => removeHotel(name)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          onClick={() => removeHighlight(index)}
+                          className="p-2 text-white/20 hover:text-red-500 transition"
                         >
-                          <FiX className="h-4 w-4" />
+                          <FiX size={16} />
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-xs text-gray-600">Price/Night</label>
-                          <input
-                            type="number"
-                            value={hotel.pricePerNight}
-                            onChange={(e) => updateHotel(name, "pricePerNight", e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600">Rating</label>
-                          <input
-                            type="number"
-                            value={hotel.rating}
-                            onChange={(e) => updateHotel(name, "rating", e.target.value)}
-                            min="1"
-                            max="5"
-                            step="0.5"
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Activities */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Activities
-                    </label>
-                    <button
-                      type="button"
-                      onClick={addActivity}
-                      className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200"
-                    >
-                      <FiPlus className="inline mr-1 h-3 w-3" />
-                      Add Activity
-                    </button>
+                    ))}
                   </div>
-                  {Object.entries(formData.activities).map(([name, activity]) => (
-                    <div key={name} className="border border-gray-200 rounded-md p-3 mb-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900">{name}</h4>
-                        <button
-                          type="button"
-                          onClick={() => removeActivity(name)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
-                        >
-                          <FiX className="h-4 w-4" />
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-xs text-gray-600">Price</label>
-                          <input
-                            type="number"
-                            value={activity.price}
-                            onChange={(e) => updateActivity(name, "price", e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs text-gray-600">Duration</label>
-                          <input
-                            type="text"
-                            value={activity.duration}
-                            onChange={(e) => updateActivity(name, "duration", e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
 
-                {/* Form Actions */}
-                <div className="flex justify-end space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      setEditingDestination(null);
-                      resetForm();
-                    }}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
+                <div className="flex gap-4 pt-6">
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="flex-1 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-purple-600/20 hover:scale-[1.02] active:scale-95 transition"
                   >
-                    <FiSave className="inline mr-2 h-4 w-4" />
-                    {editingDestination ? "Update" : "Save"} Destination
+                    <FiSave size={14} className="inline mr-2" />
+                    {editingDestination ? "Commit Overrides" : "Initialize Node"}
                   </button>
                 </div>
               </form>
-            </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
-      {destinations.length === 0 && (
-        <div className="text-center py-12">
-          <FiMapPin className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No destinations found</h3>
-          <p className="mt-1 text-sm text-gray-500">Get started by adding your first destination</p>
+      {filtered.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/5 rounded-[2rem] bg-white/[0.02]">
+          <FiMapPin size={48} className="text-white/10 mb-4" />
+          <h3 className="text-sm font-black text-white/40 uppercase tracking-widest">No matching nodes in registry</h3>
+          <p className="text-[10px] text-white/20 uppercase font-bold mt-2">Adjust your parameters or initialize a new node.</p>
         </div>
       )}
     </div>

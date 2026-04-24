@@ -161,6 +161,8 @@ function AdminNotificationPanel() {
       router.push('/admin/dashboard/agents');
     } else if (n.type === 'message' || n.type === 'support_message') {
       router.push(`/admin/dashboard?view=cmessages&recipient=${n.targetId || ''}`);
+    } else if (n.type === 'travel_request') {
+      router.push('/admin/dashboard/requests');
     }
   };
 

@@ -16,9 +16,10 @@ ALTER TABLE destinations ADD COLUMN IF NOT EXISTS activities JSONB DEFAULT '{}';
 
 -- Ensure Admin ashu (ID 1200) exists
 INSERT INTO users (id, username, name, email, password_hash, role, status)
-VALUES ('1200', 'ashu', 'Ashenafi Abebe', 'ashenafiabebe@gmail.com', 'Ashu19951', 'admin', 'active')
+VALUES ('1200', 'ashu', 'Ashenafi Abebe', 'ashenafiabebe604@gmail.com', 'Ashu19951', 'admin', 'active')
 ON CONFLICT (id) DO UPDATE SET 
   username = EXCLUDED.username,
+  email = EXCLUDED.email,
   role = 'admin', 
   status = 'active';
 

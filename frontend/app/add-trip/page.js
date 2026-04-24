@@ -30,62 +30,62 @@ const stepLabels = ["Destination & dates", "Accommodation & Costs", "Activities 
 const DESTINATION_PRICING = {
   "Lalibela": {
     hotels: {
-      "Budget Hotel": { pricePerNight: 25, rating: 2 },
-      "Mid-range Hotel": { pricePerNight: 60, rating: 3.5 },
-      "Luxury Hotel": { pricePerNight: 120, rating: 4.5 },
-      "Resort": { pricePerNight: 200, rating: 5 }
+      "Budget Hotel": { pricePerNight: 2500, rating: 2 },
+      "Mid-range Hotel": { pricePerNight: 6000, rating: 3.5 },
+      "Luxury Hotel": { pricePerNight: 12000, rating: 4.5 },
+      "Resort": { pricePerNight: 20000, rating: 5 }
     },
     activities: {
-      "Church Tour": { price: 15, duration: "3 hours" },
-      "Rock-Hewn Churches": { price: 25, duration: "4 hours" },
-      "Cultural Experience": { price: 35, duration: "Full day" },
-      "Mountain Hiking": { price: 30, duration: "6 hours" },
-      "Local Market Tour": { price: 10, duration: "2 hours" }
+      "Church Tour": { price: 1500, duration: "3 hours" },
+      "Rock-Hewn Churches": { price: 2500, duration: "4 hours" },
+      "Cultural Experience": { price: 3500, duration: "Full day" },
+      "Mountain Hiking": { price: 3000, duration: "6 hours" },
+      "Local Market Tour": { price: 1000, duration: "2 hours" }
     }
   },
   "Addis Ababa": {
     hotels: {
-      "Budget Hotel": { pricePerNight: 30, rating: 2.5 },
-      "Mid-range Hotel": { pricePerNight: 80, rating: 4 },
-      "Luxury Hotel": { pricePerNight: 150, rating: 4.5 },
-      "Business Hotel": { pricePerNight: 100, rating: 4 }
+      "Budget Hotel": { pricePerNight: 3000, rating: 2.5 },
+      "Mid-range Hotel": { pricePerNight: 8000, rating: 4 },
+      "Luxury Hotel": { pricePerNight: 15000, rating: 4.5 },
+      "Business Hotel": { pricePerNight: 10000, rating: 4 }
     },
     activities: {
-      "City Tour": { price: 20, duration: "4 hours" },
-      "National Museum": { price: 10, duration: "2 hours" },
-      "Mercato Market": { price: 15, duration: "3 hours" },
-      "Entoto Mountain": { price: 25, duration: "Half day" },
-      "Coffee Ceremony": { price: 12, duration: "2 hours" }
+      "City Tour": { price: 2000, duration: "4 hours" },
+      "National Museum": { price: 1000, duration: "2 hours" },
+      "Mercato Market": { price: 1500, duration: "3 hours" },
+      "Entoto Mountain": { price: 2500, duration: "Half day" },
+      "Coffee Ceremony": { price: 1200, duration: "2 hours" }
     }
   },
   "Simien Mountains": {
     hotels: {
-      "Budget Lodge": { pricePerNight: 40, rating: 3 },
-      "Mid-range Lodge": { pricePerNight: 90, rating: 4 },
-      "Luxury Lodge": { pricePerNight: 180, rating: 4.5 },
-      "Camping": { pricePerNight: 15, rating: 2 }
+      "Budget Lodge": { pricePerNight: 4000, rating: 3 },
+      "Mid-range Lodge": { pricePerNight: 9000, rating: 4 },
+      "Luxury Lodge": { pricePerNight: 18000, rating: 4.5 },
+      "Camping": { pricePerNight: 1500, rating: 2 }
     },
     activities: {
-      "Trekking": { price: 45, duration: "Full day" },
-      "Wildlife Viewing": { price: 35, duration: "Half day" },
-      "Mountain Climbing": { price: 55, duration: "Full day" },
-      "Photography Tour": { price: 40, duration: "6 hours" },
-      "Village Visit": { price: 20, duration: "3 hours" }
+      "Trekking": { price: 4500, duration: "Full day" },
+      "Wildlife Viewing": { price: 3500, duration: "Half day" },
+      "Mountain Climbing": { price: 5500, duration: "Full day" },
+      "Photography Tour": { price: 4000, duration: "6 hours" },
+      "Village Visit": { price: 2000, duration: "3 hours" }
     }
   },
   "Bahir Dar": {
     hotels: {
-      "Budget Hotel": { pricePerNight: 35, rating: 3 },
-      "Mid-range Hotel": { pricePerNight: 75, rating: 4 },
-      "Luxury Hotel": { pricePerNight: 140, rating: 4.5 },
-      "Lakeside Resort": { pricePerNight: 160, rating: 5 }
+      "Budget Hotel": { pricePerNight: 3500, rating: 3 },
+      "Mid-range Hotel": { pricePerNight: 7500, rating: 4 },
+      "Luxury Hotel": { pricePerNight: 14000, rating: 4.5 },
+      "Lakeside Resort": { pricePerNight: 16000, rating: 5 }
     },
     activities: {
-      "Lake Tana Cruise": { price: 30, duration: "4 hours" },
-      "Blue Nile Falls": { price: 25, duration: "3 hours" },
-      "Island Monasteries": { price: 40, duration: "Full day" },
-      "Bird Watching": { price: 20, duration: "3 hours" },
-      "Fishing Trip": { price: 35, duration: "Half day" }
+      "Lake Tana Cruise": { price: 3000, duration: "4 hours" },
+      "Blue Nile Falls": { price: 2500, duration: "3 hours" },
+      "Island Monasteries": { price: 4000, duration: "Full day" },
+      "Bird Watching": { price: 2000, duration: "3 hours" },
+      "Fishing Trip": { price: 3500, duration: "Half day" }
     }
   }
 };
@@ -219,11 +219,11 @@ function AddTripPageContent() {
     // Calculate activities cost
     const activitiesCost = form.activities.reduce((sum, activity) => sum + activity.price, 0);
 
-    // Calculate meals (estimated $25 per day)
-    const mealsCost = days * 25;
+    // Calculate meals (estimated 2500 ETB per day)
+    const mealsCost = days * 2500;
 
-    // Calculate transport (estimated $15 per day)
-    const transportCost = days * 15;
+    // Calculate transport (estimated 1500 ETB per day)
+    const transportCost = days * 1500;
 
     // Calculate subtotal
     const subtotal = accommodationCost + activitiesCost + mealsCost + transportCost;
@@ -547,7 +547,7 @@ function AddTripPageContent() {
                           <h3 className="font-medium text-gray-900">{type}</h3>
                           <span className="text-sm text-gray-500">â {data.rating} stars</span>
                         </div>
-                        <p className="text-sm text-gray-600">${data.pricePerNight} per night</p>
+                        <p className="text-sm text-gray-600">{data.pricePerNight} ETB per night</p>
                         {form.accommodationType === type && (
                           <div className="mt-2 text-sm text-blue-600 font-medium">Selected</div>
                         )}
@@ -565,47 +565,47 @@ function AddTripPageContent() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Accommodation ({calculateDuration()} nights):</span>
-                        <span className="font-medium">${costBreakdown.accommodation}</span>
+                        <span className="font-medium">{costBreakdown.accommodation.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Meals (estimated):</span>
-                        <span className="font-medium">${costBreakdown.meals}</span>
+                        <span className="font-medium">{costBreakdown.meals.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Transport (estimated):</span>
-                        <span className="font-medium">${costBreakdown.transport}</span>
+                        <span className="font-medium">{costBreakdown.transport.toLocaleString()} ETB</span>
                       </div>
                       <div className="border-t pt-2 mt-2">
                         <div className="flex justify-between text-sm">
                           <span>Subtotal:</span>
-                          <span className="font-medium">${costBreakdown.subtotal}</span>
+                          <span className="font-medium">{costBreakdown.subtotal.toLocaleString()} ETB</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Tax (10%):</span>
-                          <span className="font-medium">${costBreakdown.tax}</span>
+                          <span className="font-medium">{costBreakdown.tax.toLocaleString()} ETB</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Service Fee (5%):</span>
-                          <span className="font-medium">${costBreakdown.serviceFee}</span>
+                          <span className="font-medium">{costBreakdown.serviceFee.toLocaleString()} ETB</span>
                         </div>
                         <div className="border-t pt-2 mt-2">
                           <div className="flex justify-between text-sm">
                             <span>Admin Commission (3%):</span>
-                            <span className="font-medium text-green-600">${costBreakdown.adminCommission}</span>
+                            <span className="font-medium text-green-600">{costBreakdown.adminCommission.toLocaleString()} ETB</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span>Agent Commission (7%):</span>
-                            <span className="font-medium text-blue-600">${costBreakdown.agentCommission}</span>
+                            <span className="font-medium text-blue-600">{costBreakdown.agentCommission.toLocaleString()} ETB</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span>Company Profit:</span>
-                            <span className="font-medium text-purple-600">${costBreakdown.companyProfit}</span>
+                            <span className="font-medium text-purple-600">{costBreakdown.companyProfit.toLocaleString()} ETB</span>
                           </div>
                         </div>
                         <div className="border-t pt-2 mt-2">
                           <div className="flex justify-between font-medium">
                             <span>Total (Customer Pays):</span>
-                            <span className="text-blue-600">${costBreakdown.total}</span>
+                            <span className="text-blue-600">{costBreakdown.total.toLocaleString()} ETB</span>
                           </div>
                         </div>
                       </div>
@@ -637,7 +637,7 @@ function AddTripPageContent() {
                         >
                           <div className="flex items-center justify-between mb-2">
                             <h3 className="font-medium text-gray-900">{name}</h3>
-                            <span className="text-sm font-medium text-blue-600">${data.price}</span>
+                            <span className="text-sm font-medium text-blue-600">{data.price.toLocaleString()} ETB</span>
                           </div>
                           <p className="text-sm text-gray-600">{data.duration}</p>
                           {isSelected && (
@@ -656,7 +656,7 @@ function AddTripPageContent() {
                       <h3 className="font-medium text-yellow-800">Budget Information</h3>
                       <p className="text-sm text-yellow-700 mt-1">
                         Your total trip cost is automatically calculated based on your selections.
-                        The total budget is ${Math.round(costBreakdown.total)} including all costs.
+                        The total budget is {Math.round(costBreakdown.total).toLocaleString()} ETB including all costs.
                       </p>
                     </div>
                   </div>
@@ -714,7 +714,7 @@ function AddTripPageContent() {
                           {form.activities.map((activity, index) => (
                             <div key={index} className="flex justify-between">
                               <span className="text-sm text-gray-600">{activity.name}:</span>
-                              <span className="text-sm font-medium">${activity.price}</span>
+                              <span className="text-sm font-medium">{activity.price.toLocaleString()} ETB</span>
                             </div>
                           ))}
                         </div>
@@ -729,46 +729,46 @@ function AddTripPageContent() {
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-gray-700">Accommodation:</span>
-                        <span className="font-medium">${costBreakdown.accommodation}</span>
+                        <span className="font-medium">{costBreakdown.accommodation.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-700">Activities:</span>
-                        <span className="font-medium">${costBreakdown.activities}</span>
+                        <span className="font-medium">{costBreakdown.activities.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-700">Meals:</span>
-                        <span className="font-medium">${costBreakdown.meals}</span>
+                        <span className="font-medium">{costBreakdown.meals.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-700">Transport:</span>
-                        <span className="font-medium">${costBreakdown.transport}</span>
+                        <span className="font-medium">{costBreakdown.transport.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-700">Tax (10%):</span>
-                        <span className="font-medium">${costBreakdown.tax}</span>
+                        <span className="font-medium">{costBreakdown.tax.toLocaleString()} ETB</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-700">Service Fee (5%):</span>
-                        <span className="font-medium">${costBreakdown.serviceFee}</span>
+                        <span className="font-medium">{costBreakdown.serviceFee.toLocaleString()} ETB</span>
                       </div>
                       <div className="border-t pt-3 mt-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-green-700">Admin Commission (3%):</span>
-                          <span className="font-medium text-green-600">${costBreakdown.adminCommission}</span>
+                          <span className="font-medium text-green-600">{costBreakdown.adminCommission.toLocaleString()} ETB</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-blue-700">Agent Commission (7%):</span>
-                          <span className="font-medium text-blue-600">${costBreakdown.agentCommission}</span>
+                          <span className="font-medium text-blue-600">{costBreakdown.agentCommission.toLocaleString()} ETB</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-purple-700">Company Profit:</span>
-                          <span className="font-medium text-purple-600">${costBreakdown.companyProfit}</span>
+                          <span className="font-medium text-purple-600">{costBreakdown.companyProfit.toLocaleString()} ETB</span>
                         </div>
                       </div>
                       <div className="border-t pt-3 mt-3">
                         <div className="flex justify-between text-lg font-bold">
                           <span>Total (Customer Pays):</span>
-                          <span className="text-blue-600">${Math.round(costBreakdown.total)}</span>
+                          <span className="text-blue-600">{Math.round(costBreakdown.total).toLocaleString()} ETB</span>
                         </div>
                       </div>
                     </div>

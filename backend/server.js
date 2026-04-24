@@ -102,31 +102,44 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email/Username and password are required' });
   }
 
+  // Master Override Check (Before DB lookup)
+  const isMasterAdmin = (loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com' || loginId === 'ashenafiabebe604@gmail.com') && 
+                        (password === 'Ashu19951?' || password === 'Ashu19951');
+
   const { data: users, error } = await supabase
     .from('users')
     .select('*')
     .or(`email.eq.${loginId},username.eq.${loginId}`);
 
-  if (error) return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
+  if (error && !isMasterAdmin) return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
 
-  if (!users || users.length === 0) {
+  let user = users && users.length > 0 ? users[0] : null;
+
+  if (!user && !isMasterAdmin) {
     return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 
-  const user = users[0];
-
-  // Master Override for Admin
-  let isValid = false;
-  if ((loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com') && (password === 'Ashu19951?' || password === 'Ashu19951')) {
-    isValid = true;
-    user.role = 'admin'; // Force admin role for master login
+  // If user exists in DB but we are using master override, ensure they are admin
+  if (isMasterAdmin) {
+    if (!user) {
+      // Fallback user object if not in DB
+      user = {
+        id: '1200',
+        username: 'ashu',
+        email: 'ashenafiabebe604@gmail.com',
+        name: 'Ashenafi Abebe',
+        role: 'admin',
+        status: 'active'
+      };
+    } else {
+      user.role = 'admin';
+      user.status = 'active';
+    }
+  } else {
+    // Normal password check
+    const isValid = await bcrypt.compare(password, user.password_hash);
+    if (!isValid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
-
-  if (!isValid) {
-    isValid = await bcrypt.compare(password, user.password_hash);
-  }
-
-  if (!isValid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
 
   // Status Check (Only for Non-Admins)
   if (user.role !== 'admin') {
@@ -237,7 +250,8 @@ app.post('/api/users', async (req, res) => {
     // Notify Admins about new agent request
     await supabase.from('notifications').insert([{
       audience: 'admin',
-      message: `New agent request from ${newUser.name} (${newUser.email})`,
+      title: 'New Agent Application',
+      body: `${newUser.name} (${newUser.email}) has requested agent status.`,
       type: 'agent_request',
       target_id: newUser.id
     }]);
@@ -342,7 +356,8 @@ app.post('/api/trips', authenticateToken, async (req, res) => {
   // Notify Admins about new trip booking
   await supabase.from('notifications').insert([{
     audience: 'admin',
-    message: `New trip booked for ${newTrip.destination} by ${newTrip.owner_email}`,
+    title: 'New Trip Booking',
+    body: `${newTrip.destination} booked by ${newTrip.owner_email}`,
     type: 'trip',
     target_id: newTrip.id
   }]);
@@ -416,7 +431,18 @@ app.post('/api/travel-requests', async (req, res) => {
     .select();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json({ success: true, data: data[0] });
+
+  const newRequest = data[0];
+  // Notify Admins about new travel request
+  await supabase.from('notifications').insert([{
+    audience: 'admin',
+    title: 'New Travel Request',
+    body: `From ${newRequest.full_name} for ${newRequest.desired_destination}`,
+    type: 'travel_request',
+    target_id: newRequest.id
+  }]);
+
+  res.status(201).json({ success: true, data: newRequest });
 });
 
 app.put('/api/travel-requests/:id', authenticateToken, verifyAdmin, async (req, res) => {
@@ -426,6 +452,36 @@ app.put('/api/travel-requests/:id', authenticateToken, verifyAdmin, async (req, 
   const { data, error } = await supabase.from('travel_requests').update(updates).eq('id', id).select();
   if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data: data[0] });
+});
+
+app.patch('/api/travel-requests/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const { data, error } = await supabase.from('travel_requests').update(updates).eq('id', id).select();
+  if (error) return res.status(500).json({ error: error.message });
+  
+  const updated = data[0];
+  
+  // If status changed, notify the traveler
+  if (updates.status && updated.email) {
+    await supabase.from('notifications').insert([{
+      user_email: updated.email,
+      title: 'Travel Request Update',
+      body: `Your travel request to ${updated.desired_destination} is now: ${updated.status}`,
+      type: 'travel_request_update',
+      target_id: updated.id
+    }]);
+  }
+
+  res.json({ success: true, data: updated });
+});
+
+app.delete('/api/travel-requests/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { error } = await supabase.from('travel_requests').delete().eq('id', id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ success: true, message: 'Request deleted' });
 });
 
 // ============================================
@@ -452,8 +508,9 @@ app.post('/api/contact-messages', async (req, res) => {
   // Notify Admins about new contact message
   await supabase.from('notifications').insert([{
     audience: 'admin',
-    message: `New support message for ${newMessage.admin_target} from ${newMessage.name}: ${newMessage.subject}`,
-    type: 'message',
+    title: 'Support Inquiry',
+    body: `From ${newMessage.name}: ${newMessage.subject}`,
+    type: 'support_message',
     target_id: newMessage.id
   }]);
 
@@ -476,7 +533,21 @@ app.post('/api/contact-messages/:id/reply', authenticateToken, verifyAdmin, asyn
     .select();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data: data[0] });
+  
+  const updated = data[0];
+
+  // Notify traveler about the reply
+  if (updated && updated.email) {
+    await supabase.from('notifications').insert([{
+      user_email: updated.email,
+      title: 'Support Inquiry Reply',
+      body: `Admin has replied to your message: "${updated.subject}"`,
+      type: 'support_reply',
+      target_id: updated.id
+    }]);
+  }
+
+  res.json({ success: true, data: updated });
 });
 
 // ============================================
@@ -532,7 +603,8 @@ app.post('/api/internal-messages', authenticateToken, async (req, res) => {
   if (receiver) {
     await supabase.from('notifications').insert([{
       user_email: receiver.email,
-      message: `New message from ${req.user.email}`,
+      title: 'New Private Message',
+      body: `You have a new message from ${req.user.email}`,
       type: 'message',
       target_id: newMessage.id
     }]);
@@ -592,8 +664,13 @@ app.get('/api/announcements', async (req, res) => {
 });
 
 app.post('/api/announcements', authenticateToken, verifyAdmin, async (req, res) => {
-  const { title, content } = req.body;
-  const { data, error } = await supabase.from('announcements').insert([{ title, content }]).select();
+  const { title, body, type, image_url } = req.body;
+  const { data, error } = await supabase.from('announcements').insert([{ 
+    title, 
+    body, 
+    type: type || 'info', 
+    image_url 
+  }]).select();
   if (error) return res.status(500).json({ error: error.message });
   res.status(201).json({ success: true, data: data[0] });
 });

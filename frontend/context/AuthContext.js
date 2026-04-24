@@ -132,15 +132,15 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe();
   }, [applySession]);
 
-  const loginWithGitHub = useCallback(async () => {
+  const loginWithGoogle = useCallback(async () => {
     const redirectTo =
       typeof window !== "undefined"
         ? `${window.location.origin}/auth/callback`
         : "https://travel-planner-app-2026.vercel.app/auth/callback";
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: { redirectTo },
+      provider: "google",
+      options: { redirectTo, queryParams: { access_type: 'offline', prompt: 'select_account' } },
     });
     if (error) throw new Error(error.message);
   }, []);
@@ -195,10 +195,17 @@ export function AuthProvider({ children }) {
   );
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut().catch(() => {});
+    try {
+      await supabase.auth.signOut();
+    } catch { /* ignore */ }
+    
     setStoredToken(null);
     setToken(null);
     persistUser(null);
+    
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   }, [persistUser]);
 
   const requestPasswordReset = useCallback(async (email) => {
@@ -215,13 +222,13 @@ export function AuthProvider({ children }) {
       hydrated,
       register,
       login,
-      loginWithGitHub,
+      loginWithGoogle,
       logout,
       updateAccount,
       requestPasswordReset,
       isAdmin: user?.role === "admin",
     }),
-    [user, token, hydrated, register, login, loginWithGitHub, logout, updateAccount, requestPasswordReset]
+    [user, token, hydrated, register, login, loginWithGoogle, logout, updateAccount, requestPasswordReset]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
