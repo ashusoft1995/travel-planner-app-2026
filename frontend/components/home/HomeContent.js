@@ -144,7 +144,24 @@ export default function HomeContent() {
       })
       .then(res => {
         const data = res.data || [];
-        const finalData = data.length >= 25 ? data : DESTINATION_DETAILS;
+        let finalData = data.length >= 10 ? data : DESTINATION_DETAILS;
+        
+        // Merge missing local destinations and fallback images
+        const nameMap = new Set(finalData.map(d => d.name.toLowerCase()));
+        DESTINATION_DETAILS.forEach(local => {
+          if (!nameMap.has(local.name.toLowerCase())) {
+            finalData.push(local);
+          }
+        });
+        
+        finalData = finalData.map(d => {
+           if (!d.image && !d.imageUrl) {
+               const local = DESTINATION_DETAILS.find(l => l.name.toLowerCase() === d.name.toLowerCase());
+               if (local) d.image = local.image;
+           }
+           return d;
+        });
+
         setDestinations(finalData);
         setCounters(prev => ({ ...prev, destinations: finalData.length }));
       })
@@ -373,7 +390,7 @@ export default function HomeContent() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: (idx % 8) * 0.05 }}
-              className="group relative h-[450px] overflow-hidden rounded-[3rem] bg-white border border-slate-100 shadow-lg shadow-blue-900/5"
+              className="group relative h-[300px] overflow-hidden rounded-[3rem] bg-white border border-slate-100 shadow-lg shadow-blue-900/5"
             >
               <Image 
                 src={dest.image || dest.imageUrl} 
@@ -411,10 +428,10 @@ export default function HomeContent() {
                 </div>
                 <h4 className="text-3xl font-black text-[#051128] group-hover:text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}</p>
+                  <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}{String(dest.price).includes('ETB') ? '' : ' ETB'}</p>
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-md border border-slate-100 dark:border-white/20 shadow-sm">
                     <FiStar className="fill-blue-600 group-hover:fill-white text-blue-600 group-hover:text-white" size={12} />
-                    <span className="text-[10px] font-black text-[#051128] dark:text-white">{dest.rating}</span>
+                    <span className="text-[10px] font-black text-[#051128] dark:text-white">{dest.rating}/5</span>
                   </div>
                 </div>
               </div>
@@ -475,7 +492,7 @@ export default function HomeContent() {
                   <LineChart data={destinations.slice(0, 8)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#00000008" vertical={false} />
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[4, 5]} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[0, 5]} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       itemStyle={{ color: '#051128' }}

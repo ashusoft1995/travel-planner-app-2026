@@ -13,7 +13,6 @@ import Image from "next/image";
 
 export default function ContactContent() {
   const { user, hydrated } = useAuth();
-  const [inquiryType, setInquiryType] = useState("Lalibela Tour");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -42,7 +41,7 @@ export default function ContactContent() {
       await submitContactMessage({
         name: form.name.trim(),
         email: form.email.trim(),
-        subject: inquiryType,
+        subject: "General Inquiry",
         message: form.message.trim(),
         adminTarget: adminTarget,
       });
@@ -116,26 +115,6 @@ export default function ContactContent() {
                       }`}
                     >
                       {admin}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Inquiry Type</label>
-                <div className="flex flex-wrap gap-3">
-                  {["Lalibela Tour", "Simien Trek", "Danakil Exp.", "Custom Trip"].map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setInquiryType(type)}
-                      className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                        inquiryType === type 
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
-                          : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10"
-                      }`}
-                    >
-                      {type}
                     </button>
                   ))}
                 </div>
