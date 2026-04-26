@@ -186,6 +186,8 @@ ALTER TABLE destinations ADD COLUMN IF NOT EXISTS lng NUMERIC;
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS "travelVolumeIndex" INTEGER DEFAULT 0;
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS hotels JSONB DEFAULT '{}';
 ALTER TABLE destinations ADD COLUMN IF NOT EXISTS activities JSONB DEFAULT '{}';
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS rating NUMERIC DEFAULT 4.5;
+ALTER TABLE destinations ADD COLUMN IF NOT EXISTS price TEXT DEFAULT '20,000 ETB';
 
 -- ============================================
 -- 10. SECURITY - Fix RLS Policies

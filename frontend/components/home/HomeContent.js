@@ -429,9 +429,9 @@ export default function HomeContent() {
                 <h4 className="text-3xl font-black text-[#051128] group-hover:text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
                 <div className="flex items-center justify-between mt-4">
                   <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}{String(dest.price).includes('ETB') ? '' : ' ETB'}</p>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-md border border-slate-100 dark:border-white/20 shadow-sm">
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-md border border-slate-100 dark:border-white/20 shadow-sm min-w-[65px] justify-center">
                     <FiStar className="fill-blue-600 group-hover:fill-white text-blue-600 group-hover:text-white" size={12} />
-                    <span className="text-[10px] font-black text-[#051128] dark:text-white">{dest.rating}/5</span>
+                    <span className="text-[10px] font-black text-[#051128] dark:text-white whitespace-nowrap">{dest.rating}/5</span>
                   </div>
                 </div>
               </div>
@@ -497,7 +497,7 @@ export default function HomeContent() {
                       contentStyle={{ backgroundColor: '#fff', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '16px', fontSize: '10px', color: '#051128', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       itemStyle={{ color: '#051128' }}
                     />
-                    <Line type="monotone" dataKey="rating" stroke="#a855f7" strokeWidth={4} dot={{ r: 6, fill: '#a855f7', strokeWidth: 0 }} activeDot={{ r: 8, strokeWidth: 0 }} />
+                    <Line type="monotone" dataKey="rating" stroke="#a855f7" strokeWidth={4} dot={{ r: 6, fill: '#a855f7', strokeWidth: 0 }} activeDot={{ r: 8, strokeWidth: 0 }} connectNulls />
                   </LineChart>
                 </ResponsiveContainer>
               </div>

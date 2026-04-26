@@ -30,10 +30,10 @@ const stepLabels = ["Destination & dates", "Accommodation & Costs", "Activities 
 const DESTINATION_PRICING = {
   "Lalibela": {
     hotels: {
-      "Budget Hotel": { pricePerNight: 2500, rating: 2 },
-      "Mid-range Hotel": { pricePerNight: 6000, rating: 3.5 },
-      "Luxury Hotel": { pricePerNight: 12000, rating: 4.5 },
-      "Resort": { pricePerNight: 20000, rating: 5 }
+      "Budget Hotel": { pricePerNight: 8000, rating: 2 },
+      "Mid-range Hotel": { pricePerNight: 12000, rating: 3.5 },
+      "Luxury Hotel": { pricePerNight: 20000, rating: 4.5 },
+      "Resort": { pricePerNight: 35000, rating: 5 }
     },
     activities: {
       "Church Tour": { price: 1500, duration: "3 hours" },
@@ -219,11 +219,11 @@ function AddTripPageContent() {
     // Calculate activities cost
     const activitiesCost = form.activities.reduce((sum, activity) => sum + activity.price, 0);
 
-    // Calculate meals (estimated 2500 ETB per day)
-    const mealsCost = days * 2500;
-
-    // Calculate transport (estimated 1500 ETB per day)
-    const transportCost = days * 1500;
+    // Calculate meals (estimated 5000 ETB per day)
+    const mealsCost = days * 5000;
+    
+    // Calculate transport (estimated 4000 ETB per day)
+    const transportCost = days * 4000;
 
     // Calculate subtotal
     const subtotal = accommodationCost + activitiesCost + mealsCost + transportCost;

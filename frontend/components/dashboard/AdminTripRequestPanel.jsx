@@ -205,7 +205,7 @@ export default function AdminTripRequestPanel({ user }) {
             className="form-field mt-2"
             value={trip.budgetHint}
             onChange={(e) => setTrip((t) => ({ ...t, budgetHint: e.target.value }))}
-            placeholder="e.g. USD 2500–3500"
+            placeholder="e.g. ETB 20,000–35,000"
           />
         </label>
         <label className="block text-sm font-semibold">

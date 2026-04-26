@@ -9,6 +9,10 @@ export const useFastRouting = () => {
   
   const getRedirectPath = (user, nextParam) => {
     // Priority order: next param > role-based default > fallback
+    if (user?.role === 'admin' && (!nextParam || !nextParam.includes('/admin'))) {
+      return '/admin/dashboard';
+    }
+    
     if (nextParam && nextParam.startsWith('/') && nextParam !== '/login' && nextParam !== '/signup') {
       return nextParam;
     }

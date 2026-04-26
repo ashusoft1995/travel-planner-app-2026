@@ -95,7 +95,7 @@ export default function DashboardRecharts({ lineData, pieData }) {
                   strokeWidth={3} 
                   fillOpacity={1} 
                   fill="url(#colorBudget)"
-                  name="Budget USD"
+                  name="Budget ETB"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -137,7 +137,7 @@ export default function DashboardRecharts({ lineData, pieData }) {
                     background: "#1a1a2e",
                     fontSize: "12px"
                   }}
-                  formatter={(value) => [`$${Number(value).toLocaleString()}`, "Budget"]}
+                  formatter={(value) => [`ETB ${Number(value).toLocaleString()}`, "Budget"]}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '20px' }} />
               </PieChart>

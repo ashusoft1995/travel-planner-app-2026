@@ -96,7 +96,7 @@ app.get('/api/stats', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   const { email, identifier, password } = req.body;
-  const loginId = identifier || email;
+  const loginId = (identifier || email || '').toLowerCase().trim();
 
   if (!loginId || !password) {
     return res.status(400).json({ success: false, message: 'Email/Username and password are required' });

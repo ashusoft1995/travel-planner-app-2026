@@ -4,7 +4,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Lalibela",
     region: "Amhara",
-    price: "299 ETB",
+    price: "29,900 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1596423735880-5f2a689b903e?auto=format&fit=crop&w=1200&q=80",
     description: "UNESCO rock-hewn churches and Ethiopian Orthodox heritage. Compact town, walkable sites, strong cultural tourism infrastructure.",
@@ -20,7 +20,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Gondar",
     region: "Amhara",
-    price: "219 ETB",
+    price: "21,900 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
     description: "The ‘Camelot of Africa’: Royal Enclosure castles, Debre Berhan Selassie church, and easy access to Simien Mountains staging.",
@@ -36,7 +36,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Aksum",
     region: "Tigray",
-    price: "249 ETB",
+    price: "24,900 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1589118949245-7d38baf380d6?auto=format&fit=crop&w=1200&q=80",
     description: "Ancient stelae field, church traditions, and deep historical significance on the northern circuit.",
@@ -52,7 +52,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Simien Mountains",
     region: "Amhara",
-    price: "389 ETB",
+    price: "38,900 ETB",
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=80",
     description: "Dramatic escarpments, endemic wildlife (Gelada, Walia ibex), and multi-day trekking in Simien Mountains National Park.",
@@ -68,7 +68,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Danakil Depression",
     region: "Afar",
-    price: "459 ETB",
+    price: "45,900 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?q=80&w=1200",
     description: "Extreme landscapes: salt flats, active geology, and guided expeditions. Best as an organized tour.",
@@ -84,7 +84,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Lake Tana",
     region: "Amhara",
-    price: "199 ETB",
+    price: "19,900 ETB",
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?q=80&w=1200",
     description: "Island monasteries, birdlife, and boat culture near Bahir Dar — a relaxed complement to the northern route.",
@@ -100,7 +100,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Hawassa",
     region: "Sidama",
-    price: "179 ETB",
+    price: "17,900 ETB",
     rating: 4.5,
     image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1200",
     description: "Lakeside city with coffee country access, birding, and a calmer pace for Rift Valley stops.",
@@ -116,7 +116,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Bale Mountains",
     region: "Oromia",
-    price: "349 ETB",
+    price: "34,900 ETB",
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200",
     description: "Afro-alpine moorland, Ethiopian wolf habitat, and quieter trekking compared to the northern circuit.",
@@ -133,7 +133,7 @@ export const DESTINATION_DETAILS = [
   {
     name: "Bishoftu",
     region: "Oromia",
-    price: "159 ETB",
+    price: "15,900 ETB",
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
     description: "Crater lakes and lakeside lodges a short drive from Addis — ideal weekend escapes and birding.",
