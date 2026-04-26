@@ -92,6 +92,7 @@ ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEF
 
 ALTER TABLE trips ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE trips ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS cost_breakdown JSONB DEFAULT '{}';
 
 -- ============================================
 -- 4. ACTIVITY LOGS TABLE - Create if missing
@@ -128,8 +129,8 @@ WHERE username = 'ashu' OR email = 'ashenafiabebe@gmail.com' OR email = 'ashenaf
 
 CREATE TABLE IF NOT EXISTS internal_messages (
   id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
-  sender_id TEXT REFERENCES users(id),
-  receiver_id TEXT REFERENCES users(id),
+  sender_id TEXT CONSTRAINT internal_messages_sender_id_fkey REFERENCES users(id),
+  receiver_id TEXT CONSTRAINT internal_messages_receiver_id_fkey REFERENCES users(id),
   body TEXT NOT NULL,
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()

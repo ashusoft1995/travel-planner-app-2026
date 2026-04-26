@@ -557,7 +557,7 @@ app.post('/api/contact-messages/:id/reply', authenticateToken, verifyAdmin, asyn
 app.get('/api/internal-messages', authenticateToken, async (req, res) => {
   const { data, error } = await supabase
     .from('internal_messages')
-    .select('*, sender:sender_id(name, username, email), receiver:receiver_id(name, username, email)')
+    .select('*, sender:users!sender_id(name, username, email), receiver:users!receiver_id(name, username, email)')
     .or(`sender_id.eq.${req.user.id},receiver_id.eq.${req.user.id}`)
     .order('created_at', { ascending: true });
 
