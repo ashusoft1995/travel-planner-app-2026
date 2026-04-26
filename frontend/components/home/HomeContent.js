@@ -438,7 +438,12 @@ export default function HomeContent() {
                 </div>
                 <h4 className="text-3xl font-black text-[#051128] group-hover:text-white mb-2 uppercase tracking-tighter">{dest.name}</h4>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}{String(dest.price).includes('ETB') ? '' : ' ETB'}</p>
+                  <div>
+                    {dest.originalPrice && (
+                      <p className="text-[10px] font-black text-slate-400/60 line-through decoration-red-500/50 uppercase tracking-widest mb-0.5">{dest.originalPrice}</p>
+                    )}
+                    <p className="text-xl font-black text-blue-600 group-hover:text-white">{dest.price}{String(dest.price).includes('ETB') ? '' : ' ETB'}</p>
+                  </div>
                   <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-md border border-slate-100 dark:border-white/20 shadow-sm min-w-[65px] justify-center">
                     <FiStar className="fill-blue-600 group-hover:fill-white text-blue-600 group-hover:text-white" size={12} />
                     <span className="text-[10px] font-black text-[#051128] dark:text-white whitespace-nowrap">{dest.rating}/5</span>

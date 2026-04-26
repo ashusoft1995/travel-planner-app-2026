@@ -160,6 +160,7 @@ function TripsContent() {
                          </div>
                          <div className="p-6 rounded-3xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10">
                             <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Concierge Rate</p>
+                            {selectedDest.originalPrice && <p className="text-[10px] font-black text-slate-400 line-through mb-1">{selectedDest.originalPrice}</p>}
                             <p className="text-sm font-black text-[#051128] dark:text-white">{selectedDest.price}</p>
                          </div>
                       </div>
@@ -272,7 +273,10 @@ function TripsContent() {
                 <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   <FiMapPin className="text-blue-600" /> {dest.distanceKm} KM
                 </div>
-                <span className="text-sm font-black text-blue-600">{dest.price}</span>
+                <div className="text-right">
+                  {dest.originalPrice && <p className="text-[10px] font-black text-slate-400/60 line-through decoration-red-500/50 mb-0.5">{dest.originalPrice}</p>}
+                  <span className="text-sm font-black text-blue-600">{dest.price}{String(dest.price).includes('ETB') ? '' : ' ETB'}</span>
+                </div>
               </div>
             </motion.div>
           ))}
