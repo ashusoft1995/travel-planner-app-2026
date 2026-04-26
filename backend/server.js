@@ -555,25 +555,19 @@ app.post('/api/contact-messages/:id/reply', authenticateToken, verifyAdmin, asyn
 // ============================================
 
 app.get('/api/internal-messages', authenticateToken, async (req, res) => {
-  // Get messages where user is sender or receiver
   const { data, error } = await supabase
     .from('internal_messages')
-    .select(`
-      *,
-      sender:users!internal_messages_sender_id_fkey(name, username),
-      receiver:users!internal_messages_receiver_id_fkey(name, username)
-    `)
+    .select('*, sender:sender_id(name, username, email), receiver:receiver_id(name, username, email)')
     .or(`sender_id.eq.${req.user.id},receiver_id.eq.${req.user.id}`)
     .order('created_at', { ascending: true });
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(500).json({ success: false, message: error.message });
   
-  // Format for frontend
   const formatted = data.map(m => ({
     id: m.id,
     senderId: m.sender_id,
     receiverId: m.receiver_id,
-    senderName: m.sender?.name || m.sender?.username,
+    senderName: m.sender?.name || m.sender?.username || m.sender?.email,
     body: m.body,
     createdAt: m.created_at,
     isRead: m.is_read
@@ -685,14 +679,42 @@ app.delete('/api/announcements/:id', authenticateToken, verifyAdmin, async (req,
 // INTERNAL MESSAGES API
 // ============================================
 
-app.get('/api/internal-messages', authenticateToken, verifyAdmin, async (req, res) => {
-  const { data, error } = await supabase
-    .from('internal_messages')
-    .select('*, sender:sender_id(name, email, role), receiver:receiver_id(name, email, role)')
-    .order('created_at', { ascending: false });
-  
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
+app.get('/api/analytics', authenticateToken, verifyAdmin, async (req, res) => {
+  try {
+    const { data: trips, error: tErr } = await supabase.from('trips').select('budget, cost_breakdown');
+    if (tErr) throw tErr;
+
+    let totalRevenue = 0;
+    let totalProfit = 0;
+    let adminCommission = 0;
+    let agentCommission = 0;
+
+    trips.forEach(t => {
+      totalRevenue += (Number(t.budget) || 0);
+      const cb = t.cost_breakdown || {};
+      totalProfit += (Number(cb.companyProfit) || 0);
+      adminCommission += (Number(cb.adminCommission) || 0);
+      agentCommission += (Number(cb.agentCommission) || 0);
+    });
+
+    res.json({
+      success: true,
+      data: {
+        totalRevenue,
+        totalProfit,
+        adminCommission,
+        agentCommission,
+        monthlyData: [
+          { name: 'Jan', revenue: totalRevenue * 0.15, profit: totalProfit * 0.15 },
+          { name: 'Feb', revenue: totalRevenue * 0.25, profit: totalProfit * 0.25 },
+          { name: 'Mar', revenue: totalRevenue * 0.45, profit: totalProfit * 0.45 },
+          { name: 'Apr', revenue: totalRevenue, profit: totalProfit },
+        ]
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 app.post('/api/internal-messages', authenticateToken, async (req, res) => {

@@ -11,7 +11,9 @@ import {
   FiArrowUpRight,
   FiActivity,
   FiShield,
-  FiRefreshCw
+  FiRefreshCw,
+  FiMap,
+  FiAward
 } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { tripsApi, friendlyApiMessage } from "../../lib/api";
@@ -71,8 +73,12 @@ export default function ProfitDashboard() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const response = await tripsApi.get("/stats");
-      setStatsData(response.data?.data);
+      const [statsRes, analyticsRes] = await Promise.all([
+        tripsApi.get("/stats"),
+        tripsApi.get("/analytics")
+      ]);
+      setStatsData(statsRes.data?.data);
+      setAnalytics(analyticsRes.data?.data);
     } catch (error) {
       toast.error(friendlyApiMessage(error));
     } finally {
@@ -80,13 +86,15 @@ export default function ProfitDashboard() {
     }
   };
 
+  const [analytics, setAnalytics] = useState(null);
+
   const kpis = useMemo(() => [
-    { label: "Total Revenue", val: `$${profitData.totalRevenue.toLocaleString()}`, icon: FiDollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10", spark: [10, 15, 8, 22, 18, 30] },
-    { label: "Net Earnings", val: `$${profitData.totalProfit.toLocaleString()}`, icon: FiTrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", spark: [5, 12, 15, 10, 25, 20] },
+    { label: "Total Revenue", val: `ETB ${(analytics?.totalRevenue || 0).toLocaleString()}`, icon: FiDollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10", spark: [10, 15, 8, 22, 18, 30] },
+    { label: "Net Earnings", val: `ETB ${(analytics?.totalProfit || 0).toLocaleString()}`, icon: FiTrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", spark: [5, 12, 15, 10, 25, 20] },
     { label: "Traveler Nodes", val: statsData?.travelers || "0", icon: FiUsers, color: "text-blue-400", bg: "bg-blue-500/10", spark: [12, 18, 14, 25, 22, 28] },
     { label: "Global Trips", val: statsData?.trips || "0", icon: FiActivity, color: "text-amber-400", bg: "bg-amber-500/10", spark: [20, 25, 22, 30, 28, 35] },
     { label: "Destinations", val: statsData?.destinations || "0", icon: FiMap, color: "text-indigo-400", bg: "bg-indigo-500/10", spark: [15, 10, 20, 18, 25, 22] },
-  ], [statsData, profitData]);
+  ], [statsData, analytics]);
 
   if (loading && !statsData) {
     return (
@@ -180,7 +188,7 @@ export default function ProfitDashboard() {
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={profitData.monthlyData}>
+              <AreaChart data={analytics?.monthlyData || profitData.monthlyData}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
@@ -222,7 +230,7 @@ export default function ProfitDashboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] font-black text-emerald-400">${agent.commission.toLocaleString()}</p>
+                  <p className="text-[11px] font-black text-emerald-400">ETB {agent.commission.toLocaleString()}</p>
                   <p className="text-[8px] text-white/10 uppercase font-black tracking-widest">Commission</p>
                 </div>
               </div>
@@ -262,9 +270,9 @@ export default function ProfitDashboard() {
                   <td className="py-5">
                     <span className="px-2 py-0.5 rounded-lg bg-purple-500/10 text-purple-400 font-black text-[9px] uppercase border border-purple-500/20">{tx.destination}</span>
                   </td>
-                  <td className="py-5 font-black text-white/60 text-[11px]">${tx.total.toLocaleString()}</td>
+                  <td className="py-5 font-black text-white/60 text-[11px]">ETB {tx.total.toLocaleString()}</td>
                   <td className="py-5 text-[10px] text-white/30 font-black uppercase">{tx.agentName}</td>
-                  <td className="py-5 text-right font-black text-emerald-400 text-[11px]">${tx.profit.toLocaleString()}</td>
+                  <td className="py-5 text-right font-black text-emerald-400 text-[11px]">ETB {tx.profit.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

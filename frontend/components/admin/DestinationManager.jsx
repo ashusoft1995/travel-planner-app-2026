@@ -13,7 +13,9 @@ import {
   FiDollarSign,
   FiActivity,
   FiSearch,
-  FiRefreshCw
+  FiRefreshCw,
+  FiChevronLeft,
+  FiChevronRight
 } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { tripsApi, friendlyApiMessage, getApiUrl } from "../../lib/api";
@@ -36,8 +38,11 @@ export default function DestinationManager() {
     imageUrl: "",
     hotels: {},
     activities: {},
-    travel_volume_index: 0
+    travel_volume_index: 0,
+    price: "",
+    rating: 4.5
   });
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     fetchDestinations();
@@ -105,7 +110,9 @@ export default function DestinationManager() {
       imageUrl: "",
       hotels: {},
       activities: {},
-      travel_volume_index: 0
+      travel_volume_index: 0,
+      price: "",
+      rating: 4.5
     });
   };
 
@@ -116,9 +123,11 @@ export default function DestinationManager() {
       highlights: destination.highlights || [],
       hotels: destination.hotels || {},
       activities: destination.activities || {},
-      travel_volume_index: destination.travel_volume_index || 0
+      travel_volume_index: destination.travel_volume_index || 0,
+      price: destination.price || "",
+      rating: destination.rating || 4.5
     });
-    setShowAdd(true); // Re-using showForm but let's call it showAdd consistently
+    setShowForm(true);
   };
 
   const addHighlight = () => {
@@ -191,83 +200,100 @@ export default function DestinationManager() {
         </div>
       </div>
 
-      {/* ── GRID ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map((dest) => (
-          <motion.div 
-            layout
-            key={dest.id} 
-            className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#12122a] shadow-xl transition hover:border-purple-500/30"
-          >
-            <div className="aspect-video relative overflow-hidden bg-white/5">
-              {dest.imageUrl ? (
-                <img
-                  src={dest.imageUrl}
-                  alt={dest.name}
-                  className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <FiImage size={32} className="text-white/10" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#12122a] via-transparent to-transparent opacity-60" />
-              
-              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                <button
-                  onClick={() => handleEdit(dest)}
-                  className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-purple-600 transition shadow-xl"
-                  title="Modify Node"
-                >
-                  <FiEdit2 size={14} />
-                </button>
-                <button
-                  onClick={() => handleDelete(dest.id)}
-                  className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-red-600 transition shadow-xl"
-                  title="Purge Node"
-                >
-                  <FiTrash2 size={14} />
-                </button>
-              </div>
+      {/* ── SLIDER ── */}
+      <div className="relative group/slider">
+        <div className="flex gap-6 overflow-x-hidden pb-4 transition-all duration-500 scroll-smooth">
+          <AnimatePresence mode="wait">
+            {filtered.slice(currentIndex, currentIndex + 3).map((dest, i) => (
+              <motion.div 
+                key={dest.id}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ delay: i * 0.1 }}
+                className="w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#12122a] shadow-xl transition hover:border-purple-500/30"
+              >
+                <div className="aspect-video relative overflow-hidden bg-white/5">
+                  {dest.imageUrl ? (
+                    <img
+                      src={dest.imageUrl}
+                      alt={dest.name}
+                      className="w-full h-full object-cover transition duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FiImage size={32} className="text-white/10" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#12122a] via-transparent to-transparent opacity-60" />
+                  
+                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                    <button
+                      onClick={() => handleEdit(dest)}
+                      className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-purple-600 transition shadow-xl"
+                    >
+                      <FiEdit2 size={14} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(dest.id)}
+                      className="p-2.5 bg-white/10 backdrop-blur-md rounded-xl text-white hover:bg-red-600 transition shadow-xl"
+                    >
+                      <FiTrash2 size={14} />
+                    </button>
+                  </div>
 
-              <div className="absolute bottom-4 left-4">
-                 <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-2 py-1 rounded-lg backdrop-blur-sm border border-purple-500/20">
-                    ID: {dest.id}
-                 </span>
-              </div>
-            </div>
-            
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-black text-white uppercase tracking-tight">{dest.name}</h3>
-                <div className="flex items-center gap-1 text-amber-400">
-                   <FiStar size={12} fill="currentColor" />
-                   <span className="text-[10px] font-black">{dest.travel_volume_index || 0}</span>
+                  <div className="absolute bottom-4 left-4">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-purple-400 bg-purple-500/10 px-2 py-1 rounded-lg backdrop-blur-sm border border-purple-500/20">
+                        {dest.price || "NO PRICE"}
+                     </span>
+                  </div>
                 </div>
-              </div>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3 flex items-center gap-1">
-                <FiMapPin size={10} /> {dest.region || "Central"}, {dest.country}
-              </p>
-              
-              <p className="text-xs text-white/50 line-clamp-2 leading-relaxed mb-4 italic">
-                "{dest.description || "No transmission data available for this node."}"
-              </p>
-              
-              <div className="flex flex-wrap gap-1.5">
-                {(dest.highlights || []).slice(0, 3).map((h, i) => (
-                  <span key={i} className="px-2 py-1 bg-white/5 text-white/40 text-[9px] font-bold uppercase tracking-widest rounded-lg border border-white/5">
-                    {h}
-                  </span>
-                ))}
-              </div>
+                
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-black text-white uppercase tracking-tight">{dest.name}</h3>
+                    <div className="flex items-center gap-1 text-amber-400">
+                       <FiStar size={12} fill="currentColor" />
+                       <span className="text-[10px] font-black">{dest.rating || dest.travel_volume_index || 0}</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-3 flex items-center gap-1">
+                    <FiMapPin size={10} /> {dest.region || "Central"}, {dest.country}
+                  </p>
+                  
+                  <p className="text-xs text-white/50 line-clamp-2 leading-relaxed mb-4 italic">
+                    "{dest.description || "No transmission data available for this node."}"
+                  </p>
+                  
+                  <div className="flex items-center justify-between border-t border-white/5 pt-4 text-[9px] font-black uppercase tracking-widest text-white/20">
+                    <span className="flex items-center gap-1"><FiActivity size={12} /> {Object.keys(dest.hotels || {}).length} Infra</span>
+                    <span className="flex items-center gap-1"><FiDollarSign size={12} /> {Object.keys(dest.activities || {}).length} Services</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
 
-              <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4 text-[9px] font-black uppercase tracking-widest text-white/20">
-                <span className="flex items-center gap-1"><FiActivity size={12} /> {Object.keys(dest.hotels || {}).length} Infrastructure</span>
-                <span className="flex items-center gap-1"><FiDollarSign size={12} /> {Object.keys(dest.activities || {}).length} Services</span>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+        {/* Slider Controls */}
+        {filtered.length > 3 && (
+          <>
+            <button 
+              onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+              disabled={currentIndex === 0}
+              className="absolute -left-4 top-1/2 -translate-y-1/2 p-4 rounded-full bg-[#12122a] border border-white/10 text-white shadow-2xl hover:bg-purple-600 transition disabled:opacity-0 z-10"
+            >
+              <FiChevronLeft size={24} />
+            </button>
+            <button 
+              onClick={() => setCurrentIndex(prev => Math.min(filtered.length - 3, prev + 1))}
+              disabled={currentIndex >= filtered.length - 3}
+              className="absolute -right-4 top-1/2 -translate-y-1/2 p-4 rounded-full bg-[#12122a] border border-white/10 text-white shadow-2xl hover:bg-purple-600 transition disabled:opacity-0 z-10"
+            >
+              <FiChevronRight size={24} />
+            </button>
+          </>
+        )}
       </div>
 
       {/* ── ADD/EDIT MODAL ── */}
@@ -314,6 +340,31 @@ export default function DestinationManager() {
                       onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
                       required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Standard Price (ETB)</label>
+                    <input
+                      type="text"
+                      value={formData.price}
+                      onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
+                      placeholder="e.g. 25,000 ETB"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Node Rating (1-5)</label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="5"
+                      value={formData.rating}
+                      onChange={(e) => setFormData(prev => ({ ...prev, rating: Number(e.target.value) }))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-purple-500/50 outline-none transition"
                     />
                   </div>
                 </div>
