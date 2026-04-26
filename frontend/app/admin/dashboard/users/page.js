@@ -18,7 +18,8 @@ import {
   FiUnlock, 
   FiActivity,
   FiUserCheck,
-  FiCircle
+  FiCircle,
+  FiUserPlus
 } from "react-icons/fi";
 import { useAuth } from "../../../../context/AuthContext";
 import { tripsApi, friendlyApiMessage } from "../../../../lib/api";
@@ -120,16 +121,33 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleCreateSubmit = async (e) => {
+    e.preventDefault();
+    setFormLoading(true);
+    try {
+      await tripsApi.post("/users", editForm);
+      toast.success("New account registered successfully");
+      setSelectedUser(null);
+      setModalMode(null);
+      loadUsers();
+    } catch (e) {
+      toast.error(friendlyApiMessage(e));
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const openModal = (u, mode) => {
     setSelectedUser(u);
     setModalMode(mode);
-    if (mode === "edit") {
+    if (mode === "edit" || mode === "create") {
       setEditForm({
-        name: u.name || "",
-        email: u.email || "",
-        username: u.username || "",
-        role: u.role || "user",
-        status: u.status || "active",
+        name: u?.name || "",
+        email: u?.email || "",
+        username: u?.username || "",
+        password: "",
+        role: u?.role || "admin",
+        status: u?.status || "active",
       });
     }
   };
@@ -197,9 +215,14 @@ export default function AdminUsersPage() {
             className="w-full bg-[#12122a] border border-white/10 rounded-2xl pl-12 pr-6 py-3.5 text-sm text-white placeholder:text-white/20 focus:ring-2 focus:ring-purple-500/50 outline-none transition-all shadow-xl"
           />
         </div>
-        <button onClick={loadUsers} className="flex items-center gap-2 px-6 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-white hover:bg-white/10 transition">
-          <FiRefreshCw /> Sync Registry
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => openModal(null, 'create')} className="flex items-center gap-2 px-6 py-3.5 bg-purple-600 rounded-2xl text-xs font-black uppercase tracking-widest text-white hover:bg-purple-500 transition shadow-lg shadow-purple-600/20">
+            <FiUserPlus /> Admin Register
+          </button>
+          <button onClick={loadUsers} className="flex items-center gap-2 px-6 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-white hover:bg-white/10 transition">
+            <FiRefreshCw /> Sync Registry
+          </button>
+        </div>
       </div>
 
       {/* ── User Table ── */}
@@ -312,10 +335,10 @@ export default function AdminUsersPage() {
                 <div className="relative -mt-12 mb-6 flex justify-between items-end">
                   <div className="h-24 w-24 rounded-3xl bg-[#12122a] p-1 shadow-2xl">
                     <div className="h-full w-full rounded-2xl bg-white/5 flex items-center justify-center text-3xl font-black text-white border border-white/10">
-                      {selectedUser.name?.charAt(0)}
+                      {selectedUser?.name ? selectedUser.name.charAt(0) : <FiUserPlus />}
                     </div>
                   </div>
-                  <button onClick={() => setSelectedUser(null)} className="mb-2 p-2 rounded-full bg-white/5 text-white/40 hover:text-white"><FiX size={20} /></button>
+                  <button onClick={() => { setSelectedUser(null); setModalMode(null); }} className="mb-2 p-2 rounded-full bg-white/5 text-white/40 hover:text-white"><FiX size={20} /></button>
                 </div>
 
                 {modalMode === 'detail' && (
@@ -371,7 +394,7 @@ export default function AdminUsersPage() {
                   </div>
                 )}
 
-                {modalMode === 'edit' && (
+                {modalMode === 'edit' && selectedUser && (
                   <form onSubmit={handleEditSubmit} className="space-y-5">
                     <div className="space-y-4">
                       <div>
@@ -421,6 +444,76 @@ export default function AdminUsersPage() {
                       <button type="button" onClick={() => setModalMode('detail')} className="flex-1 py-4 bg-white/5 text-white/40 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10">Cancel</button>
                       <button disabled={formLoading} type="submit" className="flex-1 py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition shadow-xl shadow-purple-600/20">
                         {formLoading ? 'Synchronizing...' : 'Apply Overrides'}
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {modalMode === 'create' && (
+                  <form onSubmit={handleCreateSubmit} className="space-y-5">
+                    <h3 className="text-2xl font-black text-white mb-4">Register Admin</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Identity Name</label>
+                        <input 
+                          className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-purple-500/50" 
+                          value={editForm.name}
+                          onChange={e => setEditForm({...editForm, name: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Username (@)</label>
+                          <input 
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-purple-500/50" 
+                            value={editForm.username}
+                            onChange={e => setEditForm({...editForm, username: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Security Role</label>
+                          <select 
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-purple-500/50 appearance-none"
+                            value={editForm.role}
+                            onChange={e => setEditForm({...editForm, role: e.target.value})}
+                          >
+                            <option value="admin" className="bg-[#12122a] text-white">Admin / Manager</option>
+                            <option value="agent" className="bg-[#12122a] text-white">Agent</option>
+                            <option value="user" className="bg-[#12122a] text-white">Traveler</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Communication Email</label>
+                          <input 
+                            type="email"
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-purple-500/50" 
+                            value={editForm.email}
+                            onChange={e => setEditForm({...editForm, email: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2 block">Temporary Password</label>
+                          <input 
+                            type="password"
+                            className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-purple-500/50" 
+                            value={editForm.password}
+                            onChange={e => setEditForm({...editForm, password: e.target.value})}
+                            required
+                            minLength={6}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-6 flex gap-3">
+                      <button type="button" onClick={() => { setSelectedUser(null); setModalMode(null); }} className="flex-1 py-4 bg-white/5 text-white/40 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/10">Cancel</button>
+                      <button disabled={formLoading} type="submit" className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition shadow-xl shadow-emerald-600/20">
+                        {formLoading ? 'Registering...' : 'Register New Node'}
                       </button>
                     </div>
                   </form>

@@ -333,7 +333,7 @@ app.get('/api/trips/:id', async (req, res) => {
 });
 
 app.post('/api/trips', authenticateToken, async (req, res) => {
-  const { destination, startDate, endDate, budget, activities, accommodation, notes, image } = req.body;
+  const { destination, startDate, endDate, budget, activities, accommodation, notes, image, costBreakdown } = req.body;
 
   const { data, error } = await supabase
     .from('trips')
@@ -346,11 +346,12 @@ app.post('/api/trips', authenticateToken, async (req, res) => {
       activities: activities || [],
       accommodation: accommodation || 'Not specified',
       notes, image,
+      cost_breakdown: costBreakdown || {},
       approval_status: 'pending'
     }])
     .select();
 
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) return res.status(500).json({ success: false, message: error.message });
   
   const newTrip = data[0];
   // Notify Admins about new trip booking
@@ -555,23 +556,33 @@ app.post('/api/contact-messages/:id/reply', authenticateToken, verifyAdmin, asyn
 // ============================================
 
 app.get('/api/internal-messages', authenticateToken, async (req, res) => {
-  const { data, error } = await supabase
+  const { data: messages, error } = await supabase
     .from('internal_messages')
-    .select('*, sender:users!sender_id(name, username, email), receiver:users!receiver_id(name, username, email)')
+    .select('*')
     .or(`sender_id.eq.${req.user.id},receiver_id.eq.${req.user.id}`)
     .order('created_at', { ascending: true });
 
   if (error) return res.status(500).json({ success: false, message: error.message });
   
-  const formatted = data.map(m => ({
-    id: m.id,
-    senderId: m.sender_id,
-    receiverId: m.receiver_id,
-    senderName: m.sender?.name || m.sender?.username || m.sender?.email,
-    body: m.body,
-    createdAt: m.created_at,
-    isRead: m.is_read
-  }));
+  const userIds = [...new Set(messages.flatMap(m => [m.sender_id, m.receiver_id]))];
+  const { data: users } = await supabase.from('users').select('id, name, username, email').in('id', userIds);
+  const userMap = {};
+  if (users) {
+    users.forEach(u => userMap[u.id] = u);
+  }
+
+  const formatted = messages.map(m => {
+    const sender = userMap[m.sender_id];
+    return {
+      id: m.id,
+      senderId: m.sender_id,
+      receiverId: m.receiver_id,
+      senderName: sender?.name || sender?.username || sender?.email || m.sender_id,
+      body: m.body,
+      createdAt: m.created_at,
+      isRead: m.is_read
+    };
+  });
 
   res.json({ success: true, data: formatted });
 });

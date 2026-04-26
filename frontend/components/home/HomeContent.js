@@ -275,6 +275,16 @@ export default function HomeContent() {
         </div>
         <div className="container relative z-10 flex min-h-[90vh] flex-col justify-center gap-12 py-24">
           <div className="max-w-3xl">
+            {user && (
+              <div className="mb-6">
+                <Link 
+                  href={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} 
+                  className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+                >
+                  <FiArrowRight className="rotate-180" /> Back to Dashboard
+                </Link>
+              </div>
+            )}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 mb-8">
               <span className="h-2 w-2 rounded-full bg-accent-yellow animate-pulse" />
               <span className="text-xs font-black uppercase tracking-widest text-white/60">New Exploration Phase Enabled</span>
