@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiCheck, FiX, FiMap, FiClock, FiDollarSign } from "react-icons/fi";
-import { tripsApi, friendlyApiMessage } from "../../../../lib/api";
+import { tripsApi, friendlyApiMessage } from "../../../lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AgentInboxPage() {
