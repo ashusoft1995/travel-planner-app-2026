@@ -176,16 +176,61 @@ app.get('/api/me', authenticateToken, async (req, res) => {
 });
 
 app.put('/api/me', authenticateToken, async (req, res) => {
-  const updates = req.body;
-  const { data: user, error } = await supabase
-    .from('users')
-    .update(updates)
-    .eq('id', req.user.id)
-    .select('id, email, name, role, status, username, phone, about, expertise')
-    .single();
+  const { name, username, password, currentPassword, ...otherUpdates } = req.body;
+  
+  try {
+    // 1. If changing credentials, verify current password
+    const { data: currentUser, error: fetchErr } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', req.user.id)
+      .single();
 
-  if (error) return res.status(500).json({ success: false, message: error.message });
-  res.json({ success: true, data: user });
+    if (fetchErr || !currentUser) return res.status(404).json({ error: 'User not found' });
+
+    const updates = { ...otherUpdates };
+    if (name) updates.name = name;
+    if (username) updates.username = username;
+
+    if (password || username !== currentUser.username) {
+      if (!currentPassword) return res.status(400).json({ error: 'Current password required for credential changes' });
+      
+      const isValid = await bcrypt.compare(currentPassword, currentUser.password_hash);
+      if (!isValid) return res.status(401).json({ error: 'Invalid current password' });
+
+      if (password) {
+        updates.password_hash = await bcrypt.hash(password, 10);
+      }
+    }
+
+    const { data: updatedUser, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', req.user.id)
+      .select('id, email, name, role, status, username, phone, about, expertise')
+      .single();
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/me', authenticateToken, async (req, res) => {
+  try {
+    // Security check: Super admin cannot be deleted
+    if (req.user.id === '1200' || req.user.email === 'ashenafiabebe604@gmail.com') {
+      return res.status(403).json({ error: 'Security Lock: Super Admin account is immutable.' });
+    }
+
+    const { error } = await supabase.from('users').delete().eq('id', req.user.id);
+    if (error) return res.status(500).json({ error: error.message });
+    
+    res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ============================================

@@ -62,7 +62,8 @@ export const authHeaders = () => {
 export const loginAccount = (data) => api.post('/api/login', data);
 export const registerAccount = (data) => api.post('/api/users', data); // Backend uses /api/users for signup
 export const fetchSessionUser = () => api.get('/api/me');
-export const patchSessionUser = (data) => api.put('/api/me', data); // Check backend if this exists
+export const patchSessionUser = (data) => api.put('/api/me', data);
+export const deleteAccount = () => api.delete('/api/me');
 
 // -----------------------------------------------------------------------------
 // NOTIFICATIONS & ANNOUNCEMENTS

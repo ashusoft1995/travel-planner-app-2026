@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { FiCamera, FiSave, FiUser, FiGlobe, FiInfo, FiSmartphone, FiCreditCard, FiShield, FiLock, FiAtSign } from "react-icons/fi";
+import { FiCamera, FiSave, FiUser, FiGlobe, FiInfo, FiSmartphone, FiCreditCard, FiShield, FiLock, FiAtSign, FiTrash2 } from "react-icons/fi";
 import { loadUserProfile, saveUserProfile } from "../../lib/userProfileStorage";
 import { useAuth } from "../../context/AuthContext";
 
@@ -11,7 +11,7 @@ const GENDERS = ["Female", "Male", "Non-binary", "Prefer not to say"];
 const STATUSES = ["Employed", "Student", "Retired", "Self-employed", "Other"];
 
 export default function ProfilePanel({ user, onSaved }) {
-  const { updateAccount } = useAuth();
+  const { updateAccount, deleteMe } = useAuth();
   const [form, setForm] = useState(() => loadUserProfile(user?.email));
   const [accForm, setAccForm] = useState({
     username: user?.username || "",
@@ -109,6 +109,17 @@ export default function ProfilePanel({ user, onSaved }) {
       toast.error(err.message || "Failed to sync identity data", { id: loadingToast });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("CRITICAL WARNING: This will permanently purge your identity record from the EthioTravel Vault. This action is irreversible. Proceed?")) return;
+    
+    try {
+      await deleteMe();
+      toast.success("Identity record purged. Redirecting...");
+    } catch (err) {
+      toast.error(err.message || "Failed to purge record");
     }
   };
 
@@ -344,11 +355,11 @@ export default function ProfilePanel({ user, onSaved }) {
             </div>
           </div>
 
-          <div className="sm:col-span-2 mt-4">
+          <div className="sm:col-span-2 mt-4 flex flex-col sm:flex-row gap-4">
             <button 
                 type="submit" 
                 disabled={saving}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 px-8 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-purple-500/20 active:scale-95 transition-all hover:opacity-90 disabled:opacity-50"
+                className="flex-1 inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 px-8 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-purple-500/20 active:scale-95 transition-all hover:opacity-90 disabled:opacity-50"
             >
               {saving ? (
                 <>Synchronizing…</>
@@ -357,6 +368,14 @@ export default function ProfilePanel({ user, onSaved }) {
                   <FiSave size={18} /> Synchronize Profile Data
                 </>
               )}
+            </button>
+
+            <button 
+                type="button"
+                onClick={handleDelete}
+                className="flex-1 inline-flex items-center justify-center gap-3 rounded-2xl bg-red-500/10 border border-red-500/20 px-8 py-4 text-sm font-black uppercase tracking-widest text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-95"
+            >
+              <FiTrash2 size={18} /> Purge Identity Record
             </button>
           </div>
         </div>

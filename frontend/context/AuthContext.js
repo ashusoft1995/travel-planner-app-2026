@@ -194,6 +194,18 @@ export function AuthProvider({ children }) {
     [persistUser]
   );
 
+  const deleteMe = useCallback(async () => {
+    try {
+      await api.delete('/api/me');
+      applySession(null, null);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
+    } catch (e) {
+      throw new Error(friendlyApiMessage(e));
+    }
+  }, [applySession]);
+
   const logout = useCallback(async () => {
     try {
       await supabase.auth.signOut();
@@ -225,10 +237,11 @@ export function AuthProvider({ children }) {
       loginWithGoogle,
       logout,
       updateAccount,
+      deleteMe,
       requestPasswordReset,
       isAdmin: user?.role === "admin",
     }),
-    [user, token, hydrated, register, login, loginWithGoogle, logout, updateAccount, requestPasswordReset]
+    [user, token, hydrated, register, login, loginWithGoogle, logout, updateAccount, deleteMe, requestPasswordReset]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
