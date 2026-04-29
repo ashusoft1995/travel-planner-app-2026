@@ -2,12 +2,12 @@
 ALTER TABLE internal_messages ADD COLUMN IF NOT EXISTS receiver_id TEXT;
 ALTER TABLE internal_messages ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT FALSE;
 
--- Ensure trips has a valid ID default
-ALTER TABLE trips ALTER COLUMN id SET DEFAULT gen_random_uuid()::TEXT;
+-- Ensure trips has a valid ID default (Handling both UUID and TEXT types)
+ALTER TABLE trips ALTER COLUMN id SET DEFAULT gen_random_uuid();
 ALTER TABLE trips ALTER COLUMN id SET NOT NULL;
 
 -- Ensure internal_messages has a valid ID default
-ALTER TABLE internal_messages ALTER COLUMN id SET DEFAULT gen_random_uuid()::TEXT;
+ALTER TABLE internal_messages ALTER COLUMN id SET DEFAULT gen_random_uuid();
 ALTER TABLE internal_messages ALTER COLUMN id SET NOT NULL;
 
 -- Fix for announcements (title/body vs title/content)
