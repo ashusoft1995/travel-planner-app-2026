@@ -415,20 +415,23 @@ app.get('/api/trips/:id', async (req, res) => {
 app.post('/api/trips', authenticateToken, async (req, res) => {
   const { destination, startDate, endDate, budget, activities, accommodation, notes, image, costBreakdown } = req.body;
 
+  // Explicitly remove id from body if present to let DB generate it
+  const insertPayload = {
+    owner_email: req.user.email,
+    destination,
+    start_date: startDate,
+    end_date: endDate,
+    budget: budget || 0,
+    activities: activities || [],
+    accommodation: accommodation || 'Not specified',
+    notes, image,
+    cost_breakdown: costBreakdown || {},
+    approval_status: 'pending'
+  };
+
   const { data, error } = await supabase
     .from('trips')
-    .insert([{
-      owner_email: req.user.email,
-      destination,
-      start_date: startDate,
-      end_date: endDate,
-      budget: budget || 0,
-      activities: activities || [],
-      accommodation: accommodation || 'Not specified',
-      notes, image,
-      cost_breakdown: costBreakdown || {},
-      approval_status: 'pending'
-    }])
+    .insert([insertPayload])
     .select();
 
   if (error) return res.status(500).json({ success: false, message: error.message });
