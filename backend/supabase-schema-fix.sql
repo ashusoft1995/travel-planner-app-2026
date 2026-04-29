@@ -90,7 +90,8 @@ ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEF
 -- 3. TRIPS TABLE - Make sure all columns exist
 -- ============================================
 
-ALTER TABLE trips ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE trips ADD COLUMN IF NOT EXISTS id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT;
+ALTER TABLE trips ALTER COLUMN id SET NOT NULL;
 ALTER TABLE trips ADD COLUMN IF NOT EXISTS notes TEXT;
 ALTER TABLE trips ADD COLUMN IF NOT EXISTS cost_breakdown JSONB DEFAULT '{}';
 

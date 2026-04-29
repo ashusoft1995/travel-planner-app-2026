@@ -296,17 +296,52 @@ app.get('/api/destinations', async (req, res) => {
 });
 
 app.post('/api/destinations', authenticateToken, verifyAdmin, async (req, res) => {
-  const destination = req.body;
+  const body = req.body;
+  
+  // Normalize fields for database compatibility
+  const destination = {
+    name: body.name,
+    description: body.description,
+    country: body.country,
+    region: body.region,
+    price: body.price,
+    rating: body.rating,
+    // Handle both variants for image
+    image: body.imageUrl || body.image,
+    imageUrl: body.imageUrl || body.image,
+    // Handle both variants for travel volume
+    travel_volume_index: body.travel_volume_index ?? body.travelVolumeIndex ?? 0,
+    travelVolumeIndex: body.travel_volume_index ?? body.travelVolumeIndex ?? 0,
+    hotels: body.hotels || {},
+    activities: body.activities || {},
+    highlights: body.highlights || []
+  };
+
   const { data, error } = await supabase.from('destinations').insert([destination]).select();
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error('Supabase Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
   res.status(201).json({ success: true, data: data[0] });
 });
 
 app.put('/api/destinations/:id', authenticateToken, verifyAdmin, async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const body = req.body;
+  
+  // Normalize fields
+  const updates = { ...body };
+  if (body.imageUrl) updates.image = body.imageUrl;
+  if (body.image) updates.imageUrl = body.image;
+  if (body.travel_volume_index !== undefined) updates.travelVolumeIndex = body.travel_volume_index;
+  if (body.travelVolumeIndex !== undefined) updates.travel_volume_index = body.travelVolumeIndex;
+
   const { data, error } = await supabase.from('destinations').update(updates).eq('id', id).select();
-  if (error) return res.status(500).json({ error: error.message });
+  if (error) {
+    console.error('Supabase Error:', error);
+    return res.status(500).json({ error: error.message });
+  }
+  if (!data || data.length === 0) return res.status(404).json({ error: 'Destination not found' });
   res.json({ success: true, data: data[0] });
 });
 

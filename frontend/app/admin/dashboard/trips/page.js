@@ -27,7 +27,18 @@ export default function AdminTripsPage() {
         tripsApi.get("/trips"),
         fetch(getApiUrl("/users"), { headers: authHeaders() }).then(r => r.json())
       ]);
-      setAllTrips(Array.isArray(tripsRes.data) ? tripsRes.data : []);
+      const tripsData = Array.isArray(tripsRes.data) ? tripsRes.data : [];
+      const mappedTrips = tripsData.map(t => ({
+        ...t,
+        ownerEmail: t.owner_email || t.ownerEmail,
+        startDate: t.start_date || t.startDate,
+        endDate: t.end_date || t.endDate,
+        approvalStatus: t.approval_status || t.approvalStatus,
+        costBreakdown: t.cost_breakdown || t.costBreakdown,
+        agentStatus: t.agent_status || t.agentStatus,
+        assignedAgent: t.assigned_agent || t.assignedAgent
+      }));
+      setAllTrips(mappedTrips);
       setAgents((usersRes.users || []).filter(u => u.role === 'agent' && u.status === 'active'));
     } catch (e) {
       toast.error(friendlyApiMessage(e));
@@ -43,7 +54,14 @@ export default function AdminTripsPage() {
   const approveTripRow = async (trip) => {
     try {
       const { data } = await patchTripApproval(trip.id, { decision: "approved", note: "" });
-      setAllTrips((prev) => prev.map((t) => (t.id === trip.id ? data : t)));
+      const updated = {
+        ...data,
+        ownerEmail: data.owner_email || data.ownerEmail,
+        startDate: data.start_date || data.startDate,
+        endDate: data.end_date || data.endDate,
+        approvalStatus: data.approval_status || data.approvalStatus
+      };
+      setAllTrips((prev) => prev.map((t) => (t.id === trip.id ? updated : t)));
       toast.success("✅ Trip approved!");
     } catch (e) {
       toast.error(friendlyApiMessage(e));
@@ -54,7 +72,14 @@ export default function AdminTripsPage() {
     const note = window.prompt("Reason for rejection (optional):") || "";
     try {
       const { data } = await patchTripApproval(trip.id, { decision: "rejected", note });
-      setAllTrips((prev) => prev.map((t) => (t.id === trip.id ? data : t)));
+      const updated = {
+        ...data,
+        ownerEmail: data.owner_email || data.ownerEmail,
+        startDate: data.start_date || data.startDate,
+        endDate: data.end_date || data.endDate,
+        approvalStatus: data.approval_status || data.approvalStatus
+      };
+      setAllTrips((prev) => prev.map((t) => (t.id === trip.id ? updated : t)));
       toast.success("Trip rejected");
     } catch (e) {
       toast.error(friendlyApiMessage(e));
@@ -87,7 +112,17 @@ export default function AdminTripsPage() {
     e.preventDefault();
     try {
       const { data } = await tripsApi.put(`/trips/${selected.id}`, editForm);
-      setAllTrips(prev => prev.map(t => t.id === data.id ? data : t));
+      const updated = {
+        ...data,
+        ownerEmail: data.owner_email || data.ownerEmail,
+        startDate: data.start_date || data.startDate,
+        endDate: data.end_date || data.endDate,
+        approvalStatus: data.approval_status || data.approvalStatus,
+        costBreakdown: data.cost_breakdown || data.costBreakdown,
+        agentStatus: data.agent_status || data.agentStatus,
+        assignedAgent: data.assigned_agent || data.assignedAgent
+      };
+      setAllTrips(prev => prev.map(t => t.id === updated.id ? updated : t));
       toast.success("Trip updated successfully");
       setSelected(null);
     } catch (e) {

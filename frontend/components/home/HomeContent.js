@@ -338,6 +338,53 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
+      
+      {/* Announcements / Bulletins */}
+      <AnimatePresence>
+        {announcements.length > 0 && (
+          <section className="container -mt-8 mb-12 relative z-30">
+            <div className="flex flex-col gap-4">
+              {announcements.map((ann) => (
+                <motion.div
+                  key={ann.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className={`flex flex-col md:flex-row items-center gap-6 p-6 rounded-[2.5rem] border backdrop-blur-3xl shadow-2xl relative overflow-hidden group ${
+                    ann.type === 'warning' 
+                      ? 'bg-red-500/10 border-red-500/20 text-red-100' 
+                      : ann.type === 'success'
+                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-100'
+                        : 'bg-blue-500/10 border-blue-500/20 text-blue-100'
+                  }`}
+                >
+                  <div className="flex-shrink-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 border border-white/10 shadow-inner">
+                    {ann.type === 'warning' ? (
+                      <div className="text-red-400 font-black text-xl animate-pulse">!</div>
+                    ) : (
+                      <div className="h-2 w-2 rounded-full bg-current animate-ping" />
+                    )}
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-3 mb-1">
+                      <h4 className="text-lg font-black uppercase tracking-tight">{ann.title}</h4>
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-[8px] font-black uppercase tracking-widest opacity-50 border border-white/10">
+                        {new Date(ann.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium opacity-60 leading-relaxed max-w-2xl">{ann.body}</p>
+                  </div>
+                  {ann.image && (
+                    <div className="hidden lg:block h-16 w-32 relative rounded-xl overflow-hidden border border-white/10 grayscale group-hover:grayscale-0 transition-all duration-500">
+                      <Image src={ann.image} alt="Bulletin" fill className="object-cover" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+      </AnimatePresence>
 
       {/* Promotions Section */}
       <section className="container py-12 -mt-16 relative z-20">

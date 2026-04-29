@@ -33,9 +33,14 @@ export default function ProtocolBulletins() {
   const load = async () => {
     setLoading(true);
     try {
-      // Note: We need a special admin version or just use the public one if it returns all info
-      const { data } = await fetchAnnouncements(); 
-      setItems(data);
+      const { data: res } = await fetchAnnouncements(); 
+      // Handle response structure { success: true, data: [...] }
+      const rawItems = Array.isArray(res.data) ? res.data : [];
+      const mapped = rawItems.map(item => ({
+        ...item,
+        createdAt: item.created_at || item.createdAt
+      }));
+      setItems(mapped);
     } catch (e) {
       toast.error(friendlyApiMessage(e));
     } finally {

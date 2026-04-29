@@ -41,7 +41,19 @@ export default function AdminRequestsPage() {
     setLoading(true);
     try {
       const { data } = await fetchAdminTravelRequests();
-      setRequests(Array.isArray(data) ? data : []);
+      const mapped = (Array.isArray(data) ? data : []).map(r => ({
+        ...r,
+        fullName: r.full_name || r.fullName,
+        desiredDestination: r.desired_destination || r.desiredDestination,
+        preferredStartDate: r.preferred_start_date || r.preferredStartDate,
+        preferredEndDate: r.preferred_end_date || r.preferredEndDate,
+        budgetHint: r.budget_hint || r.budgetHint,
+        accommodationPreference: r.accommodation_preference || r.accommodationPreference,
+        specialRequests: r.special_requests || r.specialRequests,
+        travelHistory: r.travel_history || r.travelHistory,
+        adminNotes: r.admin_notes || r.adminNotes
+      }));
+      setRequests(mapped);
     } catch (e) { toast.error(friendlyApiMessage(e)); }
     finally { setLoading(false); }
   }, []);
@@ -69,8 +81,38 @@ export default function AdminRequestsPage() {
     if (!Number.isFinite(age) || age < 1 || age > 120) { toast.error("Age must be 1–120"); return; }
     setSaving(true);
     try {
-      const { data } = await putAdminTravelRequest(selected.id, { ...selected, ...form, age });
-      setRequests((prev) => prev.map((r) => (r.id === data.id ? data : r)));
+      // Map back to snake_case for backend if needed, but backend already handles camelCase
+      const payload = {
+        ...form,
+        age,
+        // Ensure backend picking logic works by providing both if needed or just camelCase
+        fullName: form.fullName,
+        desiredDestination: form.desiredDestination,
+        preferredStartDate: form.preferredStartDate,
+        preferredEndDate: form.preferredEndDate,
+        budgetHint: form.budgetHint,
+        accommodationPreference: form.accommodationPreference,
+        specialRequests: form.specialRequests,
+        travelHistory: form.travelHistory,
+        adminNotes: form.adminNotes
+      };
+      const { data } = await putAdminTravelRequest(selected.id, payload);
+      
+      // Map the returned data again
+      const updated = {
+        ...data,
+        fullName: data.full_name || data.fullName,
+        desiredDestination: data.desired_destination || data.desiredDestination,
+        preferredStartDate: data.preferred_start_date || data.preferredStartDate,
+        preferredEndDate: data.preferred_end_date || data.preferredEndDate,
+        budgetHint: data.budget_hint || data.budgetHint,
+        accommodationPreference: data.accommodation_preference || data.accommodationPreference,
+        specialRequests: data.special_requests || data.specialRequests,
+        travelHistory: data.travel_history || data.travelHistory,
+        adminNotes: data.admin_notes || data.adminNotes
+      };
+      
+      setRequests((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       toast.success("✅ Protocol updated");
       closeEdit();
     } catch (err) { toast.error(friendlyApiMessage(err)); }
@@ -80,7 +122,19 @@ export default function AdminRequestsPage() {
   const quickStatus = async (row, status) => {
     try {
       const { data } = await patchAdminTravelRequest(row.id, { status });
-      setRequests((prev) => prev.map((r) => (r.id === data.id ? data : r)));
+      const updated = {
+        ...data,
+        fullName: data.full_name || data.fullName,
+        desiredDestination: data.desired_destination || data.desiredDestination,
+        preferredStartDate: data.preferred_start_date || data.preferredStartDate,
+        preferredEndDate: data.preferred_end_date || data.preferredEndDate,
+        budgetHint: data.budget_hint || data.budgetHint,
+        accommodationPreference: data.accommodation_preference || data.accommodationPreference,
+        specialRequests: data.special_requests || data.specialRequests,
+        travelHistory: data.travel_history || data.travelHistory,
+        adminNotes: data.admin_notes || data.adminNotes
+      };
+      setRequests((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       toast.success(`Operational Status: ${status}`);
     } catch (e) { toast.error(friendlyApiMessage(e)); }
   };

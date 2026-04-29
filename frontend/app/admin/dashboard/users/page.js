@@ -129,6 +129,7 @@ export default function AdminUsersPage() {
       toast.success("New account registered successfully");
       setSelectedUser(null);
       setModalMode(null);
+      setEditForm({ name: "", email: "", username: "", role: "admin", status: "active" });
       loadUsers();
     } catch (e) {
       toast.error(friendlyApiMessage(e));
@@ -278,11 +279,9 @@ export default function AdminUsersPage() {
                           <button onClick={() => openModal(u, 'detail')} className="p-2.5 rounded-xl bg-white/10 text-white/60 hover:bg-blue-500/20 hover:text-blue-400 transition" title="View Details">
                             <FiEye size={16} />
                           </button>
-                          {u.role !== 'user' && (
-                            <button onClick={() => openModal(u, 'edit')} className="p-2.5 rounded-xl bg-white/10 text-white/60 hover:bg-purple-500/20 hover:text-purple-400 transition" title="Edit Profile">
-                              <FiEdit2 size={16} />
-                            </button>
-                          )}
+                          <button onClick={() => openModal(u, 'edit')} className="p-2.5 rounded-xl bg-white/10 text-white/60 hover:bg-purple-500/20 hover:text-purple-400 transition" title="Edit Profile">
+                            <FiEdit2 size={16} />
+                          </button>
                           <button 
                             disabled={isSuper}
                             onClick={() => toggleStatus(u)} 

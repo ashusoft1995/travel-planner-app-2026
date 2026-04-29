@@ -30,7 +30,18 @@ export function TripProvider({ children }) {
       const { data: res } = await tripsApi.get("/trips", {
         params: { ownerEmail: user.email },
       });
-      setTrips(Array.isArray(res?.data) ? res.data : []);
+      const resData = Array.isArray(res?.data) ? res.data : [];
+      const mappedTrips = resData.map(t => ({
+        ...t,
+        ownerEmail: t.owner_email || t.ownerEmail,
+        startDate: t.start_date || t.startDate,
+        endDate: t.end_date || t.endDate,
+        approvalStatus: t.approval_status || t.approvalStatus,
+        costBreakdown: t.cost_breakdown || t.costBreakdown,
+        agentStatus: t.agent_status || t.agentStatus,
+        assignedAgent: t.assigned_agent || t.assignedAgent
+      }));
+      setTrips(mappedTrips);
     } catch (e) {
       setError(friendlyApiMessage(e));
       setTrips([]);
@@ -50,7 +61,17 @@ export function TripProvider({ children }) {
       const { data: res } = await tripsApi.post("/trips", {
         ...trip,
       });
-      const newTrip = res.data || res;
+      const data = res.data || res;
+      const newTrip = {
+        ...data,
+        ownerEmail: data.owner_email || data.ownerEmail,
+        startDate: data.start_date || data.startDate,
+        endDate: data.end_date || data.endDate,
+        approvalStatus: data.approval_status || data.approvalStatus,
+        costBreakdown: data.cost_breakdown || data.costBreakdown,
+        agentStatus: data.agent_status || data.agentStatus,
+        assignedAgent: data.assigned_agent || data.assignedAgent
+      };
       setTrips((prev) => [newTrip, ...prev]);
       return newTrip;
     },
@@ -59,7 +80,17 @@ export function TripProvider({ children }) {
 
   const updateTrip = useCallback(async (id, patch) => {
     const { data: res } = await tripsApi.put(`/trips/${id}`, patch);
-    const updated = res.data || res;
+    const data = res.data || res;
+    const updated = {
+      ...data,
+      ownerEmail: data.owner_email || data.ownerEmail,
+      startDate: data.start_date || data.startDate,
+      endDate: data.end_date || data.endDate,
+      approvalStatus: data.approval_status || data.approvalStatus,
+      costBreakdown: data.cost_breakdown || data.costBreakdown,
+      agentStatus: data.agent_status || data.agentStatus,
+      assignedAgent: data.assigned_agent || data.assignedAgent
+    };
     setTrips((prev) => prev.map((t) => (t.id === id ? updated : t)));
     return updated;
   }, []);

@@ -90,6 +90,21 @@ const DESTINATION_PRICING = {
   }
 };
 
+const DEFAULT_PRICING = {
+  hotels: {
+    "Budget Hotel": { pricePerNight: 2500, rating: 2 },
+    "Mid-range Hotel": { pricePerNight: 6000, rating: 3.5 },
+    "Luxury Hotel": { pricePerNight: 12000, rating: 4.5 },
+    "Resort": { pricePerNight: 15000, rating: 5 }
+  },
+  activities: {
+    "City Tour": { price: 1500, duration: "3 hours" },
+    "Cultural Dinner": { price: 2000, duration: "4 hours" },
+    "Local Guide": { price: 2500, duration: "Full day" },
+    "Museum Visit": { price: 1000, duration: "2 hours" }
+  }
+};
+
 function AddTripPageContent() {
   const router = useRouter();
   const { addTrip } = useTrips();
@@ -203,8 +218,7 @@ function AddTripPageContent() {
       return;
     }
 
-    const destinationData = DESTINATION_PRICING[form.destination];
-    if (!destinationData) return;
+    const destinationData = DESTINATION_PRICING[form.destination] || DEFAULT_PRICING;
 
     // Calculate duration
     const startDate = new Date(form.startDate);
@@ -533,7 +547,7 @@ function AddTripPageContent() {
                     Accommodation Type
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(DESTINATION_PRICING[form.destination]?.hotels || {}).map(([type, data]) => (
+                    {Object.entries((DESTINATION_PRICING[form.destination] || DEFAULT_PRICING).hotels).map(([type, data]) => (
                       <div
                         key={type}
                         onClick={() => setForm(prev => ({ ...prev, accommodationType: type }))}
@@ -623,7 +637,7 @@ function AddTripPageContent() {
                     Select Activities
                   </label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(DESTINATION_PRICING[form.destination]?.activities || {}).map(([name, data]) => {
+                    {Object.entries((DESTINATION_PRICING[form.destination] || DEFAULT_PRICING).activities).map(([name, data]) => {
                       const isSelected = form.activities.some(a => a.name === name);
                       return (
                         <div
