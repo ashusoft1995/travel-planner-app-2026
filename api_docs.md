@@ -1,96 +1,88 @@
-# EthioTravel API Reference (Postman)
+# 🚀 EthioTravel API Documentation (Postman Ready)
 
-This document provides all **PUT** and **DELETE** endpoints available in the system for testing in Postman.
+This documentation provides the endpoints for both Local Development and Production environments.
+
+### 🌐 Server Environments
+- **Local Host**: `http://localhost:5000`
+- **Production Host**: `https://travel-planner-backend-f9gd.onrender.com`
+
+---
 
 ## 🔑 Authentication
-All administrative and user-specific endpoints require an `Authorization` header:
-`Authorization: Bearer <YOUR_JWT_TOKEN>`
+All administrative and user-specific endpoints require an `Authorization` header.
+
+| Key | Value |
+| :--- | :--- |
+| **Header** | `Authorization` |
+| **Format** | `Bearer <YOUR_JWT_TOKEN>` |
 
 ---
 
-## 🏗️ Destination Management
-Manage the global destination registry.
+## 🔄 ALL UPDATE ENDPOINTS (PUT / PATCH)
+Use these to modify existing records.
 
-### Update Destination
-- **URL**: `{{BASE_URL}}/api/destinations/:id`
+### 1. Update My Profile (Self)
+- **Local URL**: `http://localhost:5000/api/me`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/me`
 - **Method**: `PUT`
-- **Body** (JSON):
-```json
-{
-  "name": "Addis Ababa",
-  "country": "Ethiopia",
-  "region": "Addis Ababa",
-  "price": "25,000 ETB",
-  "rating": 4.8,
-  "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
-  "travelVolumeIndex": 85,
-  "description": "Updated city description here."
-}
-```
-
-### Delete Destination
-- **URL**: `{{BASE_URL}}/api/destinations/:id`
-- **Method**: `DELETE`
-
----
-
-## ✈️ Trip Management
-Manage user itineraries and bookings.
-
-### Update Trip
-- **URL**: `{{BASE_URL}}/api/trips/:id`
-- **Method**: `PUT`
-- **Body** (JSON):
-```json
-{
-  "destination": "Lalibela",
-  "startDate": "2026-05-10",
-  "endDate": "2026-05-15",
-  "budget": 45000,
-  "accommodation": "Luxury Hotel",
-  "notes": "Updated traveler notes."
-}
-```
-
-### Approve/Reject Trip (Admin Only)
-- **URL**: `{{BASE_URL}}/api/trips/:id/approval`
-- **Method**: `PATCH`
-- **Body** (JSON):
-```json
-{
-  "approval_status": "approved",
-  "notes": "Looks good! Itinerary confirmed."
-}
-```
-
-### Delete Trip
-- **URL**: `{{BASE_URL}}/api/trips/:id`
-- **Method**: `DELETE`
-
----
-
-## 👤 User & Profile Management
-Manage identity and system access.
-
-### Update My Profile
-- **URL**: `{{BASE_URL}}/api/me`
-- **Method**: `PUT`
-- **Body** (JSON):
+- **Payload**:
 ```json
 {
   "name": "Ashenafi Abebe",
   "phone": "+251911223344",
-  "about": "Expert guide and administrator.",
-  "username": "ashu_new",
+  "username": "ashu_updated",
   "currentPassword": "OldPassword123",
   "password": "NewSecurePassword456"
 }
 ```
 
-### Update Any User (Admin Only)
-- **URL**: `{{BASE_URL}}/api/users/:id`
+### 2. Update Destination (Admin Only)
+- **Local URL**: `http://localhost:5000/api/destinations/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/destinations/:id`
 - **Method**: `PUT`
-- **Body** (JSON):
+- **Payload**:
+```json
+{
+  "name": "Lalibela",
+  "price": "28,000 ETB",
+  "rating": 4.9,
+  "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b",
+  "travelVolumeIndex": 90
+}
+```
+
+### 3. Update Trip Itinerary
+- **Local URL**: `http://localhost:5000/api/trips/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/trips/:id`
+- **Method**: `PUT`
+- **Payload**:
+```json
+{
+  "destination": "Gondar",
+  "startDate": "2026-06-01",
+  "endDate": "2026-06-07",
+  "budget": 55000,
+  "accommodation": "Mid-range Hotel"
+}
+```
+
+### 4. Approve/Reject Trip (Admin Only)
+- **Local URL**: `http://localhost:5000/api/trips/:id/approval`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/trips/:id/approval`
+- **Method**: `PATCH`
+- **Payload**:
+```json
+{
+  "approval_status": "approved",
+  "notes": "Verified and confirmed."
+}
+```
+
+### 5. Update User Role/Status (Admin Only)
+- **Local URL**: `http://localhost:5000/api/users/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/users/:id`
+- **Method**: `PUT`
+- **Payload**:
 ```json
 {
   "role": "agent",
@@ -98,50 +90,63 @@ Manage identity and system access.
 }
 ```
 
-### Delete My Account (Self)
-- **URL**: `{{BASE_URL}}/api/me`
-- **Method**: `DELETE`
-
-### Delete Any User (Admin Only)
-- **URL**: `{{BASE_URL}}/api/users/:id`
-- **Method**: `DELETE`
-
----
-
-## 📢 Bulletins & Announcements
-
-### Update Announcement
-- **URL**: `{{BASE_URL}}/api/announcements/:id`
+### 6. Update Announcement/Bulletin (Admin Only)
+- **Local URL**: `http://localhost:5000/api/announcements/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/announcements/:id`
 - **Method**: `PUT`
-- **Body** (JSON):
+- **Payload**:
 ```json
 {
   "title": "Season Peak Alert",
-  "body": "Travel volume is increasing in the North.",
+  "body": "Travel volume is increasing.",
   "type": "warning",
   "is_active": true
 }
 ```
 
-### Delete Announcement
-- **URL**: `{{BASE_URL}}/api/announcements/:id`
-- **Method**: `DELETE`
-
----
-
-## 📨 Travel Requests
-
-### Update Travel Request Status (Admin Only)
-- **URL**: `{{BASE_URL}}/api/travel-requests/:id`
+### 7. Update Travel Request Status (Admin Only)
+- **Local URL**: `http://localhost:5000/api/travel-requests/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/travel-requests/:id`
 - **Method**: `PUT`
-- **Body** (JSON):
+- **Payload**:
 ```json
 {
   "status": "reviewed",
-  "admin_notes": "Follow up scheduled for tomorrow."
+  "admin_notes": "Follow up scheduled."
 }
 ```
 
-### Delete Travel Request
-- **URL**: `{{BASE_URL}}/api/travel-requests/:id`
+---
+
+## 🗑️ ALL DELETE ENDPOINTS
+Use these to permanently remove records.
+
+### 1. Purge My Account (Self)
+- **Local URL**: `http://localhost:5000/api/me`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/me`
+- **Method**: `DELETE`
+
+### 2. Delete Destination (Admin Only)
+- **Local URL**: `http://localhost:5000/api/destinations/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/destinations/:id`
+- **Method**: `DELETE`
+
+### 3. Delete Trip Itinerary
+- **Local URL**: `http://localhost:5000/api/trips/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/trips/:id`
+- **Method**: `DELETE`
+
+### 4. Delete User Record (Admin Only)
+- **Local URL**: `http://localhost:5000/api/users/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/users/:id`
+- **Method**: `DELETE`
+
+### 5. Kill Announcement/Bulletin (Admin Only)
+- **Local URL**: `http://localhost:5000/api/announcements/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/announcements/:id`
+- **Method**: `DELETE`
+
+### 6. Purge Travel Request (Admin Only)
+- **Local URL**: `http://localhost:5000/api/travel-requests/:id`
+- **Prod URL**: `https://travel-planner-backend-f9gd.onrender.com/api/travel-requests/:id`
 - **Method**: `DELETE`
