@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FiCheck, FiX, FiTrash2, FiMap, FiClock, FiUser, FiDollarSign, FiSearch, FiEdit2, FiEye, FiActivity, FiRefreshCw } from "react-icons/fi";
+import { FiCheck, FiX, FiTrash2, FiMap, FiClock, FiDollarSign, FiSearch, FiEdit2, FiEye, FiActivity, FiRefreshCw } from "react-icons/fi";
 import { tripsApi, patchTripApproval, friendlyApiMessage, getApiUrl, authHeaders } from "../../../../lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../../../context/LanguageContext";
@@ -25,7 +25,7 @@ export default function AdminTripsPage() {
     try {
       const [tripsRes, usersRes] = await Promise.all([
         tripsApi.get("/trips"),
-        fetch(getApiUrl("/users"), { headers: authHeaders() }).then(r => r.json())
+        fetch(getApiUrl("/api/users"), { headers: authHeaders() }).then(r => r.json())
       ]);
       const tripsData = Array.isArray(tripsRes.data) ? tripsRes.data : [];
       const mappedTrips = tripsData.map(t => ({
@@ -39,7 +39,7 @@ export default function AdminTripsPage() {
         assignedAgent: t.assigned_agent || t.assignedAgent
       }));
       setAllTrips(mappedTrips);
-      setAgents((usersRes.users || []).filter(u => u.role === 'agent' && u.status === 'active'));
+      setAgents(((usersRes.data || usersRes.users || []).filter(u => u.role === 'agent' && u.status === 'active')));
     } catch (e) {
       toast.error(friendlyApiMessage(e));
     } finally {
@@ -155,7 +155,7 @@ export default function AdminTripsPage() {
       {/* Search & Statistics */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
         {[
-          { label: "Total Asset Value", value: `$${allTrips.reduce((s,t)=>s+Number(t.budget||0),0).toLocaleString()}`, icon: FiDollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+          { label: "Total Asset Value", value: `${allTrips.reduce((s,t)=>s+Number(t.budget||0),0).toLocaleString()} ETB`, icon: FiDollarSign, color: "text-emerald-500", bg: "bg-emerald-500/10" },
           { label: "Pending Review", value: pendingCount, icon: FiClock, color: "text-amber-500", bg: "bg-amber-500/10" },
           { label: t.activeTrips, value: allTrips.length, icon: FiMap, color: "text-blue-500", bg: "bg-blue-500/10" },
           { label: t.activeNode, value: [...new Set(allTrips.map(t => t.destination))].length, icon: FiActivity, color: "text-purple-500", bg: "bg-purple-500/10" },
@@ -278,7 +278,7 @@ export default function AdminTripsPage() {
                        <span className="mx-2 text-[var(--text-muted)] opacity-30">→</span>
                        <span className="text-[11px] font-bold text-[var(--text-muted)]">{t.endDate}</span>
                     </td>
-                    <td className="px-5 py-4 font-black text-[var(--text-primary)]">${Number(t.budget || 0).toLocaleString()}</td>
+                    <td className="px-5 py-4 font-black text-[var(--text-primary)]">{Number(t.budget || 0).toLocaleString()} ETB</td>
                     <td className="px-5 py-4">
                       <div className="flex flex-wrap justify-end gap-2">
                         {ap === "pending" && (
@@ -370,7 +370,7 @@ export default function AdminTripsPage() {
                   <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
                      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-center">
                         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Budget Index</p>
-                        <p className="text-xl font-black text-white">${Number(selected.budget).toLocaleString()}</p>
+                        <p className="text-xl font-black text-white">{Number(selected.budget).toLocaleString()} ETB</p>
                      </div>
                      <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-center">
                         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20 mb-1">Accommodation</p>
@@ -543,7 +543,7 @@ export default function AdminTripsPage() {
 
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 block mb-2">Administrative Notes</label>
-                    <textarea rows={3} className="w-full rounded-xl border border-white/10 bg-white/5 py-3 px-4 text-white outline-none focus:border-blue-500/50 resize-none" value={editForm.notes} onChange={e => setEditForm({...editForm, notes: e.target.value})} />
+                    <textarea rows={3} className="w-full rounded-xl border border-white/10 bg-white/5 py-3 px-4 text-white outline-none focus:border-blue-500/50 resize-none" value={editForm.notes || ''} onChange={e => setEditForm({...editForm, notes: e.target.value})} />
                   </div>
 
                   <div className="flex gap-4 pt-4">

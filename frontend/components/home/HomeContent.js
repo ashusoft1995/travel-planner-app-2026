@@ -12,8 +12,10 @@ import {
 } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { translations } from "../../lib/translations";
 import { useTheme } from "next-themes";
 import { useInView } from "react-intersection-observer";
+import LanguageSelector from "../common/LanguageSelector";
 import {
   Bar,
   BarChart,
@@ -116,6 +118,8 @@ export default function HomeContent() {
   const { ref: demoStatsRef, inView: demoStatsInView } = useInView({ triggerOnce: true });
 
   const { user } = useAuth();
+  const { lang } = useLanguage();
+  const t = translations[lang] || translations.EN;
   const { theme, setTheme } = useTheme();
   const router = useRouter();
 
@@ -274,6 +278,11 @@ export default function HomeContent() {
           <div className="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-950/90 to-transparent" />
         </div>
         <div className="container relative z-10 flex min-h-[90vh] flex-col justify-center gap-12 py-24">
+          {/* Language Selector - Top Right */}
+          <div className="absolute top-8 right-8">
+            <LanguageSelector variant="compact" />
+          </div>
+          
           <div className="max-w-3xl">
             {user && (
               <div className="mb-6">
@@ -281,19 +290,19 @@ export default function HomeContent() {
                   href={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} 
                   className="inline-flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
                 >
-                  <FiArrowRight className="rotate-180" /> Back to Dashboard
+                  <FiArrowRight className="rotate-180" /> {t.backToDashboard}
                 </Link>
               </div>
             )}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-4 py-2 mb-8">
               <span className="h-2 w-2 rounded-full bg-accent-yellow animate-pulse" />
-              <span className="text-xs font-black uppercase tracking-widest text-white/60">New Exploration Phase Enabled</span>
+              <span className="text-xs font-black uppercase tracking-widest text-white/60">{t.newExplorationPhase}</span>
             </motion.div>
             <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="text-6xl font-black text-white lg:text-8xl leading-[0.9] tracking-tighter uppercase">
-              Ethiopia <span className="text-accent-yellow">Awaits</span>
+              {t.ethiopiaAwaits.split(' ')[0]} <span className="text-accent-yellow">{t.ethiopiaAwaits.split(' ')[1] || 'Awaits'}</span>
             </motion.h1>
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="mt-8 text-xl text-white/50 max-w-xl font-medium">
-              Discover 25+ iconic destinations across the roof of Africa. From rock-hewn ancient cities to lush tropical forests.
+              {t.heroDescription}
             </motion.p>
             <div className="mt-12 flex flex-col sm:flex-row gap-4 max-w-2xl">
               <div className="relative flex-1 group">
@@ -303,7 +312,7 @@ export default function HomeContent() {
                   value={searchQ} 
                   onChange={e => setSearchQ(e.target.value)} 
                   className="w-full rounded-2xl bg-white/10 border border-white/20 p-4 pl-12 text-white outline-none focus:border-accent-yellow/50 backdrop-blur-md transition-all uppercase tracking-widest text-xs font-bold" 
-                  placeholder="Where do you want to go?"
+                  placeholder={t.searchPlaceholder}
                 />
                 <AnimatePresence>
                   {suggestions.length > 0 && (
@@ -333,7 +342,7 @@ export default function HomeContent() {
                   )}
                 </AnimatePresence>
               </div>
-              <button onClick={runSearch} className="rounded-2xl bg-accent-yellow px-8 py-4 font-black uppercase tracking-widest text-black shadow-xl shadow-accent-yellow/20 hover:scale-105 active:scale-95 transition-all">Search</button>
+              <button onClick={runSearch} className="rounded-2xl bg-accent-yellow px-8 py-4 font-black uppercase tracking-widest text-black shadow-xl shadow-accent-yellow/20 hover:scale-105 active:scale-95 transition-all">{t.searchButton}</button>
             </div>
           </div>
         </div>
@@ -411,9 +420,9 @@ export default function HomeContent() {
       <section className="container py-24" ref={statsRef}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
            {[
-             { label: "Travelers Served", val: counters.travelers, suffix: "+", color: "text-purple-400" },
-             { label: "Active Destinations", val: counters.destinations, suffix: "", color: "text-emerald-400" },
-             { label: "Premium Lodging", val: counters.hotels, suffix: "", color: "text-blue-400" }
+             { label: t.travelersServed, val: counters.travelers, suffix: "+", color: "text-purple-400" },
+             { label: t.activeDestinations, val: counters.destinations, suffix: "", color: "text-emerald-400" },
+             { label: t.premiumLodging, val: counters.hotels, suffix: "", color: "text-blue-400" }
            ].map((stat, i) => (
              <div key={i} className="text-center group">
                <motion.p className={`text-7xl font-black tracking-tighter ${stat.color} text-glow-lg transition-transform group-hover:scale-110`}>
@@ -429,14 +438,14 @@ export default function HomeContent() {
       <section className="container py-24">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
-            <h2 className="text-xs font-black text-accent-yellow uppercase tracking-[0.4em] mb-4">Discovery Archive</h2>
-            <h3 className="text-5xl font-black text-white uppercase tracking-tight">Iconic <span className="text-white/40">Locations</span></h3>
+            <h2 className="text-xs font-black text-accent-yellow uppercase tracking-[0.4em] mb-4">{t.discoveryArchive}</h2>
+            <h3 className="text-5xl font-black text-white uppercase tracking-tight">{t.iconicLocations.split(' ')[0]} <span className="text-white/40">{t.iconicLocations.split(' ')[1] || 'Locations'}</span></h3>
           </div>
           <button 
             onClick={() => router.push("/trips")}
             className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-600 hover:text-blue-500 transition-colors group"
           >
-            View All 25+ Destinations <FiArrowRight className="transition-transform group-hover:translate-x-1" />
+            {t.viewAllDestinations} <FiArrowRight className="transition-transform group-hover:translate-x-1" />
           </button>
         </div>
 
@@ -465,7 +474,7 @@ export default function HomeContent() {
                     <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-20" />
                     <div className="bg-red-600 text-[8px] font-black text-white px-3 py-1.5 rounded-full uppercase tracking-widest shadow-lg shadow-red-900/20 flex items-center gap-1.5 border border-red-500/50">
                       <div className="h-1 w-1 bg-white rounded-full animate-pulse" />
-                      Hot
+                      {t.hot}
                     </div>
                   </div>
                 </div>
@@ -474,7 +483,7 @@ export default function HomeContent() {
               {/* Click Hint */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="px-6 py-3 bg-white/20 backdrop-blur-md rounded-2xl border border-white/30 text-[10px] font-black uppercase tracking-widest text-white animate-bounce">
-                  Explore Now
+                  {t.exploreNow}
                 </div>
               </div>
 
@@ -512,10 +521,10 @@ export default function HomeContent() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
         <div className="relative z-10 space-y-16">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Telemetry Integration</h2>
-            <h3 className="text-5xl font-black text-[#051128] uppercase tracking-tight">Market <span className="text-slate-200">Analytics</span></h3>
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">{t.telemetryIntegration}</h2>
+            <h3 className="text-5xl font-black text-[#051128] uppercase tracking-tight">{t.marketAnalytics.split(' ')[0]} <span className="text-slate-200">{t.marketAnalytics.split(' ')[1] || 'Analytics'}</span></h3>
             <p className="mt-6 text-slate-500 text-sm font-medium leading-relaxed">
-              Synthesizing real-time traveler flow and economic indicators. We leverage deep telemetry to optimize your itinerary and budget allocation.
+              {t.analyticsDescription}
             </p>
           </div>
 
@@ -523,7 +532,7 @@ export default function HomeContent() {
             {/* Bar Chart: Volume */}
             <div className="p-8 rounded-[3rem] bg-[#f8faff] border border-slate-100 shadow-sm">
               <div className="flex items-center justify-between mb-8 px-2">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Travel Volume Index</h4>
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t.travelVolumeIndex}</h4>
                 <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
               </div>
               <div className="h-[350px]">
@@ -546,7 +555,7 @@ export default function HomeContent() {
             {/* Line Chart: Trends */}
             <div className="p-8 rounded-[3rem] bg-[#f8faff] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm">
               <div className="flex items-center justify-between mb-8 px-2">
-                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Rating Propagation</h4>
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t.ratingPropagation}</h4>
                 <div className="h-2 w-2 rounded-full bg-purple-600 animate-pulse" />
               </div>
               <div className="h-[350px]">
@@ -571,8 +580,8 @@ export default function HomeContent() {
       {/* Testimonials */}
       <section className="container py-24">
         <div className="text-center mb-20">
-          <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">Transmission Logs</h2>
-          <h3 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tight">Traveler <span className="text-slate-200 dark:text-white/20">Verified</span></h3>
+          <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.4em] mb-4">{t.transmissionLogs}</h2>
+          <h3 className="text-5xl font-black text-[#051128] dark:text-white uppercase tracking-tight">{t.travelerVerified.split(' ')[0]} <span className="text-slate-200 dark:text-white/20">{t.travelerVerified.split(' ')[1] || 'Verified'}</span></h3>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -615,22 +624,22 @@ export default function HomeContent() {
           </div>
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-white/80 to-transparent" />
           <div className="relative z-10 max-w-4xl mx-auto">
-            <h2 className="text-5xl lg:text-7xl font-black text-[#051128] mb-8 tracking-tighter uppercase leading-[0.9]">Start your <span className="text-blue-600">Journey</span></h2>
+            <h2 className="text-5xl lg:text-7xl font-black text-[#051128] mb-8 tracking-tighter uppercase leading-[0.9]">{t.startYourJourney.split(' ').slice(0, 2).join(' ')} <span className="text-blue-600">{t.startYourJourney.split(' ')[2] || 'Journey'}</span></h2>
             <p className="text-slate-500 text-xl mb-12 font-medium max-w-2xl mx-auto">
-              Join thousands of travelers who have already discovered the hidden treasures of Ethiopia. Your bespoke experience starts with a single click.
+              {t.ctaDescription}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <button 
                 onClick={e => handleProtectedAction(e, "/add-trip")} 
                 className="w-full sm:w-auto px-12 py-6 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all"
               >
-                Plan Your Trip
+                {t.planYourTrip}
               </button>
               <Link 
                 href="/contact" 
                 className="w-full sm:w-auto px-12 py-6 bg-white text-[#051128] font-black uppercase tracking-widest rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all"
               >
-                Talk to an Expert
+                {t.talkToExpert}
               </Link>
             </div>
           </div>

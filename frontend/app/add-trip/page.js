@@ -360,12 +360,36 @@ function AddTripPageContent() {
 
     try {
       const created = await addTrip(tripData);
+
+      // Also submit a travel request so admin sees it in Travel Requests panel
+      try {
+        const { submitTravelRequestToAdmin } = await import("../../lib/api");
+        await submitTravelRequestToAdmin({
+          fullName: form.clientEmail ? form.clientEmail.split("@")[0] : "Self",
+          email: form.clientEmail || "",
+          phone: "",
+          nationality: "Ethiopian",
+          age: 25,
+          gender: "Not specified",
+          desiredDestination: form.destination.trim(),
+          preferredStartDate: form.startDate,
+          preferredEndDate: form.endDate,
+          budgetHint: `${Number(form.budget) || 0} ETB`,
+          accommodationPreference: form.accommodationType,
+          specialRequests: form.notes.trim(),
+          travelHistory: `Activities: ${form.activities.map(a => a.name).join(", ")}`,
+        });
+      } catch (reqErr) {
+        // Non-critical — trip was saved, just log the request error
+        console.warn("Travel request creation failed:", reqErr);
+      }
+
       if (created?.approvalStatus === "pending") {
-        toast.success("Trip saved â pending admin approval. Youâll get a notification when reviewed.");
+        toast.success("Trip saved — pending admin approval. You'll get a notification when reviewed.");
       } else {
         toast.success("Trip saved successfully!");
       }
-      router.push("/trips");
+      router.push("/dashboard");
     } catch (err) {
       toast.error(
         err?.response?.data?.message || "Could not save trip. Is the API running?"
@@ -379,6 +403,14 @@ function AddTripPageContent() {
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard")}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-black uppercase tracking-widest text-xs mb-6 transition-colors group"
+          >
+            <FiArrowLeft className="transition-transform group-hover:-translate-x-1" size={16} />
+            Back to Dashboard
+          </button>
           <h1 className="text-3xl font-bold text-gray-900">Plan Your Trip</h1>
           <p className="mt-2 text-gray-600">Create your perfect Ethiopian travel experience with our smart cost calculator</p>
         </div>

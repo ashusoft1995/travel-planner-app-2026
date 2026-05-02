@@ -98,8 +98,8 @@ export default function TripCard({ trip, showDelete = true }) {
           </p>
         )}
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border)] pt-3">
-          <span className="text-lg font-bold text-brand-600 dark:thiext-accent-yellow">
-            ${Number(trip.budget || 0).toLocaleString()}
+          <span className="text-lg font-bold text-brand-600 dark:text-accent-yellow">
+            {Number(trip.budget || 0).toLocaleString()} ETB
           </span>
           <span className="text-xs text-[var(--muted)]">
             {activitiesCount} activit{activitiesCount === 1 ? "y" : "ies"}

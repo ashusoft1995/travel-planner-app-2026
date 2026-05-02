@@ -22,7 +22,7 @@ import {
   FiUserPlus
 } from "react-icons/fi";
 import { useAuth } from "../../../../context/AuthContext";
-import { tripsApi, friendlyApiMessage } from "../../../../lib/api";
+import { api, tripsApi, friendlyApiMessage } from "../../../../lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AdminUsersPage() {
@@ -40,7 +40,7 @@ export default function AdminUsersPage() {
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await tripsApi.get("/users");
+      const { data } = await api.get("/api/users");
       const users = data?.data || [];
       
       // Hierarchical Sort Logic
@@ -83,7 +83,7 @@ export default function AdminUsersPage() {
     if (!confirm(`Are you sure you want to ${isBlocking ? 'BLOCK' : 'UNBLOCK'} ${userRow.name}?`)) return;
 
     try {
-      await tripsApi.put(`/users/${userRow.id}`, { status: isBlocking ? "blocked" : "active" });
+      await api.put(`/api/users/${userRow.id}`, { status: isBlocking ? "blocked" : "active" });
       toast.success(isBlocking ? "User account suspended" : "User account reactivated");
       loadUsers();
     } catch (e) {
@@ -98,7 +98,7 @@ export default function AdminUsersPage() {
     }
     if (!confirm(`Permanently delete user "${userRow.name}"? This cannot be undone.`)) return;
     try {
-      await tripsApi.delete(`/users/${userRow.id}`);
+      await api.delete(`/api/users/${userRow.id}`);
       toast.success("User record deleted.");
       loadUsers();
     } catch (e) {
@@ -110,7 +110,7 @@ export default function AdminUsersPage() {
     e.preventDefault();
     setFormLoading(true);
     try {
-      await tripsApi.put(`/users/${selectedUser.id}`, editForm);
+      await api.put(`/api/users/${selectedUser.id}`, editForm);
       toast.success("Account updated successfully");
       setSelectedUser(null);
       loadUsers();
@@ -123,13 +123,24 @@ export default function AdminUsersPage() {
 
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
+    if (!editForm.name || !editForm.email || !editForm.username || !editForm.password) {
+      toast.error("All fields including password are required");
+      return;
+    }
     setFormLoading(true);
     try {
-      await tripsApi.post("/users", editForm);
-      toast.success("New account registered successfully");
+      await api.post("/api/users", {
+        name: editForm.name,
+        email: editForm.email,
+        username: editForm.username,
+        password: editForm.password,
+        role: editForm.role,
+        status: "active",
+      });
+      toast.success(`New ${editForm.role} registered successfully`);
       setSelectedUser(null);
       setModalMode(null);
-      setEditForm({ name: "", email: "", username: "", role: "admin", status: "active" });
+      setEditForm({ name: "", email: "", username: "", password: "", role: "admin", status: "active" });
       loadUsers();
     } catch (e) {
       toast.error(friendlyApiMessage(e));
@@ -139,17 +150,29 @@ export default function AdminUsersPage() {
   };
 
   const openModal = (u, mode) => {
-    setSelectedUser(u);
     setModalMode(mode);
-    if (mode === "edit" || mode === "create") {
+    if (mode === 'create') {
+      setSelectedUser({ _create: true }); // sentinel to open modal
       setEditForm({
-        name: u?.name || "",
-        email: u?.email || "",
-        username: u?.username || "",
+        name: "",
+        email: "",
+        username: "",
         password: "",
-        role: u?.role || "admin",
-        status: u?.status || "active",
+        role: "admin",
+        status: "active",
       });
+    } else {
+      setSelectedUser(u);
+      if (mode === "edit") {
+        setEditForm({
+          name: u?.name || "",
+          email: u?.email || "",
+          username: u?.username || "",
+          password: "",
+          role: u?.role || "admin",
+          status: u?.status || "active",
+        });
+      }
     }
   };
 
@@ -313,7 +336,7 @@ export default function AdminUsersPage() {
 
       {/* ── USER DETAIL / EDIT MODAL ── */}
       <AnimatePresence>
-        {selectedUser && (
+        {(selectedUser || modalMode === 'create') && (
           <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} 
@@ -337,8 +360,7 @@ export default function AdminUsersPage() {
                       {selectedUser?.name ? selectedUser.name.charAt(0) : <FiUserPlus />}
                     </div>
                   </div>
-                  <button onClick={() => { setSelectedUser(null); setModalMode(null); }} className="mb-2 p-2 rounded-full bg-white/5 text-white/40 hover:text-white"><FiX size={20} /></button>
-                </div>
+                  <button onClick={() => { setSelectedUser(null); setModalMode(null); }} className="mb-2 p-2 rounded-full bg-white/5 text-white/40 hover:text-white"><FiX size={20} /></button>                </div>
 
                 {modalMode === 'detail' && (
                   <div className="space-y-6">

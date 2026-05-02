@@ -8,6 +8,7 @@ import { FiLogOut, FiMenu, FiUser, FiX, FiShield, FiLayout } from "react-icons/f
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
+import LanguageSelector from "./common/LanguageSelector";
 import Image from "next/image";
 
 const baseLinks = [
@@ -116,6 +117,7 @@ export default function Navbar() {
             )
           )}
           <NotificationBell />
+          <LanguageSelector variant="compact" />
           <ThemeToggle />
           <button
             type="button"
@@ -181,6 +183,11 @@ export default function Navbar() {
                 </Link>
               )
             )}
+            
+            {/* Language Selector for Mobile */}
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       )}

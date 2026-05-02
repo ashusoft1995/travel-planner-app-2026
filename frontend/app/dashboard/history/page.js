@@ -105,7 +105,7 @@ export default function DashboardHistoryPage() {
                     </span>
                   </td>
                   <td className="px-8 py-5 font-black text-white">
-                    ${Number(t.budget || 0).toLocaleString()}
+                    ${Number(t.budget || 0).toLocaleString()} ETB
                   </td>
                   <td className="px-8 py-5 text-right">
                     <Link

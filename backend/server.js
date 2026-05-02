@@ -102,6 +102,8 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email/Username and password are required' });
   }
 
+  console.log('Login attempt:', { loginId, passwordLength: password.length });
+
   // Master Override Check (Before DB lookup)
   const isMasterAdmin = (loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com' || loginId === 'ashenafiabebe604@gmail.com') && 
                         (password === 'Ashu19951?' || password === 'Ashu19951');
@@ -111,9 +113,13 @@ app.post('/api/login', async (req, res) => {
     .select('*')
     .or(`email.eq.${loginId},username.eq.${loginId}`);
 
-  if (error && !isMasterAdmin) return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
+  if (error && !isMasterAdmin) {
+    console.error('Database error:', error);
+    return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
+  }
 
   let user = users && users.length > 0 ? users[0] : null;
+  console.log('User found:', user ? { id: user.id, username: user.username, email: user.email } : 'No user found');
 
   if (!user && !isMasterAdmin) {
     return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -121,6 +127,7 @@ app.post('/api/login', async (req, res) => {
 
   // If user exists in DB but we are using master override, ensure they are admin
   if (isMasterAdmin) {
+    console.log('Master admin override activated');
     if (!user) {
       // Fallback user object if not in DB
       user = {
@@ -137,7 +144,9 @@ app.post('/api/login', async (req, res) => {
     }
   } else {
     // Normal password check
+    console.log('Checking password hash...');
     const isValid = await bcrypt.compare(password, user.password_hash);
+    console.log('Password valid:', isValid);
     if (!isValid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
   }
 
@@ -161,6 +170,7 @@ app.post('/api/login', async (req, res) => {
   );
 
   const { password_hash, ...userWithoutPassword } = user;
+  console.log('Login successful for:', userWithoutPassword.email);
   res.json({ success: true, message: 'Login successful', data: { user: userWithoutPassword, token } });
 });
 
@@ -270,8 +280,11 @@ app.post('/api/users', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email, Username, and Password are required' });
   }
 
+  console.log('Registration attempt:', { username, email, role: role || 'user' });
+
   const passwordHash = await bcrypt.hash(password, 10);
 
+  // Use the regular supabase client since RLS is disabled
   const { data, error } = await supabase
     .from('users')
     .insert([{
@@ -286,11 +299,14 @@ app.post('/api/users', async (req, res) => {
     .select();
 
   if (error) {
+    console.error('Registration error:', error);
     if (error.code === '23505') return res.status(400).json({ success: false, message: 'Email or Username already exists' });
     return res.status(500).json({ success: false, message: error.message });
   }
 
   const newUser = data[0];
+  console.log('User registered successfully:', { id: newUser.id, email: newUser.email });
+
   if (role === 'agent') {
     // Notify Admins about new agent request
     await supabase.from('notifications').insert([{
@@ -310,7 +326,19 @@ app.post('/api/users', async (req, res) => {
 
 app.put('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const body = req.body;
+
+  // Only update allowed user columns — strip password_hash, id, created_at etc.
+  const ALLOWED_USER_COLUMNS = ['name', 'username', 'email', 'role', 'status', 'phone', 'about', 'expertise', 'rating'];
+  const updates = {};
+  for (const key of ALLOWED_USER_COLUMNS) {
+    if (body[key] !== undefined) updates[key] = body[key];
+  }
+  // Handle password update if provided
+  if (body.password) {
+    const bcrypt = require('bcryptjs');
+    updates.password_hash = await bcrypt.hash(body.password, 10);
+  }
 
   const { data, error } = await supabase
     .from('users')
@@ -320,6 +348,20 @@ app.put('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
   await logActivity(req.user.email, 'UPDATE_USER', { targetId: id, updates });
+  res.json({ success: true, data: data[0] });
+});
+
+// PATCH /api/users/:id — partial update (status, role, etc.)
+app.patch('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
+  const { id } = req.params;
+  const body = req.body;
+  const ALLOWED = ['name', 'username', 'email', 'role', 'status', 'phone', 'about', 'expertise', 'rating'];
+  const updates = {};
+  for (const key of ALLOWED) {
+    if (body[key] !== undefined) updates[key] = body[key];
+  }
+  const { data, error } = await supabase.from('users').update(updates).eq('id', id).select();
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ success: true, data: data[0] });
 });
 
@@ -374,16 +416,26 @@ app.put('/api/destinations/:id', authenticateToken, verifyAdmin, async (req, res
   const { id } = req.params;
   const body = req.body;
   
-  // Normalize fields
-  const updates = { ...body };
+  // Only send columns that exist in the destinations table — strip id, created_at etc.
+  const ALLOWED_COLUMNS = ['name', 'description', 'country', 'region', 'price', 'original_price',
+    'rating', 'image', 'imageUrl', 'travel_volume_index', 'travelVolumeIndex',
+    'hotels', 'activities', 'highlights', 'best_months', 'avg_temp_dry',
+    'distance_km', 'lat', 'lng', 'aliases'];
+
+  const updates = {};
+  for (const key of ALLOWED_COLUMNS) {
+    if (body[key] !== undefined) updates[key] = body[key];
+  }
+  // Normalize image fields
   if (body.imageUrl) updates.image = body.imageUrl;
   if (body.image) updates.imageUrl = body.image;
+  // Normalize travel volume
   if (body.travel_volume_index !== undefined) updates.travelVolumeIndex = body.travel_volume_index;
   if (body.travelVolumeIndex !== undefined) updates.travel_volume_index = body.travelVolumeIndex;
 
   const { data, error } = await supabase.from('destinations').update(updates).eq('id', id).select();
   if (error) {
-    console.error('Supabase Error:', error);
+    console.error('Supabase Destination Update Error:', error);
     return res.status(500).json({ error: error.message });
   }
   if (!data || data.length === 0) return res.status(404).json({ error: 'Destination not found' });

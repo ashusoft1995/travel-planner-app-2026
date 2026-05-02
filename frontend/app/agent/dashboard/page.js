@@ -79,7 +79,7 @@ export default function AgentInboxPage() {
                     </div>
                     <div className="flex justify-between text-xs">
                        <span className="text-white/40">Budget</span>
-                       <span className="text-white/80 font-bold">${Number(m.budget||0).toLocaleString()}</span>
+                       <span className="text-white/80 font-bold">{Number(m.budget||0).toLocaleString()} ETB</span>
                     </div>
                  </div>
                  <div className="flex gap-2">
@@ -130,7 +130,7 @@ export default function AgentInboxPage() {
                    </div>
                    <div className="rounded-xl bg-white/5 p-3">
                      <p className="text-[10px] uppercase text-white/40 tracking-widest mb-1">Budget Allocation</p>
-                     <p className="text-sm font-bold text-white">${Number(selected.budget).toLocaleString()}</p>
+                     <p className="text-sm font-bold text-white">{Number(selected.budget).toLocaleString()} ETB</p>
                    </div>
                    <div className="rounded-xl bg-white/5 p-3 col-span-2">
                      <p className="text-[10px] uppercase text-white/40 tracking-widest mb-1">Accommodation</p>

@@ -261,7 +261,7 @@ function AdminCommandCenter() {
       {/* ── KPI Grid ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Total Asset Flow", val: `$${totalBudget.toLocaleString()}`, icon: FiDollarSign, color: "from-emerald-500/20", text: "text-emerald-400", sub: "Global trip budget" },
+          { label: "Total Asset Flow", val: `${totalBudget.toLocaleString()} ETB`, icon: FiDollarSign, color: "from-emerald-500/20", text: "text-emerald-400", sub: "Global trip budget (ETB)" },
           { label: "Active Travelers", val: stats.users.length, icon: FiUsers, color: "from-blue-500/20", text: "text-blue-400", sub: "Registered accounts" },
           { label: "Security Oversight", val: stats.trips.length, icon: FiMap, color: "from-purple-500/20", text: "text-purple-400", sub: "Itineraries tracked" },
           { label: "Pending Orders", val: pendingRequests, icon: FiSend, color: "from-amber-500/20", text: "text-amber-400", sub: "Awaiting approval" },

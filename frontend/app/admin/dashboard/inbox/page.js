@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { 
   FiSend, 
@@ -19,22 +20,37 @@ import { fetchAdminContactMessages, postAdminContactReply, friendlyApiMessage } 
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function AdminInboxPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="h-10 w-10 animate-spin rounded-full border-4 border-purple-500 border-t-transparent" /></div>}>
+      <AdminInboxContent />
+    </Suspense>
+  );
+}
+
+function AdminInboxContent() {
   const [contacts, setContacts] = useState([]);
   const [replyInputs, setReplyInputs] = useState({});
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+  const searchParams = useSearchParams();
 
   const loadContacts = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await fetchAdminContactMessages();
-      setContacts(Array.isArray(data) ? data : []);
+      const list = Array.isArray(data) ? data : [];
+      setContacts(list);
+      // Auto-expand if messageId param is present
+      const msgId = searchParams.get("messageId");
+      if (msgId) {
+        setExpandedId(msgId);
+      }
     } catch (e) {
       toast.error(friendlyApiMessage(e));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     loadContacts();

@@ -87,7 +87,7 @@ export const patchAdminTravelRequest = (id, data) => api.patch(`/api/travel-requ
 export const deleteAdminTravelRequest = (id) => api.delete(`/api/travel-requests/${id}`);
 
 export const fetchAdminContactMessages = () => api.get('/api/contact-messages');
-export const postAdminContactReply = (id, data) => api.post(`/api/contact-messages/${id}/reply`, data);
+export const postAdminContactReply = (id, data) => api.post(`/api/contact-messages/${id}/reply`, typeof data === 'string' ? { replyText: data } : data);
 
 export const fetchActivityLogs = () => api.get('/api/activity-logs');
 export const undoActivity = (id) => api.post(`/api/activity-logs/${id}/undo`);

@@ -159,8 +159,10 @@ function AdminNotificationPanel() {
       router.push(`/admin/dashboard/trips?id=${n.targetId}`);
     } else if (n.type === 'agent_request') {
       router.push('/admin/dashboard/agents');
-    } else if (n.type === 'message' || n.type === 'support_message') {
+    } else if (n.type === 'message') {
       router.push(`/admin/dashboard?view=cmessages&recipient=${n.targetId || ''}`);
+    } else if (n.type === 'support_message') {
+      router.push(`/admin/dashboard/inbox?messageId=${n.target_id || n.targetId || ''}`);
     } else if (n.type === 'travel_request') {
       router.push('/admin/dashboard/requests');
     }

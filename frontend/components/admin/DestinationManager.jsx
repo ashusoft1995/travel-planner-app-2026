@@ -65,7 +65,23 @@ export default function DestinationManager() {
     const loadingToast = toast.loading(editingDestination ? "Updating node..." : "Initializing new destination...");
     
     try {
-      const payload = { ...formData };
+      // Clean payload — only send fields the backend/DB accepts
+      const payload = {
+        name: formData.name,
+        country: formData.country,
+        region: formData.region,
+        description: formData.description,
+        highlights: formData.highlights,
+        image: formData.imageUrl || formData.image || "",
+        imageUrl: formData.imageUrl || formData.image || "",
+        hotels: formData.hotels || {},
+        activities: formData.activities || {},
+        travel_volume_index: Number(formData.travel_volume_index) || 0,
+        travelVolumeIndex: Number(formData.travel_volume_index) || 0,
+        price: formData.price || "",
+        rating: Number(formData.rating) || 4.5,
+      };
+
       let response;
       
       if (editingDestination) {

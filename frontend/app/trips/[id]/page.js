@@ -307,7 +307,7 @@ function ItineraryTab({ trip, onUpdate }) {
           <div className="mt-6">
             <div className="flex justify-between text-sm mb-2">
               <span className="font-medium">Total Spent</span>
-              <span className="font-bold">${totalSpent.toLocaleString()}</span>
+              <span className="font-bold">{totalSpent.toLocaleString()} ETB</span>
             </div>
             <div className="w-full bg-[var(--border)] h-2.5 rounded-full overflow-hidden">
               <div 

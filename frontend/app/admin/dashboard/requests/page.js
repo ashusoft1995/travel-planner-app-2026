@@ -41,7 +41,8 @@ export default function AdminRequestsPage() {
     setLoading(true);
     try {
       const { data } = await fetchAdminTravelRequests();
-      const mapped = (Array.isArray(data) ? data : []).map(r => ({
+      const rawList = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      const mapped = rawList.map(r => ({
         ...r,
         fullName: r.full_name || r.fullName,
         desiredDestination: r.desired_destination || r.desiredDestination,

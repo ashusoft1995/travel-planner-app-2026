@@ -59,10 +59,10 @@ export default function UserCommandCenter() {
   const fetchUserData = async () => {
     try {
       const [tripsResponse, notificationsResponse] = await Promise.all([
-        fetch(getApiUrl("/trips"), {
+        fetch(getApiUrl("/api/trips"), {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch(getApiUrl("/notifications"), {
+        fetch(getApiUrl("/api/notifications"), {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -148,7 +148,7 @@ export default function UserCommandCenter() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
             {[
               { label: "Total Voyages", val: stats.totalTrips, icon: FiMap, color: "from-blue-500/20", text: "text-blue-400", sub: "Lifetime trips" },
-              { label: "Mission Capital", val: `$${stats.totalBudget.toLocaleString()}`, icon: FiDollarSign, color: "from-emerald-500/20", text: "text-emerald-400", sub: "Allocated budget" },
+              { label: "Mission Capital", val: `${stats.totalBudget.toLocaleString()} ETB`, icon: FiDollarSign, color: "from-emerald-500/20", text: "text-emerald-400", sub: "Allocated budget (ETB)" },
               { label: "Active Deployments", val: stats.upcoming, icon: FiCalendar, color: "from-amber-500/20", text: "text-amber-400", sub: "Upcoming trips" },
               { label: "Completed Operations", val: stats.completed, icon: FiCheckCircle, color: "from-purple-500/20", text: "text-purple-400", sub: "Past travels" },
             ].map((kpi, i) => (
@@ -307,7 +307,7 @@ export default function UserCommandCenter() {
                               {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
                             </td>
                             <td className="py-4 font-black text-blue-400">
-                              ${(trip.budget || 0).toLocaleString()}
+                              {(trip.budget || 0).toLocaleString()} ETB
                             </td>
                             <td className="py-4">
                               <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest ${
