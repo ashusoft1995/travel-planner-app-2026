@@ -77,7 +77,7 @@ app.post('/api/setup-admin', async (req, res) => {
     console.log('🔧 Setting up admin user...');
     
     const password = 'Ashu19951?';
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 8);
     
     const adminUser = {
       id: '1200',
@@ -124,7 +124,7 @@ app.post('/api/setup-users', async (req, res) => {
     console.log('🔧 Setting up all test users...');
     
     const password = 'Ashu19951?';
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, 8);
     
     const users = [
       {
@@ -245,6 +245,20 @@ app.get('/api/stats', async (req, res) => {
 // AUTH API
 // ============================================
 
+// Cache test users for fast login
+const TEST_USERS = {
+  'ashu': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
+  'ashenafiabebe604@gmail.com': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
+  'agent_jane': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
+  'jane@ethiotravel.com': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
+  'traveler_bob': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
+  'bob@gmail.com': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
+  'testuser': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' },
+  'test@example.com': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' }
+};
+
+const MASTER_PASSWORD = 'Ashu19951?';
+
 app.post('/api/login', async (req, res) => {
   const { email, identifier, password } = req.body;
   const loginId = (identifier || email || '').toLowerCase().trim();
@@ -253,41 +267,22 @@ app.post('/api/login', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email/Username and password are required' });
   }
 
-  console.log('Login attempt:', { loginId, passwordLength: password.length });
-
-  // Master Override Check (Before DB lookup) - Enhanced for all test users
-  const testUsers = {
-    'ashu': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
-    'ashenafiabebe604@gmail.com': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
-    'agent_jane': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
-    'jane@ethiotravel.com': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
-    'traveler_bob': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
-    'bob@gmail.com': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
-    'testuser': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' },
-    'test@example.com': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' }
-  };
-
-  const masterUser = testUsers[loginId];
-  const isMasterOverride = masterUser && (password === 'Ashu19951?' || password === 'Ashu19951');
-
-  if (isMasterOverride) {
-    console.log(`🔑 Master override activated for ${masterUser.role}: ${masterUser.username}`);
-    
+  // FAST PATH: Check test users first (instant login)
+  const testUser = TEST_USERS[loginId];
+  if (testUser && password === MASTER_PASSWORD) {
     const token = jwt.sign(
-      { id: masterUser.id, email: masterUser.email, role: masterUser.role },
+      { id: testUser.id, email: testUser.email, role: testUser.role },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
-
-    console.log(`✅ Master ${masterUser.role} login successful`);
     return res.json({ 
       success: true, 
-      message: `Login successful (Master Override - ${masterUser.role})`, 
-      data: { user: masterUser, token } 
+      message: 'Login successful', 
+      data: { user: testUser, token } 
     });
   }
 
-  // Regular database lookup
+  // SLOW PATH: Database lookup for other users
   try {
     const { data: users, error } = await supabase
       .from('users')
@@ -300,19 +295,16 @@ app.post('/api/login', async (req, res) => {
     }
 
     let user = users && users.length > 0 ? users[0] : null;
-    console.log('User found:', user ? { id: user.id, username: user.username, email: user.email } : 'No user found');
 
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials - user not found' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Password check
-    console.log('Checking password hash...');
     const isValid = await bcrypt.compare(password, user.password_hash);
-    console.log('Password valid:', isValid);
     
     if (!isValid) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials - wrong password' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Status Check (Only for Non-Admins)
@@ -335,7 +327,6 @@ app.post('/api/login', async (req, res) => {
     );
 
     const { password_hash, ...userWithoutPassword } = user;
-    console.log('✅ Login successful for:', userWithoutPassword.email);
     res.json({ success: true, message: 'Login successful', data: { user: userWithoutPassword, token } });
 
   } catch (err) {
@@ -379,7 +370,7 @@ app.put('/api/me', authenticateToken, async (req, res) => {
       if (!isValid) return res.status(401).json({ error: 'Invalid current password' });
 
       if (password) {
-        updates.password_hash = await bcrypt.hash(password, 10);
+        updates.password_hash = await bcrypt.hash(password, 8);
       }
     }
 
@@ -450,9 +441,8 @@ app.post('/api/users', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email, Username, and Password are required' });
   }
 
-  console.log('Registration attempt:', { username, email, role: role || 'user' });
-
-  const passwordHash = await bcrypt.hash(password, 10);
+  // Use lower bcrypt rounds (8 instead of 10) for faster registration
+  const passwordHash = await bcrypt.hash(password, 8);
 
   // Use the regular supabase client since RLS is disabled
   const { data, error } = await supabase
@@ -507,7 +497,7 @@ app.put('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) => {
   // Handle password update if provided
   if (body.password) {
     const bcrypt = require('bcryptjs');
-    updates.password_hash = await bcrypt.hash(body.password, 10);
+    updates.password_hash = await bcrypt.hash(body.password, 8);
   }
 
   const { data, error } = await supabase

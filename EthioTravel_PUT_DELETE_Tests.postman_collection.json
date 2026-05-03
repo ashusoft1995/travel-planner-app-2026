@@ -1,0 +1,379 @@
+{
+  "info": {
+    "name": "EthioTravel PUT & DELETE Tests",
+    "description": "10 Essential PUT and DELETE API tests for EthioTravel application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-set authorization header",
+          "if (pm.environment.get('token')) {",
+          "    pm.request.headers.add({",
+          "        key: 'Authorization',",
+          "        value: 'Bearer ' + pm.environment.get('token')",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "🔑 Authentication",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Save token from login response",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data.token) {",
+                  "        pm.environment.set('token', response.data.token);",
+                  "        console.log('Admin token saved:', response.data.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"ashu\",\n  \"password\": \"Ashu19951?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔄 PUT Operations",
+      "item": [
+        {
+          "name": "1️⃣ PUT - Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Profile Name\",\n  \"phone\": \"+251911777888\",\n  \"about\": \"Updated profile description for testing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "2️⃣ PUT - Update User (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Agent Name\",\n  \"role\": \"agent\",\n  \"status\": \"active\",\n  \"phone\": \"+251911999888\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/1201",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1201"]
+            }
+          }
+        },
+        {
+          "name": "3️⃣ PUT - Update Destination (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Lalibela\",\n  \"description\": \"Updated description with new attractions and facilities\",\n  \"price\": \"45,000 ETB\",\n  \"rating\": 4.9,\n  \"travel_volume_index\": 90\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/destinations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations", "1"]
+            }
+          }
+        },
+        {
+          "name": "4️⃣ PUT - Update Trip",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Updated Gondar\",\n  \"startDate\": \"2026-08-15\",\n  \"endDate\": \"2026-08-25\",\n  \"budget\": 55000,\n  \"accommodation\": \"Luxury Heritage Hotel\",\n  \"notes\": \"Updated preferences for luxury experience\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}"]
+            }
+          }
+        },
+        {
+          "name": "5️⃣ PUT - Update Travel Request (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"reviewed\",\n  \"admin_notes\": \"Customer contacted. Tour package prepared for requested destination.\",\n  \"assigned_agent\": \"agent_jane\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/travel-requests/{{request_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "travel-requests", "{{request_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🗑️ DELETE Operations",
+      "item": [
+        {
+          "name": "6️⃣ DELETE - Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1202",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1202"]
+            }
+          }
+        },
+        {
+          "name": "7️⃣ DELETE - Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/trips/{{trip_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "{{trip_id}}"]
+            }
+          }
+        },
+        {
+          "name": "8️⃣ DELETE - Delete Destination (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/destinations/5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations", "5"]
+            }
+          }
+        },
+        {
+          "name": "9️⃣ DELETE - Delete Travel Request (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/travel-requests/{{request_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "travel-requests", "{{request_id}}"]
+            }
+          }
+        },
+        {
+          "name": "🔟 DELETE - Delete My Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📋 Helper Requests",
+      "item": [
+        {
+          "name": "Get All Users (for IDs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get All Trips (for IDs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/trips",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips"]
+            }
+          }
+        },
+        {
+          "name": "Get All Destinations (for IDs)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/destinations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations"]
+            }
+          }
+        },
+        {
+          "name": "Get Travel Requests (for IDs)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/travel-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "travel-requests"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
