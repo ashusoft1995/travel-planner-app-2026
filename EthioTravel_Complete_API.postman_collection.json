@@ -1,0 +1,547 @@
+{
+  "info": {
+    "name": "EthioTravel API - Complete Collection",
+    "description": "Complete API collection for EthioTravel with Local and Production URLs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"ashu\",\n  \"password\": \"Ashu19951?\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set(\"token\", jsonData.data.token);",
+                  "    pm.test(\"Login successful\", function() {",
+                  "        pm.expect(jsonData.success).to.be.true;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"username\": \"johndoe\",\n  \"password\": \"SecurePass123!\",\n  \"role\": \"user\",\n  \"phone\": \"+251911234567\",\n  \"about\": \"Travel enthusiast\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Register Agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Travel Expert\",\n  \"email\": \"jane@example.com\",\n  \"username\": \"jane_agent\",\n  \"password\": \"SecurePass123!\",\n  \"role\": \"agent\",\n  \"phone\": \"+251911234567\",\n  \"expertise\": [\"Addis Ababa\", \"Lalibela\", \"Simien Mountains\"],\n  \"about\": \"Professional travel guide with 10 years experience\",\n  \"legal_paper_photo\": \"https://example.com/permit.jpg\",\n  \"national_id_photo\": \"https://example.com/id.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"+251922345678\",\n  \"about\": \"Updated bio\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        },
+        {
+          "name": "Delete Account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 User Management (Admin)",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1200",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1200"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Agent Name\",\n  \"status\": \"active\",\n  \"role\": \"agent\",\n  \"rating\": 4.8\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/1201",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1201"]
+            }
+          }
+        },
+        {
+          "name": "Approve/Reject Agent",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/1201",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1201"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/1203",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "1203"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏖️ Destinations",
+      "item": [
+        {
+          "name": "Get All Destinations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/destinations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations"]
+            }
+          }
+        },
+        {
+          "name": "Create Destination",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Danakil Depression\",\n  \"description\": \"One of the hottest places on Earth\",\n  \"country\": \"Ethiopia\",\n  \"region\": \"Afar\",\n  \"price\": \"45,000 ETB\",\n  \"rating\": 4.6,\n  \"image\": \"https://images.unsplash.com/...\",\n  \"travel_volume_index\": 75,\n  \"best_months\": [\"October\", \"November\", \"December\"],\n  \"avg_temp_dry\": 45,\n  \"distance_km\": 600,\n  \"lat\": 13.1939,\n  \"lng\": 40.3006\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/destinations",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations"]
+            }
+          }
+        },
+        {
+          "name": "Update Destination",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": \"40,000 ETB\",\n  \"rating\": 4.9\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/destinations/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Destination",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/destinations/5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "destinations", "5"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "✈️ Trips",
+      "item": [
+        {
+          "name": "Get All Trips",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/trips",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips"]
+            }
+          }
+        },
+        {
+          "name": "Get Trip by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/trips/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "1"]
+            }
+          }
+        },
+        {
+          "name": "Create Trip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destination\": \"Simien Mountains\",\n  \"startDate\": \"2026-07-01\",\n  \"endDate\": \"2026-07-10\",\n  \"budget\": 75000,\n  \"activities\": [\"Hiking\", \"Wildlife viewing\", \"Photography\"],\n  \"accommodation\": \"Mountain lodge\",\n  \"notes\": \"Looking for experienced guide\",\n  \"costBreakdown\": {\n    \"accommodation\": 30000,\n    \"food\": 20000,\n    \"transport\": 15000,\n    \"activities\": 10000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips"]
+            }
+          }
+        },
+        {
+          "name": "Update Trip",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"budget\": 80000,\n  \"notes\": \"Updated notes\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "2"]
+            }
+          }
+        },
+        {
+          "name": "Approve Trip",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approval_status\": \"approved\",\n  \"notes\": \"Approved by admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/trips/2/approval",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "2", "approval"]
+            }
+          }
+        },
+        {
+          "name": "Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/trips/2",
+              "host": ["{{base_url}}"],
+              "path": ["api", "trips", "2"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Travel Requests",
+      "item": [
+        {
+          "name": "Get All Travel Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/travel-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "travel-requests"]
+            }
+          }
+        },
+        {
+          "name": "Submit Travel Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Ahmed Hassan\",\n  \"email\": \"ahmed@example.com\",\n  \"phone\": \"+251911234567\",\n  \"nationality\": \"Ethiopian\",\n  \"age\": 35,\n  \"gender\": \"Male\",\n  \"desiredDestination\": \"Lalibela\",\n  \"preferredStartDate\": \"2026-06-01\",\n  \"preferredEndDate\": \"2026-06-07\",\n  \"budgetHint\": \"50000-100000 ETB\",\n  \"accommodationPreference\": \"Hotel\",\n  \"specialRequests\": \"Vegetarian meals\",\n  \"travelHistory\": \"First time to Ethiopia\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/travel-requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "travel-requests"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Health & Stats",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            }
+          }
+        },
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "stats"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
