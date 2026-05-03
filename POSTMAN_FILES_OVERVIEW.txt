@@ -1,0 +1,296 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                   ETHIOTRAVEL API - POSTMAN DOCUMENTATION                      ║
+║                          Complete Setup & Reference                            ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+📁 DOCUMENTATION FILES CREATED
+═══════════════════════════════════════════════════════════════════════════════
+
+1. 📘 README_POSTMAN.md
+   ├─ Main comprehensive guide
+   ├─ Quick start (5 minutes)
+   ├─ Environment setup
+   ├─ Test users
+   ├─ Common workflows
+   └─ Troubleshooting
+
+2. 📗 POSTMAN_API_GUIDE.md
+   ├─ All 25+ endpoints documented
+   ├─ Request/response examples
+   ├─ Headers and authentication
+   ├─ Admin-only endpoints
+   ├─ Error handling
+   └─ Setup instructions
+
+3. 📙 POSTMAN_SETUP_STEPS.md
+   ├─ Download Postman
+   ├─ Import collection
+   ├─ Create environments
+   ├─ Test endpoints
+   ├─ Troubleshooting
+   └─ Tips & tricks
+
+4. 📕 API_QUICK_REFERENCE.md
+   ├─ Quick endpoint reference
+   ├─ Test users
+   ├─ Response formats
+   ├─ Status codes
+   ├─ Common requests
+   └─ Workflows
+
+5. 📦 EthioTravel_Complete_API.postman_collection.json
+   ├─ 25+ pre-configured requests
+   ├─ Organized by feature
+   ├─ Auto-save token functionality
+   ├─ Test scripts included
+   └─ Ready to import
+
+6. 📋 POSTMAN_DOCUMENTATION_SUMMARY.md
+   ├─ Overview of all files
+   ├─ Quick start
+   ├─ Environment URLs
+   ├─ Test credentials
+   ├─ API endpoints list
+   └─ Common workflows
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🌐 ENVIRONMENT URLS
+═══════════════════════════════════════════════════════════════════════════════
+
+LOCAL DEVELOPMENT:
+  Backend:  http://localhost:5001
+  Frontend: http://localhost:3000
+
+PRODUCTION (RENDER):
+  Backend:  https://travel-planner-backend-f9gd.onrender.com
+  Frontend: https://travel-planner-app-2026.vercel.app
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🧪 TEST USERS
+═══════════════════════════════════════════════════════════════════════════════
+
+ADMIN:
+  Username: ashu
+  Email:    ashenafiabebe604@gmail.com
+  Password: Ashu19951?
+  Role:     Admin
+
+AGENT:
+  Username: agent_jane
+  Email:    jane@ethiotravel.com
+  Password: Ashu19951?
+  Role:     Agent
+
+USER:
+  Username: traveler_bob
+  Email:    bob@gmail.com
+  Password: Ashu19951?
+  Role:     User
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 API ENDPOINTS (25+)
+═══════════════════════════════════════════════════════════════════════════════
+
+🔐 AUTHENTICATION (6 endpoints)
+  ✓ POST   /api/login                    - Login user
+  ✓ POST   /api/users                    - Register user
+  ✓ GET    /api/me                       - Get current user
+  ✓ PUT    /api/me                       - Update profile
+  ✓ DELETE /api/me                       - Delete account
+
+👥 USER MANAGEMENT (5 endpoints)
+  ✓ GET    /api/users                    - Get all users (Admin)
+  ✓ GET    /api/users/:id                - Get user by ID
+  ✓ PUT    /api/users/:id                - Update user (Admin)
+  ✓ PATCH  /api/users/:id                - Partial update (Admin)
+  ✓ DELETE /api/users/:id                - Delete user (Admin)
+
+🏖️ DESTINATIONS (4 endpoints)
+  ✓ GET    /api/destinations             - Get all destinations
+  ✓ POST   /api/destinations             - Create destination (Admin)
+  ✓ PUT    /api/destinations/:id         - Update destination (Admin)
+  ✓ DELETE /api/destinations/:id         - Delete destination (Admin)
+
+✈️ TRIPS (6 endpoints)
+  ✓ GET    /api/trips                    - Get all trips
+  ✓ GET    /api/trips/:id                - Get trip by ID
+  ✓ POST   /api/trips                    - Create trip
+  ✓ PUT    /api/trips/:id                - Update trip
+  ✓ PATCH  /api/trips/:id/approval       - Approve trip (Admin)
+  ✓ DELETE /api/trips/:id                - Delete trip
+
+📝 TRAVEL REQUESTS (2 endpoints)
+  ✓ GET    /api/travel-requests          - Get all requests (Admin)
+  ✓ POST   /api/travel-requests          - Submit request
+
+🔔 HEALTH & STATS (2 endpoints)
+  ✓ GET    /api/health                   - Health check
+  ✓ GET    /api/stats                    - Get statistics
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 QUICK START (5 MINUTES)
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Download Postman
+   → https://www.postman.com/downloads/
+
+2. Import Collection
+   → File → Import → EthioTravel_Complete_API.postman_collection.json
+
+3. Create Environment
+   → Environments → Create New
+   → Name: EthioTravel Local
+   → base_url: http://localhost:5001
+
+4. Select Environment
+   → Top right corner → Select EthioTravel Local
+
+5. Test Login
+   → Authentication → Login → Send
+   → Token auto-saves to environment
+
+✅ DONE! You're ready to test the API
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📋 COMMON WORKFLOWS
+═══════════════════════════════════════════════════════════════════════════════
+
+ADMIN WORKFLOW:
+  1. Login as admin
+  2. GET /api/users → View all users
+  3. PATCH /api/users/:id → Approve agent
+  4. GET /api/travel-requests → View requests
+  5. PATCH /api/trips/:id/approval → Approve trip
+
+USER WORKFLOW:
+  1. POST /api/users → Register
+  2. POST /api/login → Login
+  3. POST /api/trips → Create trip
+  4. GET /api/trips → View my trips
+  5. PUT /api/me → Update profile
+
+AGENT WORKFLOW:
+  1. POST /api/users (role: agent) → Register as agent
+  2. Wait for admin approval
+  3. POST /api/login → Login
+  4. GET /api/travel-requests → View requests
+  5. PUT /api/me → Update profile
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔐 AUTHENTICATION FLOW
+═══════════════════════════════════════════════════════════════════════════════
+
+1. POST /api/login
+   ↓
+2. Get token in response
+   ↓
+3. Token auto-saved to {{token}} environment variable
+   ↓
+4. Use {{token}} in Authorization header for protected endpoints
+   ↓
+5. Token expires in 7 days
+   ↓
+6. Login again to get new token
+
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ COMMON ISSUES & SOLUTIONS
+═══════════════════════════════════════════════════════════════════════════════
+
+Issue: Cannot GET /api/login
+→ Solution: Start backend: npm start (in backend folder)
+
+Issue: Invalid API key
+→ Solution: Use test users for quick testing
+
+Issue: Unauthorized
+→ Solution: Login first to get token
+
+Issue: Token not found
+→ Solution: Run login request, check environment variables
+
+Issue: CORS Error
+→ Solution: Backend CORS configured for localhost:3000
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION GUIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+For Quick Setup (5 min)
+→ Read: README_POSTMAN.md
+
+For Detailed Reference (30 min)
+→ Read: POSTMAN_API_GUIDE.md
+
+For Step-by-Step Instructions (10 min)
+→ Read: POSTMAN_SETUP_STEPS.md
+
+For Quick Lookup (1 min)
+→ Use: API_QUICK_REFERENCE.md
+
+For Postman Import
+→ Use: EthioTravel_Complete_API.postman_collection.json
+
+For Overview
+→ Read: POSTMAN_DOCUMENTATION_SUMMARY.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ CHECKLIST
+═══════════════════════════════════════════════════════════════════════════════
+
+□ Download Postman
+□ Import collection
+□ Create environment
+□ Test login endpoint
+□ Explore other endpoints
+□ Create custom requests
+□ Share with team
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 STATISTICS
+═══════════════════════════════════════════════════════════════════════════════
+
+Total Endpoints:        25+
+Test Users:             3
+Environments:           2 (Local + Production)
+Documentation Files:    6
+Request Examples:       50+
+Response Examples:      25+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎉 YOU'RE ALL SET!
+═══════════════════════════════════════════════════════════════════════════════
+
+Everything you need to test the EthioTravel API is ready:
+
+✓ Complete API documentation
+✓ Ready-to-import Postman collection
+✓ Test users and credentials
+✓ Step-by-step setup guide
+✓ Quick reference card
+✓ Troubleshooting guide
+✓ Common workflows
+✓ Security best practices
+
+START TESTING NOW! 🚀
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 SUPPORT
+═══════════════════════════════════════════════════════════════════════════════
+
+GitHub: https://github.com/ashusoft1995/travel-planner-app-2026
+Version: 1.0.0
+Last Updated: May 3, 2026
+
+═══════════════════════════════════════════════════════════════════════════════
