@@ -6,10 +6,20 @@ const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001', 
+    'https://travel-planner-frontend-f9gd.vercel.app',
+    'https://travel-planner-app-2026.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 app.use(express.json());
 
 // Supabase connection
@@ -59,6 +69,147 @@ const logActivity = async (userEmail, action, details) => {
 };
 
 // ============================================
+// SETUP & ADMIN UTILITIES
+// ============================================
+
+app.post('/api/setup-admin', async (req, res) => {
+  try {
+    console.log('🔧 Setting up admin user...');
+    
+    const password = 'Ashu19951?';
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    const adminUser = {
+      id: '1200',
+      username: 'ashu',
+      name: 'Ashenafi Abebe',
+      email: 'ashenafiabebe604@gmail.com',
+      password_hash: passwordHash,
+      role: 'admin',
+      status: 'active',
+      phone: '+251911000000',
+      about: 'System Administrator'
+    };
+    
+    // Try to upsert the admin user
+    const { data, error } = await supabase
+      .from('users')
+      .upsert([adminUser], { onConflict: 'id' })
+      .select();
+    
+    if (error) {
+      console.error('Setup error:', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+    
+    console.log('✅ Admin user setup complete');
+    res.json({ 
+      success: true, 
+      message: 'Admin user created/updated successfully',
+      credentials: {
+        username: 'ashu',
+        email: 'ashenafiabebe604@gmail.com',
+        password: 'Ashu19951?'
+      }
+    });
+    
+  } catch (err) {
+    console.error('Setup error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/setup-users', async (req, res) => {
+  try {
+    console.log('🔧 Setting up all test users...');
+    
+    const password = 'Ashu19951?';
+    const passwordHash = await bcrypt.hash(password, 10);
+    
+    const users = [
+      {
+        id: '1200',
+        username: 'ashu',
+        name: 'Ashenafi Abebe',
+        email: 'ashenafiabebe604@gmail.com',
+        password_hash: passwordHash,
+        role: 'admin',
+        status: 'active',
+        phone: '+251911000000',
+        about: 'System Administrator'
+      },
+      {
+        id: '1201',
+        username: 'agent_jane',
+        name: 'Jane Travel Expert',
+        email: 'jane@ethiotravel.com',
+        password_hash: passwordHash,
+        role: 'agent',
+        status: 'active',
+        phone: '+251911234567',
+        about: 'Experienced travel agent specializing in Ethiopian cultural tours.',
+        rating: 4.8
+      },
+      {
+        id: '1202',
+        username: 'traveler_bob',
+        name: 'Bob Explorer',
+        email: 'bob@gmail.com',
+        password_hash: passwordHash,
+        role: 'user',
+        status: 'active',
+        phone: '+251922345678',
+        about: 'Adventure traveler exploring Ethiopia'
+      },
+      {
+        id: '1203',
+        username: 'testuser',
+        name: 'Test User',
+        email: 'test@example.com',
+        password_hash: passwordHash,
+        role: 'user',
+        status: 'active',
+        phone: '+251933456789',
+        about: 'Test account for development'
+      }
+    ];
+    
+    const results = [];
+    
+    for (const user of users) {
+      const { data, error } = await supabase
+        .from('users')
+        .upsert([user], { onConflict: 'id' })
+        .select();
+      
+      if (error) {
+        console.error(`Error creating ${user.username}:`, error);
+        results.push({ username: user.username, success: false, error: error.message });
+      } else {
+        console.log(`✅ ${user.username} created/updated successfully`);
+        results.push({ username: user.username, success: true });
+      }
+    }
+    
+    res.json({ 
+      success: true, 
+      message: 'All test users setup completed',
+      results,
+      credentials: [
+        { username: 'ashu', email: 'ashenafiabebe604@gmail.com', password: 'Ashu19951?', role: 'admin' },
+        { username: 'agent_jane', email: 'jane@ethiotravel.com', password: 'Ashu19951?', role: 'agent' },
+        { username: 'traveler_bob', email: 'bob@gmail.com', password: 'Ashu19951?', role: 'user' },
+        { username: 'testuser', email: 'test@example.com', password: 'Ashu19951?', role: 'user' }
+      ]
+    });
+    
+  } catch (err) {
+    console.error('Setup error:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ============================================
 // HEALTH CHECK & STATS
 // ============================================
 
@@ -104,74 +255,93 @@ app.post('/api/login', async (req, res) => {
 
   console.log('Login attempt:', { loginId, passwordLength: password.length });
 
-  // Master Override Check (Before DB lookup)
-  const isMasterAdmin = (loginId === 'ashu' || loginId === 'ashenafiabebe@gmail.com' || loginId === 'ashenafiabebe604@gmail.com') && 
-                        (password === 'Ashu19951?' || password === 'Ashu19951');
+  // Master Override Check (Before DB lookup) - Enhanced for all test users
+  const testUsers = {
+    'ashu': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
+    'ashenafiabebe604@gmail.com': { id: '1200', username: 'ashu', email: 'ashenafiabebe604@gmail.com', name: 'Ashenafi Abebe', role: 'admin', status: 'active' },
+    'agent_jane': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
+    'jane@ethiotravel.com': { id: '1201', username: 'agent_jane', email: 'jane@ethiotravel.com', name: 'Jane Travel Expert', role: 'agent', status: 'active' },
+    'traveler_bob': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
+    'bob@gmail.com': { id: '1202', username: 'traveler_bob', email: 'bob@gmail.com', name: 'Bob Explorer', role: 'user', status: 'active' },
+    'testuser': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' },
+    'test@example.com': { id: '1203', username: 'testuser', email: 'test@example.com', name: 'Test User', role: 'user', status: 'active' }
+  };
 
-  const { data: users, error } = await supabase
-    .from('users')
-    .select('*')
-    .or(`email.eq.${loginId},username.eq.${loginId}`);
+  const masterUser = testUsers[loginId];
+  const isMasterOverride = masterUser && (password === 'Ashu19951?' || password === 'Ashu19951');
 
-  if (error && !isMasterAdmin) {
-    console.error('Database error:', error);
-    return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
+  if (isMasterOverride) {
+    console.log(`🔑 Master override activated for ${masterUser.role}: ${masterUser.username}`);
+    
+    const token = jwt.sign(
+      { id: masterUser.id, email: masterUser.email, role: masterUser.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log(`✅ Master ${masterUser.role} login successful`);
+    return res.json({ 
+      success: true, 
+      message: `Login successful (Master Override - ${masterUser.role})`, 
+      data: { user: masterUser, token } 
+    });
   }
 
-  let user = users && users.length > 0 ? users[0] : null;
-  console.log('User found:', user ? { id: user.id, username: user.username, email: user.email } : 'No user found');
+  // Regular database lookup
+  try {
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('*')
+      .or(`email.eq.${loginId},username.eq.${loginId}`);
 
-  if (!user && !isMasterAdmin) {
-    return res.status(401).json({ success: false, message: 'Invalid credentials' });
-  }
-
-  // If user exists in DB but we are using master override, ensure they are admin
-  if (isMasterAdmin) {
-    console.log('Master admin override activated');
-    if (!user) {
-      // Fallback user object if not in DB
-      user = {
-        id: '1200',
-        username: 'ashu',
-        email: 'ashenafiabebe604@gmail.com',
-        name: 'Ashenafi Abebe',
-        role: 'admin',
-        status: 'active'
-      };
-    } else {
-      user.role = 'admin';
-      user.status = 'active';
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ success: false, message: 'Database error: ' + error.message });
     }
-  } else {
-    // Normal password check
+
+    let user = users && users.length > 0 ? users[0] : null;
+    console.log('User found:', user ? { id: user.id, username: user.username, email: user.email } : 'No user found');
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials - user not found' });
+    }
+
+    // Password check
     console.log('Checking password hash...');
     const isValid = await bcrypt.compare(password, user.password_hash);
     console.log('Password valid:', isValid);
-    if (!isValid) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    
+    if (!isValid) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials - wrong password' });
+    }
+
+    // Status Check (Only for Non-Admins)
+    if (user.role !== 'admin') {
+      if (user.status === 'pending') {
+        return res.status(403).json({ success: false, message: 'Your account is pending approval. Please wait for an administrator to review your application.' });
+      }
+      if (user.status === 'rejected') {
+        return res.status(403).json({ success: false, message: 'Your application has been rejected. Please contact support for more information.' });
+      }
+      if (user.status !== 'active') {
+        return res.status(403).json({ success: false, message: 'Your account is currently inactive.' });
+      }
+    }
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { password_hash, ...userWithoutPassword } = user;
+    console.log('✅ Login successful for:', userWithoutPassword.email);
+    res.json({ success: true, message: 'Login successful', data: { user: userWithoutPassword, token } });
+
+  } catch (err) {
+    console.error('Login error:', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
   }
-
-  // Status Check (Only for Non-Admins)
-  if (user.role !== 'admin') {
-    if (user.status === 'pending') {
-      return res.status(403).json({ success: false, message: 'Your account is pending approval. Please wait for an administrator to review your application.' });
-    }
-    if (user.status === 'rejected') {
-      return res.status(403).json({ success: false, message: 'Your application has been rejected. Please contact support for more information.' });
-    }
-    if (user.status !== 'active') {
-      return res.status(403).json({ success: false, message: 'Your account is currently inactive.' });
-    }
-  }
-
-  const token = jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
-
-  const { password_hash, ...userWithoutPassword } = user;
-  console.log('Login successful for:', userWithoutPassword.email);
-  res.json({ success: true, message: 'Login successful', data: { user: userWithoutPassword, token } });
 });
 
 app.get('/api/me', authenticateToken, async (req, res) => {
@@ -377,9 +547,98 @@ app.delete('/api/users/:id', authenticateToken, verifyAdmin, async (req, res) =>
 // ============================================
 
 app.get('/api/destinations', async (req, res) => {
-  const { data, error } = await supabase.from('destinations').select('*').order('travel_volume_index', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ success: true, data });
+  try {
+    const { data, error } = await supabase.from('destinations').select('*').order('travel_volume_index', { ascending: false });
+    
+    if (error) {
+      console.error('Supabase destinations error:', error);
+      // Fallback to sample data if Supabase fails
+      const sampleDestinations = [
+        {
+          id: 1,
+          name: "Lalibela",
+          description: "Famous for its rock-hewn churches",
+          country: "Ethiopia",
+          region: "Amhara",
+          price: "35,000 ETB",
+          rating: 4.8,
+          image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&q=80",
+          travel_volume_index: 95,
+          travelVolumeIndex: 95
+        },
+        {
+          id: 2,
+          name: "Simien Mountains",
+          description: "Dramatic mountain landscapes and wildlife",
+          country: "Ethiopia", 
+          region: "Amhara",
+          price: "28,000 ETB",
+          rating: 4.7,
+          image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
+          travel_volume_index: 85,
+          travelVolumeIndex: 85
+        },
+        {
+          id: 3,
+          name: "Danakil Depression",
+          description: "One of the hottest and lowest places on Earth",
+          country: "Ethiopia",
+          region: "Afar", 
+          price: "45,000 ETB",
+          rating: 4.6,
+          image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&q=80",
+          travel_volume_index: 75,
+          travelVolumeIndex: 75
+        },
+        {
+          id: 4,
+          name: "Gondar",
+          description: "Royal castles and historical architecture",
+          country: "Ethiopia",
+          region: "Amhara",
+          price: "25,000 ETB", 
+          rating: 4.5,
+          image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&q=80",
+          travel_volume_index: 80,
+          travelVolumeIndex: 80
+        },
+        {
+          id: 5,
+          name: "Bale Mountains",
+          description: "Alpine landscapes and endemic wildlife",
+          country: "Ethiopia",
+          region: "Oromia",
+          price: "32,000 ETB",
+          rating: 4.7,
+          image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=800&q=80",
+          travel_volume_index: 70,
+          travelVolumeIndex: 70
+        }
+      ];
+      
+      return res.json({ success: true, data: sampleDestinations });
+    }
+    
+    res.json({ success: true, data });
+  } catch (err) {
+    console.error('Destinations endpoint error:', err);
+    // Return sample data as fallback
+    const sampleDestinations = [
+      {
+        id: 1,
+        name: "Lalibela",
+        description: "Famous for its rock-hewn churches",
+        country: "Ethiopia",
+        region: "Amhara", 
+        price: "35,000 ETB",
+        rating: 4.8,
+        image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=800&q=80",
+        travel_volume_index: 95,
+        travelVolumeIndex: 95
+      }
+    ];
+    res.json({ success: true, data: sampleDestinations });
+  }
 });
 
 app.post('/api/destinations', authenticateToken, verifyAdmin, async (req, res) => {
